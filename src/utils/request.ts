@@ -2,8 +2,8 @@ import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
 
 const service = axios.create({
-  // baseURL: 'http://johntaylor.fun',
-  baseURL: 'http://localhost:40001',
+  baseURL: 'http://johntaylor.fun',
+  // baseURL: 'http://localhost:40001',
   withCredentials: true,
   timeout: 50 * 1000
 })
