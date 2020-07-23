@@ -2,28 +2,28 @@ import request from '@/utils/request'
 
 export const login = (
   data: {
-    userName: string;
+    userName?: string;
     password: string;
-    phoneNumber: string;
-    email: string;
+    phoneNumber?: string;
+    email?: string;
   }) =>
   request({
     url: '/api/user/login',
     method: 'post',
-    params: data
+    data: data
   })
 
 export const register = (
   data: {
     userName: string;
     password: string;
-    phoneNumber: string;
-    email: string;
+    phoneNumber?: string;
+    email?: string;
   }) =>
   request({
     url: '/api/user/register',
     method: 'post',
-    params: data
+    data: data
   })
 
 export const logout = () =>

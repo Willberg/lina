@@ -1,28 +1,28 @@
 <template>
-  <div class="login-container">
+  <div class="register-container">
     <el-form
-      ref="loginForm"
-      :model="loginForm"
-      :rules="loginRules"
-      class="login-form"
+      ref="registerForm"
+      :model="registerForm"
+      :rules="registerRules"
+      class="register-form"
       autocomplete="on"
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">登录</h3>
+        <h3 class="title">注册</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="userName">
         <span class="svg-container">
           <svg-icon name="user"/>
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.userName"
-          name="username"
+          ref="userName"
+          v-model="registerForm.userName"
+          name="userName"
           type="text"
           autocomplete="on"
-          placeholder="username"
+          placeholder="用户名"
         />
       </el-form-item>
 
@@ -33,24 +33,52 @@
         <el-input
           :key="passwordType"
           ref="password"
-          v-model="loginForm.password"
+          v-model="registerForm.password"
           :type="passwordType"
-          placeholder="password"
+          placeholder="密码"
           name="password"
           autocomplete="on"
-          @keyup.enter.native="handleLogin"
+          @keyup.enter.native="handleRegister"
         />
         <span class="show-pwd" @click="showPwd">
           <svg-icon :name="passwordType === 'password' ? 'eye-off' : 'eye-on'"/>
         </span>
       </el-form-item>
 
+      <el-form-item prop="phoneNumber">
+        <span class="svg-container">
+          <svg-icon name="user"/>
+        </span>
+        <el-input
+          ref="phoneNumber"
+          v-model="registerForm.phoneNumber"
+          name="phoneNumber"
+          type="text"
+          autocomplete="on"
+          placeholder="手机号"
+        />
+      </el-form-item>
+
+      <el-form-item prop="email">
+        <span class="svg-container">
+          <svg-icon name="user"/>
+        </span>
+        <el-input
+          ref="email"
+          v-model="registerForm.email"
+          name="email"
+          type="text"
+          autocomplete="on"
+          placeholder="邮箱"
+        />
+      </el-form-item>
+
       <el-button
         :loading="loading"
         type="primary"
         style="width: 100%; margin-bottom: 30px;"
-        @click.native.prevent="handleLogin"
-      >Sign in
+        @click.native.prevent="handleRegister"
+      >注册
       </el-button>
     </el-form>
   </div>
@@ -61,18 +89,42 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { Route } from 'vue-router'
 import { Dictionary } from 'vue-router/types/router'
 import { Form as ElForm, Input } from 'element-ui'
-import { isValidEmail, isValidLoginUser, isValidPhoneNumber } from '@/utils/validate'
+import { isValidEmail, isValidUsername } from '@/utils/validate'
 import { UserModule } from '@/store/modules/user'
 import md5 from 'js-md5'
 
 @Component({
-  name: 'Login'
+  name: 'Register'
 })
 export default class extends Vue {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private validLoginUser = (rule: any, value: string, callback: Function) => {
-    if (!isValidLoginUser(value)) {
-      callback(new Error('请输入正确的用户名或手机号或邮箱'))
+  private validateUserName = (rule: any, value: string, callback: Function) => {
+    if (!isValidUsername(value)) {
+      callback(new Error('请输入正确的用户名'))
+    } else {
+      callback()
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private validateEmail = (rule: any, value: string, callback: Function) => {
+    if (value === '') {
+      callback()
+    }
+    if (!isValidEmail(value)) {
+      callback(new Error('请输入正确的邮箱'))
+    } else {
+      callback()
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private validatePhoneNumber = (rule: any, value: string, callback: Function) => {
+    if (value === '') {
+      callback()
+    }
+    if (!isValidEmail(value)) {
+      callback(new Error('请输入正确的手机号'))
     } else {
       callback()
     }
@@ -87,13 +139,17 @@ export default class extends Vue {
     }
   }
 
-  private loginForm = {
+  private registerForm = {
     userName: '',
-    password: ''
+    password: '',
+    phoneNumber: '',
+    email: ''
   }
 
-  private loginRules = {
-    userName: [{ validator: this.validLoginUser, trigger: 'blur' }],
+  private registerRules = {
+    userName: [{ validator: this.validateUserName, trigger: 'blur' }],
+    phoneNumber: [{ validator: this.validatePhoneNumber, trigger: 'blur' }],
+    email: [{ validator: this.validateEmail, trigger: 'blur' }],
     password: [{ validator: this.validatePassword, trigger: 'blur' }]
   }
 
@@ -134,28 +190,23 @@ export default class extends Vue {
       })
     }
 
-    if (this.loginForm.userName === '') {
+    if (this.registerForm.userName === '') {
       (this.$refs.userName as Input).focus()
-    } else if (this.loginForm.password === '') {
+    } else if (this.registerForm.password === '') {
       (this.$refs.password as Input).focus()
     }
   }
 
-  private handleLogin () {
-    (this.$refs.loginForm as ElForm).validate(async (valid: boolean) => {
+  private handleRegister () {
+    (this.$refs.registerForm as ElForm).validate(async (valid: boolean) => {
       if (!valid) {
         return false
       }
 
       this.loading = true
-      const loginParam = {
-        userName: this.loginForm.userName,
-        password: md5(this.loginForm.password),
-        phoneNumber: isValidPhoneNumber(this.loginForm.userName) ? this.loginForm.userName : undefined,
-        email: isValidEmail(this.loginForm.userName) ? this.loginForm.userName : undefined
-      }
-
-      await UserModule.Login(loginParam)
+      const phoneNumber = this.registerForm.phoneNumber !== '' ? this.registerForm.phoneNumber : undefined
+      const email = this.registerForm.email !== '' ? this.registerForm.email : undefined
+      await UserModule.Register(this.registerForm.userName, md5(this.registerForm.password), phoneNumber, email)
       const user = UserModule.getUser()
       if (user) {
         await this.$router.push({
@@ -184,7 +235,7 @@ export default class extends Vue {
 <style lang="scss">
   // References: https://www.zhangxinxu.com/wordpress/2018/01/css-caret-color-first-line/
   @supports (-webkit-mask: none) and (not (cater-color: $loginCursorColor)) {
-    .login-container .el-input {
+    .register-container .el-input {
       input {
         color: $loginCursorColor;
       }
@@ -195,7 +246,7 @@ export default class extends Vue {
     }
   }
 
-  .login-container {
+  .register-container {
     .el-input {
       display: inline-block;
       height: 47px;
@@ -228,13 +279,13 @@ export default class extends Vue {
 </style>
 
 <style lang="scss" scoped>
-  .login-container {
+  .register-container {
     height: 100%;
     width: 100%;
     overflow: hidden;
     background-color: $loginBg;
 
-    .login-form {
+    .register-form {
       position: relative;
       width: 520px;
       max-width: 100%;

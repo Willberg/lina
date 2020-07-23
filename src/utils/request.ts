@@ -1,9 +1,9 @@
 import axios from 'axios'
-import qs from 'qs'
 import { Message, MessageBox } from 'element-ui'
 
 const service = axios.create({
-  baseURL: 'http://johntaylor.fun',
+  // baseURL: 'http://johntaylor.fun',
+  baseURL: 'http://localhost:40001',
   withCredentials: true,
   timeout: 50 * 1000
 })
@@ -15,7 +15,6 @@ service.interceptors.request.use(
     config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
     if (config.method === 'post') {
       config.headers['Content-Type'] = 'application/json;charset=UTF-8'
-      config.data = qs.stringify(config.params)
     }
     return config
   },
@@ -34,8 +33,8 @@ service.interceptors.response.use(
         MessageBox.confirm(
           res.message,
           {
-            confirmButtonText: 'Relogin',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: '重新登录',
+            cancelButtonText: '取消',
             type: 'warning'
           }
         ).then(() => {

@@ -4,27 +4,26 @@ import request from '@/utils/request'
 export const openAddTodo = (
   data: {
     task: string;
-    value: number;
-    estimateTime: number;
+    value?: number;
     priority: number;
   }) =>
   request({
     url: '/api/open/todo/add',
     method: 'post',
-    params: data
+    data: data
   })
 
 // 更新任务(开放)
 export const openUpdateTodo = (
   data: {
     id: number;
-    task: string;
-    priority: number;
+    task?: string;
+    priority?: number;
   }) => {
   return request({
     url: '/api/open/todo/update',
     method: 'post',
-    params: data
+    data: data
   })
 }
 
