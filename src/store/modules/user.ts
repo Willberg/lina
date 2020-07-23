@@ -3,7 +3,7 @@ import { login, logout, register } from '@/api/user'
 import store from '@/store'
 
 export interface UserInterface {
-  getUser (): any
+  getUser (): any;
 }
 
 // dynamic: 必须为true,否则会无法引用这里的函数
