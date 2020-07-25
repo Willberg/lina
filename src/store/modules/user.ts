@@ -5,7 +5,7 @@ import store from '@/store'
 // dynamic: 必须为true,否则会无法引用这里的函数
 @Module({ name: 'User', dynamic: true, store: store, namespaced: true })
 class User extends VuexModule {
-  user = undefined
+  user = sessionStorage.getItem('user') || undefined
 
   get userProfile () {
     return this.user

@@ -64,9 +64,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
-import { Route } from 'vue-router'
-import { Dictionary } from 'vue-router/types/router'
+import { Component, Vue } from 'vue-property-decorator'
 import { Form as ElForm, Input } from 'element-ui'
 import { isValidEmail, isValidLoginUser, isValidPhoneNumber } from '@/utils/validate'
 import { UserModule } from '@/store/modules/user'
@@ -106,8 +104,6 @@ export default class extends Vue {
 
   private passwordType = 'password'
   private loading = false
-  private redirect?: string
-  private otherQuery: Dictionary<string> = {}
 
   private showPwd () {
     if (this.passwordType === 'password') {
@@ -120,25 +116,13 @@ export default class extends Vue {
     })
   }
 
-  @Watch('$route', { immediate: true })
-  private onRouteChange (route: Route) {
-    // TODO: remove the "as Dictionary<string>" hack after v4 release for vue-router
-    // See https://github.com/vuejs/vue-router/pull/2050 for details
-    const query = route.query as Dictionary<string>
-    if (query) {
-      this.redirect = query.redirect
-      this.otherQuery = this.getOtherQuery(query)
-    }
-  }
-
   mounted () {
     // html加载完成后执行。执行顺序：子组件-父组件
     const user = UserModule.userProfile
     if (user) {
       console.log(user)
       this.$router.push({
-        path: this.redirect || '/',
-        query: this.otherQuery
+        path: '/'
       })
     }
 
@@ -166,8 +150,7 @@ export default class extends Vue {
       const status = await UserModule.Login(loginParam)
       if (status) {
         await this.$router.push({
-          path: this.redirect || '/',
-          query: this.otherQuery
+          path: '/'
         })
       } else {
         this.loading = false
@@ -177,18 +160,8 @@ export default class extends Vue {
 
   private async handleRegister () {
     await this.$router.push({
-      path: this.redirect || '/register',
-      query: this.otherQuery
+      path: '/register'
     })
-  }
-
-  private getOtherQuery (query: Dictionary<string>) {
-    return Object.keys(query).reduce((acc, cur) => {
-      if (cur !== 'redirect') {
-        acc[cur] = query[cur]
-      }
-      return acc
-    }, {} as Dictionary<string>)
   }
 }
 </script>

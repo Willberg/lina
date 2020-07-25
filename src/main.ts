@@ -20,6 +20,18 @@ Vue.use(SvgIcon, {
 })
 
 new Vue({
+  created () {
+    //在页面加载时读取sessionStorage里的状态信息
+    const saveStore = sessionStorage.getItem("store")
+    if (saveStore) {
+      this.$store.replaceState(Object.assign({}, this.$store.state, JSON.parse(saveStore)))
+    }
+
+    //在页面刷新时将vuex里的信息保存到sessionStorage里
+    window.addEventListener("beforeunload", () => {
+      sessionStorage.setItem("store", JSON.stringify(this.$store.state))
+    })
+  },
   router,
   store,
   render: h => h(App)
