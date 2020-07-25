@@ -80,6 +80,13 @@
         @click.native.prevent="handleRegister"
       >注册
       </el-button>
+
+      <el-button
+        type="info"
+        style="width: 100%; margin-left: 0; margin-bottom: 30px;"
+        @click.native.prevent="handleLogin"
+      >登录
+      </el-button>
     </el-form>
   </div>
 </template>
@@ -182,7 +189,7 @@ export default class extends Vue {
 
   mounted () {
     // html加载完成后执行。执行顺序：子组件-父组件
-    const user = UserModule.getUser()
+    const user = UserModule.userProfile
     if (user) {
       this.$router.push({
         path: this.redirect || '/',
@@ -204,20 +211,28 @@ export default class extends Vue {
       }
 
       this.loading = true
-      const phoneNumber = this.registerForm.phoneNumber !== '' ? this.registerForm.phoneNumber : undefined
-      const email = this.registerForm.email !== '' ? this.registerForm.email : undefined
-      await UserModule.Register(this.registerForm.userName, md5(this.registerForm.password), phoneNumber, email)
-      const user = UserModule.getUser()
-      if (user) {
+      const registerParam = {
+        userName: this.registerForm.userName,
+        password: md5(this.registerForm.password),
+        phoneNumber: this.registerForm.phoneNumber !== '' ? this.registerForm.phoneNumber : undefined,
+        email: this.registerForm.email !== '' ? this.registerForm.email : undefined
+      }
+      const status = await UserModule.Register(registerParam)
+      if (status) {
         await this.$router.push({
           path: this.redirect || '/',
           query: this.otherQuery
         })
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.loading = false
-        }, 0.5 * 1000)
+      } else {
+        this.loading = false
       }
+    })
+  }
+
+  private async handleLogin () {
+    await this.$router.push({
+      path: this.redirect || '/login',
+      query: this.otherQuery
     })
   }
 

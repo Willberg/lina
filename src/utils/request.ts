@@ -27,7 +27,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response) => {
     const res = response.data
-    // console.log(res)
+    console.log(res)
     if (!res.status) {
       if (res.code === 'user.0002') {
         MessageBox.confirm(
@@ -38,20 +38,18 @@ service.interceptors.response.use(
             type: 'warning'
           }
         ).then(() => {
-          location.reload() // To prevent bugs from vue-router
+          location.assign("#/login")
+          // location.reload() // To prevent bugs from vue-router
         })
       } else {
         Message({
           message: res.message || '解析错误',
           type: 'error',
-          duration: 5 * 1000
+          duration: 3 * 1000
         })
       }
-      return Promise.reject(new Error(res.message || 'Error'))
-    } else {
-      // axios官方库上的解决方法，不能返回response.data，否则找不到数据
-      return response
     }
+    return res
   },
   (error) => {
     Message({

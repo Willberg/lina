@@ -1,39 +1,45 @@
-import { Action, getModule, Module, VuexModule } from 'vuex-module-decorators'
+import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import { login, logout, register } from '@/api/user'
 import store from '@/store'
 
-export interface UserInterface {
-  getUser (): any;
-}
-
 // dynamic: 必须为true,否则会无法引用这里的函数
 @Module({ name: 'User', dynamic: true, store: store, namespaced: true })
-class User extends VuexModule implements UserInterface {
-  public user: any
+class User extends VuexModule {
+  user = undefined
 
-  @Action({ rawError: true })
-  public async Login (userInfo: { userName?: string; password: string; phoneNumber?: string; email?: string }) {
-    const { data } = await login(userInfo)
-    this.user = data
+  get userProfile () {
+    return this.user
+  }
+
+  @Mutation
+  setUser (user: any) {
+    this.user = user
   }
 
   @Action({ rawError: true })
-  public async Register (userName: string, password: string, phoneNumber?: string, email?: string) {
-    const { data } = await register({ userName, password, phoneNumber, email })
-    this.user = data
+  public async Login (userInfo: { userName?: string; password: string; phoneNumber?: string; email?: string }) {
+    const result = await login(userInfo)
+    if (result.status) {
+      this.context.commit('setUser', result.data)
+    }
+    return result.status
+  }
+
+  @Action({ rawError: true })
+  public async Register (registerInfo: { userName: string, password: string, phoneNumber?: string, email?: string }) {
+    const result = await register(registerInfo)
+    if (result.status) {
+      this.context.commit('setUser', result.data)
+    }
+    return result.status
   }
 
   @Action({ rawError: true })
   public async Logout () {
-    const { data } = await logout()
-    if (data.status) {
-      this.user = undefined
+    const result = await logout()
+    if (result.status) {
+      this.context.commit('setUser', undefined)
     }
-  }
-
-  public getUser (): any {
-    console.log(this.user)
-    return this.user
   }
 }
 

@@ -12,17 +12,17 @@
         <h3 class="title">登录</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="userName">
         <span class="svg-container">
           <svg-icon name="user"/>
         </span>
         <el-input
-          ref="username"
+          ref="userName"
           v-model="loginForm.userName"
-          name="username"
+          name="userName"
           type="text"
           autocomplete="on"
-          placeholder="username"
+          placeholder="请输入用户名或手机号或密码"
         />
       </el-form-item>
 
@@ -35,7 +35,7 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="password"
+          placeholder="请输入密码"
           name="password"
           autocomplete="on"
           @keyup.enter.native="handleLogin"
@@ -50,7 +50,14 @@
         type="primary"
         style="width: 100%; margin-bottom: 30px;"
         @click.native.prevent="handleLogin"
-      >Sign in
+      >登录
+      </el-button>
+
+      <el-button
+        type="info"
+        style="width: 100%; margin-left: 0; margin-bottom: 30px;"
+        @click.native.prevent="handleRegister"
+      >注册
       </el-button>
     </el-form>
   </div>
@@ -126,8 +133,9 @@ export default class extends Vue {
 
   mounted () {
     // html加载完成后执行。执行顺序：子组件-父组件
-    const user = UserModule.getUser()
+    const user = UserModule.userProfile
     if (user) {
+      console.log(user)
       this.$router.push({
         path: this.redirect || '/',
         query: this.otherQuery
@@ -155,18 +163,22 @@ export default class extends Vue {
         email: isValidEmail(this.loginForm.userName) ? this.loginForm.userName : undefined
       }
 
-      await UserModule.Login(loginParam)
-      const user = UserModule.getUser()
-      if (user) {
+      const status = await UserModule.Login(loginParam)
+      if (status) {
         await this.$router.push({
           path: this.redirect || '/',
           query: this.otherQuery
         })
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.loading = false
-        }, 0.5 * 1000)
+      } else {
+        this.loading = false
       }
+    })
+  }
+
+  private async handleRegister () {
+    await this.$router.push({
+      path: this.redirect || '/register',
+      query: this.otherQuery
     })
   }
 
