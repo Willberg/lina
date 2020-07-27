@@ -120,7 +120,6 @@ export default class extends Vue {
     // html加载完成后执行。执行顺序：子组件-父组件
     const user = UserModule.userProfile
     if (user) {
-      console.log(user)
       this.$router.push({
         path: '/'
       })

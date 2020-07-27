@@ -40,6 +40,7 @@ class User extends VuexModule {
     if (result.status) {
       this.context.commit('setUser', undefined)
     }
+    return result.status
   }
 }
 

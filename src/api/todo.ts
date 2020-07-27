@@ -1,5 +1,4 @@
 import request from '@/utils/request'
-import qs from 'qs'
 
 // 批量增加任务
 export const patchAddTodo = (
@@ -48,7 +47,7 @@ export const listTodoGroup = (
   request({
     url: '/api/todo/group/list',
     method: 'get',
-    params: qs.stringify(data)
+    params: data
   })
 
 // 查询任务列表

@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
+import { UserModule } from "@/store/modules/user";
 
 const service = axios.create({
   baseURL: 'http://johntaylor.fun',
@@ -27,7 +28,6 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response) => {
     const res = response.data
-    console.log(res)
     if (!res.status) {
       if (res.code === 'user.0002') {
         MessageBox.confirm(
@@ -38,8 +38,10 @@ service.interceptors.response.use(
             type: 'warning'
           }
         ).then(() => {
-          location.assign("#/login")
-          // location.reload() // To prevent bugs from vue-router
+          // 重新登录，要清除vuex
+          // sessionStorage.clear()
+          UserModule.context.commit('setUser', undefined)
+          location.reload() // To prevent bugs from vue-router
         })
       } else {
         Message({
