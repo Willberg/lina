@@ -1,9 +1,6 @@
 <template>
   <div>
-    <el-menu class="el-menu-demo" mode="horizontal" background-color="#30B08F" text-color="#f4f4f5">
-      <el-menu-item index="1">首页</el-menu-item>
-      <el-menu-item index="2" style="position:absolute;right:0;" @click.native.prevent="handleLogout">退出</el-menu-item>
-    </el-menu>
+    <Nav></Nav>
     <el-table
       v-loading="listLoading"
       :data="tableData"
@@ -72,10 +69,14 @@ import { Component, Vue } from 'vue-property-decorator'
 import { UserModule } from '@/store/modules/user'
 import { listTodoGroup } from "@/api/todo";
 import moment from 'moment'
-import { ITodoGroup } from "@/api/types";
+import { ITodoGroup } from '@/api/types';
+import Nav from '@/components/navbar/index.vue'
 
 @Component({
-  name: 'Home'
+  name: 'Home',
+  components: {
+    Nav
+  }
 })
 export default class extends Vue {
   private tableData: ITodoGroup[] = []
@@ -137,15 +138,6 @@ export default class extends Vue {
     } else {
       // 已登录，加载初始数据
       this.getTodoGroupList()
-    }
-  }
-
-  private async handleLogout () {
-    const status = await UserModule.Logout()
-    if (status) {
-      await this.$router.push({
-        path: '/login'
-      })
     }
   }
 }
