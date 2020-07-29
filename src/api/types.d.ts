@@ -12,14 +12,15 @@ export interface ITodoGroup {
 export interface ITodo {
   id: number
   groupId: number
+  cp: string
   createDate: string
-  simpleTask: string
   task: string
   value: number
   estimateTime: number
+  realityTime: number
   updateDateTime: string
-  priority: string
-  status: string
+  priority: number
+  status: number
 }
 
 export interface IRetTodo {
@@ -27,6 +28,7 @@ export interface IRetTodo {
   task: string
   value: number
   estimateTime: number
+  realityTime: number
   groupId: number
   createTime: number
   updateTime: number

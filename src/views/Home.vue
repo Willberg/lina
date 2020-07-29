@@ -4,12 +4,14 @@
     <el-table
       v-loading="listLoading"
       :data="tableData"
+      :default-sort = "{prop: 'createDate', order: 'descending'}"
       border
       fit
       highlight-current-row
       max-height="600"
       style="width: 100%;">
       <el-table-column
+        sortable
         fixed="left"
         align="center"
         prop="createDate"
@@ -88,6 +90,7 @@ export default class extends Vue {
 
   private async handleDetails(row: any) {
     localStorage.setItem("groupId", row.id)
+    localStorage.setItem("maxTime", row.maxTime)
     await this.$router.push({
       path: '/todoList'
     })

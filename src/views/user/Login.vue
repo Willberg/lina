@@ -151,6 +151,10 @@ export default class extends Vue {
         await this.$router.push({
           path: '/'
         })
+        // Just to simulate the time of the request,防止页面不跳转
+        setTimeout(() => {
+          this.loading = false
+        }, 0.5 * 1000)
       } else {
         this.loading = false
       }
