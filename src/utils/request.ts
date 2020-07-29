@@ -39,8 +39,7 @@ service.interceptors.response.use(
           }
         ).then(() => {
           // 重新登录，要清除vuex
-          // sessionStorage.clear()
-          UserModule.context.commit('setUser', undefined)
+          UserModule.setUser(undefined)
           location.reload() // To prevent bugs from vue-router
         })
       } else {

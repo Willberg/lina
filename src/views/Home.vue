@@ -118,7 +118,6 @@ export default class extends Vue {
           'updateDateTime': moment(t.updateTime).format("YYYY-MM-DD HH:mm:ss"),
           'status': t.status
         }
-        console.log(todoGroup)
         this.tableData.push(todoGroup)
       }
     }
