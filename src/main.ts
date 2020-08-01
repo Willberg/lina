@@ -9,6 +9,7 @@ import SvgIcon from 'vue-svgicon'
 import '@/icons/components'
 import '@/styles/element-variables.scss'
 import '@/styles/index.scss'
+import VueClipboard from 'vue-clipboard2'
 
 Vue.config.productionTip = false
 
@@ -18,6 +19,8 @@ Vue.use(SvgIcon, {
   defaultWidth: '1em',
   defaultHeight: '1em'
 })
+
+Vue.use(VueClipboard)
 
 new Vue({
   created () {

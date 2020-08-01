@@ -68,7 +68,7 @@
     <!-- Form -->
     <el-dialog title="修改任务组信息" :visible.sync="todoGroupFormVisible">
       <el-form :model="todoGroupForm">
-        <el-form-item label="最大时长" label-width="120px" align="left">
+        <el-form-item label="最大时长" label-width="120px">
           <el-tooltip content="请选择任务组最长工作时间(分钟)" placement="top">
             <el-input v-model="todoGroupForm.maxTime" autocomplete="off"></el-input>
           </el-tooltip>
@@ -86,6 +86,14 @@
         <el-button type="primary" @click="submitEdit" :loading="editLoading">确 定</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="分享url" :visible.sync="shareUrlVisible">
+      <el-link type="primary">{{shareUrl}}</el-link>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="button" v-clipboard:copy="shareUrl">拷 贝</el-button>
+        <el-button @click="shareUrlVisible=false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -96,6 +104,7 @@ import { listTodoGroup, updateTodoGroup } from "@/api/todo";
 import moment from 'moment'
 import { ITodoGroup } from '@/api/types';
 import Nav from '@/components/navbar/index.vue'
+import { createUrl } from "@/api/user";
 
 @Component({
   name: 'Home',
@@ -107,6 +116,8 @@ export default class extends Vue {
   private tableData: ITodoGroup[] = []
   private listLoading = true
   private editLoading = false
+  private shareUrlVisible = false
+  private shareUrl = ''
   private todoGroupFormVisible = false
   private todoGroupForm: any = {}
   private pendingTodoGroup: ITodoGroup | undefined
@@ -165,8 +176,16 @@ export default class extends Vue {
     this.editLoading = false
   }
 
-  private async handleShare () {
-
+  private async handleShare (todoGroup: ITodoGroup) {
+    this.shareUrlVisible = true
+    const param = {
+      url: location.protocol + '//' + location.host + '/#/todoList',
+      groupId: todoGroup.id
+    }
+    const result = await createUrl(param)
+    if (result.status) {
+      this.shareUrl = result.data
+    }
   }
 
   private async getTodoGroupList () {
