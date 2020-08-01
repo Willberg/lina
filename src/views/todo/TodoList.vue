@@ -96,6 +96,52 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- Form -->
+    <el-dialog title="修改任务信息" :visible.sync="todoFormVisible">
+      <el-form :model="todoForm">
+        <el-form-item label="任务内容" label-width="120px">
+          <el-tooltip content="请修改任务" placement="top">
+            <el-input v-model="todoForm.task" autocomplete="off"></el-input>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="优先级" label-width="120px">
+          <el-tooltip content="请选择优先级(数字越小优先级越高,重要且紧急>紧急不重要>重要不紧急>既不重要也不紧急)" placement="top">
+            <el-select v-model="todoForm.priority" placeholder="请选择优先级">
+              <el-option v-for="p in priorities" :label="p.label" :value="p.value"></el-option>
+            </el-select>
+          </el-tooltip>
+        </el-form-item>
+        <div v-if="!isOpen">
+          <el-form-item label="任务价值" label-width="120px">
+            <el-tooltip content="请修改任务价值(1-100)" placement="top">
+              <el-input v-model="todoForm.value" autocomplete="off"></el-input>
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="预估时间" label-width="120px">
+            <el-tooltip content="请修改任务预估时间(分钟)" placement="top">
+              <el-input v-model="todoForm.estimateTime" autocomplete="off"></el-input>
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="实际时间" label-width="120px">
+            <el-tooltip content="请修改任务实际时间(分钟)" placement="top">
+              <el-input v-model="todoForm.realityTime" autocomplete="off"></el-input>
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="任务状态" label-width="120px">
+            <el-tooltip content="请选择任务状态" placement="top">
+              <el-select v-model="todoForm.status" placeholder="请选择任务状态">
+                <el-option v-for="s in statusGroup" :label="s.label" :value="s.value"></el-option>
+              </el-select>
+            </el-tooltip>
+          </el-form-item>
+        </div>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="todoFormVisible=false">取 消</el-button>
+        <el-button type="primary" @click="submitEdit" :loading="editLoading">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -103,9 +149,10 @@
 import { Component, Vue } from "vue-property-decorator";
 import Nav from "@/components/navbar/index.vue";
 import { IRetTodo, ITodo } from "@/api/types";
-import { listTodo } from "@/api/todo";
+import { listTodo, updateTodo } from "@/api/todo";
 import moment from "moment";
 import { UserModule } from "@/store/modules/user";
+import { openListTodo, openUpdateTodo } from "@/api/open/todo";
 
 @Component({
   name: 'TodoList',
@@ -126,21 +173,118 @@ export default class extends Vue {
   private listLoading = true
   private dataMap: Map<string, Array<ITodo>> = new Map<string, Array<ITodo>>()
 
+  private isOpen = false
+  private tokenStr: string | undefined
+  private todoFormVisible = false
+  private editLoading = false
+  private todoForm: any = {}
+  private oldTodo: ITodo | undefined
+  private statusGroup = [
+    { label: '初始', value: 1 },
+    { label: '等待', value: 10 },
+    { label: '处理中', value: 20 },
+    { label: '删除', value: 50 },
+    { label: '完成', value: 100 }
+  ]
+  private priorities = [
+    { label: '重要且紧急-1', value: 1 },
+    { label: '重要且紧急-2', value: 2 },
+    { label: '重要且紧急-3', value: 3 },
+    { label: '紧急不重要-1', value: 4 },
+    { label: '紧急不重要-2', value: 5 },
+    { label: '紧急不重要-3', value: 6 },
+    { label: '重要不紧急-1', value: 7 },
+    { label: '重要不紧急-2', value: 8 },
+    { label: '重要不紧急-3', value: 9 },
+    { label: '既不重要也不紧急', value: 10 }
+  ]
+
   mounted () {
     // html加载完成后执行。执行顺序：子组件-父组件
     const user = UserModule.userProfile
     if (user === undefined) {
-      this.$router.push({
-        path: '/login'
-      })
+      const token = this.$route.query.token
+      if ('string' !== typeof token) {
+        this.$router.push({
+          path: '/login'
+        })
+        return
+      }
+      const tokenStr = token.toString()
+      if (/^(\w|-)+\.(\w|-)+\.(\w|-)+$/.test(tokenStr)) {
+        // jwt获取数据
+        this.getOpenTodoList(tokenStr)
+      } else {
+        this.$router.push({
+          path: '/login'
+        })
+      }
     } else {
       // 已登录，加载初始数据
       this.getTodoList()
     }
   }
 
-  private async handleEdit () {
+  private handleEdit (todo: ITodo) {
+    this.oldTodo = todo
+    this.todoForm = {
+      id: todo.id,
+      task: todo.task,
+      priority: todo.priority,
+      value: todo.value,
+      estimateTime: todo.estimateTime,
+      realityTime: todo.realityTime,
+      status: todo.status
+    }
+    this.todoFormVisible = true
+  }
 
+  private async submitEdit () {
+    if (this.oldTodo !== undefined
+      && (this.oldTodo.task !== this.todoForm.task
+        || this.oldTodo.priority !== this.todoForm.priority
+        || this.oldTodo.value !== this.todoForm.value
+        || this.oldTodo.estimateTime !== this.todoForm.estimateTime
+        || this.oldTodo.realityTime !== this.todoForm.realityTime
+        || this.oldTodo.status !== this.todoForm.status)) {
+      if (this.isOpen) {
+        if (this.tokenStr === undefined) {
+          this.$message.error('你无权操作');
+          return
+        }
+        const result = await openUpdateTodo(this.tokenStr, {
+          id: this.todoForm.id,
+          task: this.todoForm.task,
+          priority: this.todoForm.priority
+        })
+        if (result.status) {
+          this.oldTodo.task = result.data.task
+          this.oldTodo.priority = result.data.priority
+        }
+      } else {
+        const result = await updateTodo(this.todoForm)
+        if (result.status) {
+          this.oldTodo.task = result.data.task
+          this.oldTodo.priority = result.data.priority
+          this.oldTodo.value = result.data.value
+          this.oldTodo.estimateTime = result.data.estimateTime
+          this.oldTodo.realityTime = result.data.realityTime
+          this.oldTodo.status = result.data.status
+        }
+      }
+    }
+    this.todoFormVisible = false
+    this.editLoading = false
+  }
+
+  private async getOpenTodoList (token: string) {
+    this.listLoading = true
+    const result = await openListTodo(token)
+    if (result.status) {
+      this.isOpen = true
+      this.tokenStr = token
+    }
+    this.handleTodoList(result)
   }
 
   private async getTodoList (status?: string) {
@@ -149,6 +293,13 @@ export default class extends Vue {
       groupId: parseInt(localStorage.getItem('groupId') || '0')
     }
     const result = await listTodo(param)
+    if (result.status) {
+      this.isOpen = false
+    }
+    this.handleTodoList(result, status)
+  }
+
+  private handleTodoList (result: any, status?: string) {
     if (result.status) {
       for (let k of Object.keys(result.data)) {
         result.data[k].forEach((v: IRetTodo) => {
@@ -190,7 +341,6 @@ export default class extends Vue {
           this.tableData.push(t)
         }
       }
-
     }
     // Just to simulate the time of the request
     setTimeout(() => {

@@ -203,9 +203,8 @@ export default class extends Vue {
       }
       const status = await UserModule.Register(registerParam)
       if (status) {
-        await this.$router.push({
-          path: '/'
-        })
+        // 防止router bug 不跳转
+        location.reload()
       }
       this.loading = false
     })

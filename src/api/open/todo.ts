@@ -15,6 +15,7 @@ export const openAddTodo = (
 
 // 更新任务(开放)
 export const openUpdateTodo = (
+  token: string,
   data: {
     id: number;
     task?: string;
@@ -23,13 +24,17 @@ export const openUpdateTodo = (
   return request({
     url: '/api/open/todo/update',
     method: 'post',
+    headers: { 'Authorization': 'Bearer ' + token },
     data: data
   })
 }
 
 // 查询任务列表(开放)
-export const openListTodo = () =>
+export const openListTodo = (
+  token: string
+) =>
   request({
-    url: '/api/todo/list',
-    method: 'get'
+    url: '/api/open/todo/list',
+    method: 'get',
+    headers: { 'Authorization': 'Bearer ' + token }
   })
