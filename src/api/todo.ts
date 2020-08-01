@@ -36,6 +36,21 @@ export const updateTodo = (
   })
 }
 
+// 更新任务
+export const updateTodoGroup = (
+  data: {
+    id: number;
+    maxTime?: number;
+    minPriority?: number;
+    isPrivate?: boolean;
+  }) => {
+  return request({
+    url: '/api/todo/group/update',
+    method: 'post',
+    data: data
+  })
+}
+
 // 查询任务组列表
 export const listTodoGroup = (
   data: {

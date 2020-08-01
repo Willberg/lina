@@ -4,7 +4,7 @@
     <el-table
       v-loading="listLoading"
       :data="tableData"
-      :default-sort = "{prop: 'createDate', order: 'descending'}"
+      :default-sort="{prop: 'createDate', order: 'descending'}"
       border
       fit
       highlight-current-row
@@ -60,16 +60,39 @@
         <template slot-scope="scope">
           <el-button @click="handleDetails(scope.row)" type="text" size="small">详情</el-button>
           <el-button @click="handleEdit(scope.row)" type="text" size="small">编辑</el-button>
+          <el-button @click="handleShare(scope.row)" type="text" size="small">分享</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- Form -->
+    <el-dialog title="修改任务组信息" :visible.sync="todoGroupFormVisible">
+      <el-form :model="todoGroupForm">
+        <el-form-item label="最大时长" label-width="120px" align="left">
+          <el-tooltip content="请选择任务组最长工作时间(分钟)" placement="top">
+            <el-input v-model="todoGroupForm.maxTime" autocomplete="off"></el-input>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item label="最小优先级" label-width="120px">
+          <el-tooltip content="请选择优先级(数字越小优先级越高，表示高于此优先级的任务会优先处理)" placement="top">
+            <el-select v-model="todoGroupForm.minPriority" placeholder="请选择优先级">
+              <el-option v-for="p in priorities" :label="p.label" :value="p.value"></el-option>
+            </el-select>
+          </el-tooltip>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="todoGroupFormVisible=false">取 消</el-button>
+        <el-button type="primary" @click="submitEdit" :loading="editLoading">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { UserModule } from '@/store/modules/user'
-import { listTodoGroup } from "@/api/todo";
+import { listTodoGroup, updateTodoGroup } from "@/api/todo";
 import moment from 'moment'
 import { ITodoGroup } from '@/api/types';
 import Nav from '@/components/navbar/index.vue'
@@ -83,12 +106,28 @@ import Nav from '@/components/navbar/index.vue'
 export default class extends Vue {
   private tableData: ITodoGroup[] = []
   private listLoading = true
+  private editLoading = false
+  private todoGroupFormVisible = false
+  private todoGroupForm: any = {}
+  private pendingTodoGroup: ITodoGroup | undefined
+  private priorities = [
+    { label: '1', value: 1 },
+    { label: '2', value: 2 },
+    { label: '3', value: 3 },
+    { label: '4', value: 4 },
+    { label: '5', value: 5 },
+    { label: '6', value: 6 },
+    { label: '7', value: 7 },
+    { label: '8', value: 8 },
+    { label: '9', value: 9 },
+    { label: '10', value: 10 }
+  ]
 
   private descStatus (status: number) {
     return status === 1 ? '进行中' : status === 50 ? '已删除' : '已完成'
   }
 
-  private async handleDetails(row: any) {
+  private async handleDetails (row: any) {
     localStorage.setItem("groupId", row.id)
     localStorage.setItem("maxTime", row.maxTime)
     await this.$router.push({
@@ -96,17 +135,47 @@ export default class extends Vue {
     })
   }
 
-  private async handleEdit() {
+  private handleEdit (todoGroup: ITodoGroup) {
+    this.todoGroupForm = {
+      id: todoGroup.id,
+      maxTime: todoGroup.maxTime,
+      minPriority: todoGroup.minPriority
+    }
+    this.pendingTodoGroup = todoGroup
+    this.todoGroupFormVisible = true
+  }
+
+  private async submitEdit () {
+    this.editLoading = true
+    if (this.pendingTodoGroup !== undefined
+      && (this.pendingTodoGroup.maxTime !== this.todoGroupForm.maxTime
+        || this.pendingTodoGroup.minPriority !== this.todoGroupForm.minPriority)) {
+      const param = {
+        id: this.todoGroupForm.id,
+        maxTime: this.todoGroupForm.maxTime,
+        minPriority: this.todoGroupForm.minPriority,
+      }
+      const result = await updateTodoGroup(param)
+      if (result.status) {
+        this.pendingTodoGroup.maxTime = result.data.maxTime
+        this.pendingTodoGroup.minPriority = result.data.minPriority
+      }
+    }
+    this.todoGroupFormVisible = false
+    this.editLoading = false
+  }
+
+  private async handleShare () {
 
   }
 
   private async getTodoGroupList () {
     this.listLoading = true
-    let param = {
-      offset: 0,
-      count: 100,
+    const param = {
+      // offset: 0,
+      // count: 10,
       // timeMillis: moment().unix() * 1000,
-      sort: 'asc',
+      sort: 'desc',
     }
     const result = await listTodoGroup(param)
     if (result.status) {
@@ -124,10 +193,7 @@ export default class extends Vue {
         this.tableData.push(todoGroup)
       }
     }
-    // Just to simulate the time of the request
-    setTimeout(() => {
-      this.listLoading = false
-    }, 0.5 * 1000)
+    this.listLoading = false
   }
 
   mounted () {

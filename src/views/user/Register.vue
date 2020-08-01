@@ -206,9 +206,8 @@ export default class extends Vue {
         await this.$router.push({
           path: '/'
         })
-      } else {
-        this.loading = false
       }
+      this.loading = false
     })
   }
 
