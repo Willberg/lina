@@ -2,6 +2,7 @@ import request from '@/utils/request'
 
 // 增加任务(开放)
 export const openAddTodo = (
+  token: string,
   data: {
     task: string;
     value?: number;
@@ -10,6 +11,7 @@ export const openAddTodo = (
   request({
     url: '/api/open/todo/add',
     method: 'post',
+    headers: { 'Authorization': 'Bearer ' + token },
     data: data
   })
 

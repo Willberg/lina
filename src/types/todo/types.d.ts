@@ -35,3 +35,10 @@ export interface IRetTodo {
   priority: number
   status: number
 }
+
+export interface IPatchAddTodo {
+  task: string;
+  value: number;
+  estimateTime: number;
+  priority: number;
+}

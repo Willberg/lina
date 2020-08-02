@@ -1,11 +1,12 @@
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import { login, logout, register } from '@/api/user'
 import store from '@/store'
+import { USER } from "@/constant/storageConstant";
 
 // dynamic: 必须为true,否则会无法引用这里的函数
 @Module({ name: 'User', dynamic: true, store: store, namespaced: true })
 class User extends VuexModule {
-  user = sessionStorage.getItem('user') || undefined
+  user = sessionStorage.getItem(USER) || undefined
 
   get userProfile () {
     return this.user

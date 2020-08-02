@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { IPatchAddTodo } from "@/types/todo/types";
 
 // 批量增加任务
 export const patchAddTodo = (
@@ -6,12 +7,7 @@ export const patchAddTodo = (
     groupId?: number;
     maxTime?: number;
     minPriority?: number;
-    todoList: [{
-      task: string;
-      value: number;
-      estimateTime: number;
-      priority: number;
-    }];
+    todoList: Array<IPatchAddTodo>;
   }) =>
   request({
     url: '/api/todo/patch/add',

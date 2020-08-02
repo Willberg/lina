@@ -3,13 +3,20 @@
     <Nav></Nav>
     <el-table
       v-loading="listLoading"
-      :data="tableData"
+      :data="todoGroupList"
       :default-sort="{prop: 'createDate', order: 'descending'}"
       border
       fit
       highlight-current-row
       max-height="600"
       style="width: 100%;">
+      <el-table-column
+        sortable
+        fixed="left"
+        align="center"
+        prop="id"
+        label="id">
+      </el-table-column>
       <el-table-column
         sortable
         fixed="left"
@@ -69,7 +76,7 @@
     <el-dialog title="修改任务组信息" :visible.sync="todoGroupFormVisible">
       <el-form :model="todoGroupForm">
         <el-form-item label="最大时长" label-width="120px">
-          <el-tooltip content="请选择任务组最长工作时间(分钟)" placement="top">
+          <el-tooltip content="请填写任务组最长工作时间(分钟)" placement="top">
             <el-input v-model="todoGroupForm.maxTime" autocomplete="off"></el-input>
           </el-tooltip>
         </el-form-item>
@@ -102,9 +109,11 @@ import { Component, Vue } from 'vue-property-decorator'
 import { UserModule } from '@/store/modules/user'
 import { listTodoGroup, updateTodoGroup } from "@/api/todo";
 import moment from 'moment'
-import { ITodoGroup } from '@/api/types';
+import { ITodoGroup } from '@/types/todo/types';
 import Nav from '@/components/navbar/index.vue'
 import { createUrl } from "@/api/user";
+import { todoGroupList, todoGroupPriorities } from "@/constant/todoConstant";
+import { GROUP_ID, MAX_TIME } from "@/constant/storageConstant";
 
 @Component({
   name: 'Home',
@@ -113,7 +122,7 @@ import { createUrl } from "@/api/user";
   }
 })
 export default class extends Vue {
-  private tableData: ITodoGroup[] = []
+  private todoGroupList: ITodoGroup[] = todoGroupList
   private listLoading = true
   private editLoading = false
   private shareUrlVisible = false
@@ -121,26 +130,15 @@ export default class extends Vue {
   private todoGroupFormVisible = false
   private todoGroupForm: any = {}
   private pendingTodoGroup: ITodoGroup | undefined
-  private priorities = [
-    { label: '1', value: 1 },
-    { label: '2', value: 2 },
-    { label: '3', value: 3 },
-    { label: '4', value: 4 },
-    { label: '5', value: 5 },
-    { label: '6', value: 6 },
-    { label: '7', value: 7 },
-    { label: '8', value: 8 },
-    { label: '9', value: 9 },
-    { label: '10', value: 10 }
-  ]
+  private priorities = todoGroupPriorities
 
   private descStatus (status: number) {
     return status === 1 ? '进行中' : status === 50 ? '已删除' : '已完成'
   }
 
   private async handleDetails (row: any) {
-    localStorage.setItem("groupId", row.id)
-    localStorage.setItem("maxTime", row.maxTime)
+    localStorage.setItem(GROUP_ID, row.id)
+    localStorage.setItem(MAX_TIME, row.maxTime)
     await this.$router.push({
       path: '/todoList'
     })
@@ -163,8 +161,14 @@ export default class extends Vue {
         || this.pendingTodoGroup.minPriority !== this.todoGroupForm.minPriority)) {
       const param = {
         id: this.todoGroupForm.id,
-        maxTime: this.todoGroupForm.maxTime,
-        minPriority: this.todoGroupForm.minPriority,
+        maxTime: undefined,
+        minPriority: undefined
+      }
+      if (this.pendingTodoGroup.maxTime !== this.todoGroupForm.maxTime) {
+        param.maxTime = this.todoGroupForm.maxTime
+      }
+      if (this.pendingTodoGroup.minPriority !== this.todoGroupForm.minPriority) {
+        param.minPriority = this.todoGroupForm.minPriority
       }
       const result = await updateTodoGroup(param)
       if (result.status) {
@@ -197,19 +201,21 @@ export default class extends Vue {
       sort: 'desc',
     }
     const result = await listTodoGroup(param)
+    // 拉取数据时要清空原来的数据
+    this.todoGroupList = []
     if (result.status) {
       for (let t of result.data) {
         const todoGroup = {
-          'id': t.id,
-          'createDate': moment(t.createTime).format("YYYY-MM-DD HH:mm:ss"),
-          'totalValue': t.value,
-          'totalTime': t.totalTime,
-          'maxTime': t.maxTime,
-          'minPriority': t.minPriority,
-          'updateDateTime': moment(t.updateTime).format("YYYY-MM-DD HH:mm:ss"),
-          'status': t.status
+          id: t.id,
+          createDate: moment(t.createTime).format("YYYY-MM-DD HH:mm:ss"),
+          totalValue: t.value,
+          totalTime: t.totalTime,
+          maxTime: t.maxTime,
+          minPriority: t.minPriority,
+          updateDateTime: moment(t.updateTime).format("YYYY-MM-DD HH:mm:ss"),
+          status: t.status
         }
-        this.tableData.push(todoGroup)
+        this.todoGroupList.push(todoGroup)
       }
     }
     this.listLoading = false

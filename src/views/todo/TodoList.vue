@@ -3,13 +3,20 @@
     <Nav></Nav>
     <el-table
       v-loading="listLoading"
-      :data="tableData"
+      :data="todoList"
       :default-sort="{prop: 'cp', order: 'descending'}"
       border
       fit
       highlight-current-row
       max-height="600"
       style="width: 100%;">
+      <el-table-column
+        fixed="left"
+        align="center"
+        prop="id"
+        width="160"
+        label="id">
+      </el-table-column>
       <el-table-column
         fixed="left"
         align="center"
@@ -148,11 +155,14 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Nav from "@/components/navbar/index.vue";
-import { IRetTodo, ITodo } from "@/api/types";
+import { IRetTodo, ITodo } from "@/types/todo/types";
 import { listTodo, updateTodo } from "@/api/todo";
 import moment from "moment";
 import { UserModule } from "@/store/modules/user";
 import { openListTodo, openUpdateTodo } from "@/api/open/todo";
+import { priorities, statusGroup, todoList } from '@/constant/todoConstant';
+import { GROUP_ID, TOKEN } from "@/constant/storageConstant";
+import { calCp } from "@/utils/todo";
 
 @Component({
   name: 'TodoList',
@@ -161,7 +171,7 @@ import { openListTodo, openUpdateTodo } from "@/api/open/todo";
   }
 })
 export default class extends Vue {
-  private tableData: ITodo[] = []
+  private todoList: ITodo[] = todoList
   private statusArray = ['1', '10', '20', '50', '100']
   private filterArray = [
     { text: '初始', value: '1' },
@@ -179,25 +189,8 @@ export default class extends Vue {
   private editLoading = false
   private todoForm: any = {}
   private oldTodo: ITodo | undefined
-  private statusGroup = [
-    { label: '初始', value: 1 },
-    { label: '等待', value: 10 },
-    { label: '处理中', value: 20 },
-    { label: '删除', value: 50 },
-    { label: '完成', value: 100 }
-  ]
-  private priorities = [
-    { label: '重要且紧急-1', value: 1 },
-    { label: '重要且紧急-2', value: 2 },
-    { label: '重要且紧急-3', value: 3 },
-    { label: '紧急不重要-1', value: 4 },
-    { label: '紧急不重要-2', value: 5 },
-    { label: '紧急不重要-3', value: 6 },
-    { label: '重要不紧急-1', value: 7 },
-    { label: '重要不紧急-2', value: 8 },
-    { label: '重要不紧急-3', value: 9 },
-    { label: '既不重要也不紧急', value: 10 }
-  ]
+  private statusGroup = statusGroup
+  private priorities = priorities
 
   mounted () {
     // html加载完成后执行。执行顺序：子组件-父组件
@@ -252,17 +245,52 @@ export default class extends Vue {
           this.$message.error('你无权操作');
           return
         }
-        const result = await openUpdateTodo(this.tokenStr, {
+        const param = {
           id: this.todoForm.id,
-          task: this.todoForm.task,
-          priority: this.todoForm.priority
-        })
+          task: undefined,
+          priority: undefined
+        }
+        if (this.oldTodo.task !== this.todoForm.task) {
+          param.task = this.todoForm.task
+        }
+        if (this.oldTodo.priority !== this.todoForm.priority) {
+          param.priority = this.todoForm.priority
+        }
+        const result = await openUpdateTodo(this.tokenStr, param)
         if (result.status) {
           this.oldTodo.task = result.data.task
           this.oldTodo.priority = result.data.priority
         }
       } else {
-        const result = await updateTodo(this.todoForm)
+        const param = {
+          id: this.todoForm.id,
+          task: undefined,
+          priority: undefined,
+          value: undefined,
+          estimateTime: undefined,
+          realityTime: undefined,
+          status: undefined
+        }
+
+        if (this.oldTodo.task !== this.todoForm.task) {
+          param.task = this.todoForm.task
+        }
+        if (this.oldTodo.value !== this.todoForm.value) {
+          param.value = this.todoForm.value
+        }
+        if (this.oldTodo.priority !== this.todoForm.priority) {
+          param.priority = this.todoForm.priority
+        }
+        if (this.oldTodo.estimateTime !== this.todoForm.estimateTime) {
+          param.estimateTime = this.todoForm.estimateTime
+        }
+        if (this.oldTodo.realityTime !== this.todoForm.realityTime) {
+          param.realityTime = this.todoForm.realityTime
+        }
+        if (this.oldTodo.status !== this.todoForm.status) {
+          param.status = this.todoForm.status
+        }
+        const result = await updateTodo(param)
         if (result.status) {
           this.oldTodo.task = result.data.task
           this.oldTodo.priority = result.data.priority
@@ -283,6 +311,8 @@ export default class extends Vue {
     if (result.status) {
       this.isOpen = true
       this.tokenStr = token
+      // openAdd使用
+      localStorage.setItem(TOKEN, token)
     }
     this.handleTodoList(result)
   }
@@ -290,7 +320,7 @@ export default class extends Vue {
   private async getTodoList (status?: string) {
     this.listLoading = true
     let param = {
-      groupId: parseInt(localStorage.getItem('groupId') || '0')
+      groupId: parseInt(localStorage.getItem(GROUP_ID) || '0')
     }
     const result = await listTodo(param)
     if (result.status) {
@@ -308,10 +338,7 @@ export default class extends Vue {
             t = new Array<ITodo>()
             this.dataMap.set(k, t)
           }
-          let cp = ((v.value || 100) / (v.estimateTime || 1)).toFixed(4)
-          if (k === '100') {
-            cp = (v.value / v.realityTime).toFixed(4)
-          }
+          let cp = calCp(v, k)
           let todo: ITodo = {
             id: v.id,
             groupId: v.groupId,
@@ -328,17 +355,20 @@ export default class extends Vue {
           t.push(todo)
         })
       }
+
+      // 拉取数据时要清空原来的数据
+      this.todoList = []
       if (!status) {
         for (let s of this.statusArray) {
           let processingTodoList = this.dataMap.get(s) || []
           for (let t of processingTodoList) {
-            this.tableData.push(t)
+            this.todoList.push(t)
           }
         }
       } else {
         let processingTodoList = this.dataMap.get(status) || []
         for (let t of processingTodoList) {
-          this.tableData.push(t)
+          this.todoList.push(t)
         }
       }
     }
