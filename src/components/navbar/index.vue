@@ -201,7 +201,7 @@ export default class extends Vue {
           priority: this.todoForm.priority
         })
         this.changeIsClearAdd(result.status)
-        handleTodoList(result, todoList)
+        handleTodoList(result, todoList, true)
       } else {
         const param = {
           groupId: this.todoForm.groupId,
@@ -216,7 +216,7 @@ export default class extends Vue {
         }
         const result = await patchAddTodo(param)
         this.changeIsClearAdd(result.status)
-        handleTodoList(result, todoList)
+        handleTodoList(result, todoList, true)
       }
     }
 

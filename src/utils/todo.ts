@@ -9,10 +9,20 @@ export const calCp = (v: IRetTodo, k: number | string) => {
   return cp
 }
 
-export const handleTodoList = (result: any, todoList: ITodo[]) => {
+export const handleTodoList = (result: any, todoList: ITodo[], isAdd?: boolean) => {
   if (result.status) {
-    // 拉取数据时要清空原来的数据
-    todoList.splice(0, todoList.length)
+    let needClear = isAdd === undefined || !isAdd
+    let todoMap: Map<number, ITodo> = new Map<number, ITodo>()
+    if (needClear) {
+      // 拉取数据时要清空原来的数据
+      todoList.splice(0, todoList.length)
+    } else {
+      for (let t of todoList) {
+        todoMap.set(t.id, t)
+      }
+      todoList.splice(0, todoList.length)
+    }
+
     result.data.forEach((v: IRetTodo) => {
       let cp = calCp(v, v.status)
       let todo: ITodo = {
@@ -28,7 +38,18 @@ export const handleTodoList = (result: any, todoList: ITodo[]) => {
         priority: v.priority,
         status: v.status
       }
-      todoList.push(todo)
+      if (needClear) {
+        todoList.push(todo)
+      } else {
+        // 更新或添加
+        todoMap.set(todo.id, todo)
+      }
     })
+    for (let key of todoMap.keys()) {
+      let t = todoMap.get(key)
+      if (t !== undefined) {
+        todoList.push(t)
+      }
+    }
   }
 }
