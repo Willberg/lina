@@ -37,3 +37,12 @@ export const todoGroupPriorities = [
 // home页面，todoList页面与Nav组件数据通信
 export const todoGroupList: ITodoGroup[] = []
 export const todoList: ITodo[] = []
+
+export const statusArray = ['1', '10', '20', '50', '100']
+export const filterArray = [
+  { text: '初始', value: '1' },
+  { text: '等待', value: '10' },
+  { text: '处理中', value: '20' },
+  { text: '删除', value: '50' },
+  { text: '完成', value: '100' }
+]

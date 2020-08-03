@@ -21,8 +21,11 @@
         sortable
         fixed="left"
         align="center"
-        prop="createDate"
+        prop="createTime"
         label="创建日期">
+<!--        <template slot-scope="scope">-->
+<!--          {{moment(scope.row.createTime).format("YYYY-MM-DD HH:mm:ss")}}-->
+<!--        </template>-->
       </el-table-column>
       <el-table-column
         align="center"
@@ -202,12 +205,12 @@ export default class extends Vue {
     }
     const result = await listTodoGroup(param)
     // 拉取数据时要清空原来的数据
-    this.todoGroupList = []
+    this.todoGroupList.splice(0, this.todoGroupList.length)
     if (result.status) {
       for (let t of result.data) {
         const todoGroup = {
           id: t.id,
-          createDate: moment(t.createTime).format("YYYY-MM-DD HH:mm:ss"),
+          createTime: t.createTime,
           totalValue: t.value,
           totalTime: t.totalTime,
           maxTime: t.maxTime,

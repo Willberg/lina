@@ -1,6 +1,6 @@
 export interface ITodoGroup {
   id: number
-  createDate: string
+  createTime: number
   totalValue: number
   totalTime: number
   maxTime: number

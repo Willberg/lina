@@ -71,7 +71,7 @@ import { patchAddTodo } from "@/api/todo";
 import { priorities, todoGroupList, todoGroupPriorities, todoList } from "@/constant/todoConstant";
 import { GROUP_ID, TOKEN } from "@/constant/storageConstant";
 import moment from "moment";
-import { calCp } from "@/utils/todo";
+import { handleTodoList } from "@/utils/todo";
 
 @Component({
   name: 'Nav'
@@ -79,6 +79,7 @@ import { calCp } from "@/utils/todo";
 export default class extends Vue {
   private isHome = true
   private isOpen = false
+  private isClearAdd = true
   private tokenStr: string | undefined
   private todoFormVisible = false
   private addLoading = false
@@ -104,6 +105,10 @@ export default class extends Vue {
   private handleAdd () {
     const token = localStorage.getItem(TOKEN)
     const groupId = localStorage.getItem(GROUP_ID)
+    //清空
+    if (this.isClearAdd) {
+      this.todoForm = {}
+    }
     if (groupId !== null) {
       this.todoForm.groupId = groupId
     }
@@ -112,8 +117,6 @@ export default class extends Vue {
       this.isOpen = true
       this.tokenStr = token
     }
-    console.log('isOpen:' + this.isOpen)
-    console.log('isHome:' + this.isHome)
     this.todoFormVisible = true
   }
 
@@ -122,7 +125,6 @@ export default class extends Vue {
       return false
     }
 
-    console.log(v.groupId)
     if (this.isHome) {
       if (v.maxTime === undefined
         || v.minPriority === undefined) {
@@ -150,8 +152,11 @@ export default class extends Vue {
     return true
   }
 
+  private changeIsClearAdd (status: any) {
+    this.isClearAdd = status
+  }
+
   private async submitAdd () {
-    console.log('检查：' + this.checkParam(this.todoForm))
     if (!this.checkParam(this.todoForm)) {
       this.$message.error('请填写完任务信息');
       return
@@ -169,11 +174,12 @@ export default class extends Vue {
         }]
       }
       const result = await patchAddTodo(param)
+      this.changeIsClearAdd(result.status)
       if (result.status) {
         const t = result.data
         const todoGroup = {
           id: t.id,
-          createDate: moment(t.createTime).format("YYYY-MM-DD HH:mm:ss"),
+          createTime: t.createTime,
           totalValue: t.value,
           totalTime: t.totalTime,
           maxTime: t.maxTime,
@@ -182,9 +188,9 @@ export default class extends Vue {
           status: t.status
         }
         todoGroupList.unshift(todoGroup)
+
       }
     } else {
-      console.log("开始")
       if (this.isOpen) {
         if (this.tokenStr === undefined) {
           this.$message.error('你无权操作');
@@ -194,24 +200,8 @@ export default class extends Vue {
           task: this.todoForm.task,
           priority: this.todoForm.priority
         })
-        if (result.status) {
-          const v = result.data
-          let cp = calCp(v, v.status)
-          const todo = {
-            id: v.id,
-            groupId: v.groupId,
-            cp: cp,
-            createDate: moment(v.createTime).format("YYYY-MM-DD HH:mm:ss"),
-            task: v.task,
-            value: v.value,
-            estimateTime: v.estimateTime,
-            realityTime: v.realityTime,
-            updateDateTime: moment(v.updateTime).format("YYYY-MM-DD HH:mm:ss"),
-            priority: v.priority,
-            status: v.status
-          }
-          todoList.push(todo)
-        }
+        this.changeIsClearAdd(result.status)
+        handleTodoList(result, todoList)
       } else {
         const param = {
           groupId: this.todoForm.groupId,
@@ -224,12 +214,9 @@ export default class extends Vue {
             priority: this.todoForm.priority
           }]
         }
-        console.log('param' + param)
         const result = await patchAddTodo(param)
-        if (result.status) {
-          todoList.splice(0, todoList.length)
-          todoList.push(result.data)
-        }
+        this.changeIsClearAdd(result.status)
+        handleTodoList(result, todoList)
       }
     }
 

@@ -115,7 +115,7 @@
         <el-form-item label="优先级" label-width="120px">
           <el-tooltip content="请选择优先级(数字越小优先级越高,重要且紧急>紧急不重要>重要不紧急>既不重要也不紧急)" placement="top">
             <el-select v-model="todoForm.priority" placeholder="请选择优先级">
-              <el-option v-for="p in priorities" :label="p.label" :value="p.value"></el-option>
+              <el-option v-for="p in priorities" :key="p.value" :label="p.label" :value="p.value"></el-option>
             </el-select>
           </el-tooltip>
         </el-form-item>
@@ -138,7 +138,7 @@
           <el-form-item label="任务状态" label-width="120px">
             <el-tooltip content="请选择任务状态" placement="top">
               <el-select v-model="todoForm.status" placeholder="请选择任务状态">
-                <el-option v-for="s in statusGroup" :label="s.label" :value="s.value"></el-option>
+                <el-option v-for="s in statusGroup" :key="s.value" :label="s.label" :value="s.value"></el-option>
               </el-select>
             </el-tooltip>
           </el-form-item>
@@ -153,16 +153,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import Nav from "@/components/navbar/index.vue";
-import { IRetTodo, ITodo } from "@/types/todo/types";
-import { listTodo, updateTodo } from "@/api/todo";
-import moment from "moment";
-import { UserModule } from "@/store/modules/user";
-import { openListTodo, openUpdateTodo } from "@/api/open/todo";
-import { priorities, statusGroup, todoList } from '@/constant/todoConstant';
-import { GROUP_ID, TOKEN } from "@/constant/storageConstant";
-import { calCp } from "@/utils/todo";
+import { Component, Vue } from "vue-property-decorator"
+import Nav from "@/components/navbar/index.vue"
+import { ITodo } from "@/types/todo/types"
+import { listTodo, updateTodo } from "@/api/todo"
+import { UserModule } from "@/store/modules/user"
+import { openListTodo, openUpdateTodo } from "@/api/open/todo"
+import { filterArray, priorities, statusGroup, todoList } from '@/constant/todoConstant'
+import { GROUP_ID, TOKEN } from "@/constant/storageConstant"
+import { handleTodoList } from "@/utils/todo"
 
 @Component({
   name: 'TodoList',
@@ -172,16 +171,8 @@ import { calCp } from "@/utils/todo";
 })
 export default class extends Vue {
   private todoList: ITodo[] = todoList
-  private statusArray = ['1', '10', '20', '50', '100']
-  private filterArray = [
-    { text: '初始', value: '1' },
-    { text: '等待', value: '10' },
-    { text: '处理中', value: '20' },
-    { text: '删除', value: '50' },
-    { text: '完成', value: '100' }
-  ]
+  private filterArray = filterArray
   private listLoading = true
-  private dataMap: Map<string, Array<ITodo>> = new Map<string, Array<ITodo>>()
 
   private isOpen = false
   private tokenStr: string | undefined
@@ -314,10 +305,10 @@ export default class extends Vue {
       // openAdd使用
       localStorage.setItem(TOKEN, token)
     }
-    this.handleTodoList(result)
+    handleTodoList(result, this.todoList)
   }
 
-  private async getTodoList (status?: string) {
+  private async getTodoList () {
     this.listLoading = true
     let param = {
       groupId: parseInt(localStorage.getItem(GROUP_ID) || '0')
@@ -326,52 +317,7 @@ export default class extends Vue {
     if (result.status) {
       this.isOpen = false
     }
-    this.handleTodoList(result, status)
-  }
-
-  private handleTodoList (result: any, status?: string) {
-    if (result.status) {
-      for (let k of Object.keys(result.data)) {
-        result.data[k].forEach((v: IRetTodo) => {
-          let t = this.dataMap.get(k)
-          if (!t) {
-            t = new Array<ITodo>()
-            this.dataMap.set(k, t)
-          }
-          let cp = calCp(v, k)
-          let todo: ITodo = {
-            id: v.id,
-            groupId: v.groupId,
-            cp: cp,
-            createDate: moment(v.createTime).format("YYYY-MM-DD HH:mm:ss"),
-            task: v.task,
-            value: v.value,
-            estimateTime: v.estimateTime,
-            realityTime: v.realityTime,
-            updateDateTime: moment(v.updateTime).format("YYYY-MM-DD HH:mm:ss"),
-            priority: v.priority,
-            status: v.status
-          }
-          t.push(todo)
-        })
-      }
-
-      // 拉取数据时要清空原来的数据
-      this.todoList = []
-      if (!status) {
-        for (let s of this.statusArray) {
-          let processingTodoList = this.dataMap.get(s) || []
-          for (let t of processingTodoList) {
-            this.todoList.push(t)
-          }
-        }
-      } else {
-        let processingTodoList = this.dataMap.get(status) || []
-        for (let t of processingTodoList) {
-          this.todoList.push(t)
-        }
-      }
-    }
+    handleTodoList(result, this.todoList)
     // Just to simulate the time of the request
     setTimeout(() => {
       this.listLoading = false
