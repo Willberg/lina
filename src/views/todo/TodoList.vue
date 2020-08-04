@@ -161,7 +161,7 @@ import { UserModule } from "@/store/modules/user"
 import { openListTodo, openUpdateTodo } from "@/api/open/todo"
 import { filterArray, priorities, statusGroup, todoList } from '@/constant/todoConstant'
 import { GROUP_ID, TOKEN } from "@/constant/storageConstant"
-import { handleTodoList } from "@/utils/todo"
+import { handleTodoList, refreshToken } from "@/utils/todo"
 
 @Component({
   name: 'TodoList',
@@ -302,6 +302,8 @@ export default class extends Vue {
     if (result.status) {
       this.isOpen = true
       this.tokenStr = token
+      // refresh token
+      refreshToken(this.tokenStr)
       // openAdd使用
       localStorage.setItem(TOKEN, token)
     }
@@ -378,8 +380,8 @@ export default class extends Vue {
     } else if (aStatus < bStatus) {
       return -1
     } else {
-      const aCp = a.cp
-      const bCp = b.cp
+      const aCp = parseFloat(a.cp)
+      const bCp = parseFloat(b.cp)
       return aCp > bCp ? 1 : -1
     }
   }

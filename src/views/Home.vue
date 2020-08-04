@@ -19,13 +19,14 @@
       </el-table-column>
       <el-table-column
         sortable
+        width="160"
         fixed="left"
         align="center"
         prop="createTime"
         label="创建日期">
-<!--        <template slot-scope="scope">-->
-<!--          {{moment(scope.row.createTime).format("YYYY-MM-DD HH:mm:ss")}}-->
-<!--        </template>-->
+        <template slot-scope="scope">
+          {{descCreateTime(scope.row.createTime)}}
+        </template>
       </el-table-column>
       <el-table-column
         align="center"
@@ -49,6 +50,7 @@
       </el-table-column>
       <el-table-column
         align="center"
+        width="160"
         prop="updateDateTime"
         label="最后更新时间">
       </el-table-column>
@@ -134,6 +136,10 @@ export default class extends Vue {
   private todoGroupForm: any = {}
   private pendingTodoGroup: ITodoGroup | undefined
   private priorities = todoGroupPriorities
+
+  private descCreateTime (createTime: number) {
+    return moment(createTime).format("YYYY-MM-DD HH:mm:ss")
+  }
 
   private descStatus (status: number) {
     return status === 1 ? '进行中' : status === 50 ? '已删除' : '已完成'
