@@ -99,7 +99,9 @@
         fixed="right"
         label="操作">
         <template slot-scope="scope">
-          <el-button @click="handleEdit(scope.row)" type="text" size="small">编辑</el-button>
+          <el-button :disabled="disableEditButton(scope.row.status)" @click="handleEdit(scope.row)"
+                     type="text" size="small">编辑
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -161,7 +163,8 @@ import { UserModule } from "@/store/modules/user"
 import { openListTodo, openUpdateTodo } from "@/api/open/todo"
 import { filterArray, priorities, statusGroup, todoList } from '@/constant/todoConstant'
 import { GROUP_ID, TOKEN } from "@/constant/storageConstant"
-import { handleTodoList, refreshToken } from "@/utils/todo"
+import { handleTodoList } from "@/utils/todo"
+import { openFreshToken } from "@/api/open/token";
 
 @Component({
   name: 'TodoList',
@@ -175,13 +178,27 @@ export default class extends Vue {
   private listLoading = true
 
   private isOpen = false
-  private tokenStr: string | undefined
   private todoFormVisible = false
   private editLoading = false
   private todoForm: any = {}
   private oldTodo: ITodo | undefined
   private statusGroup = statusGroup
   private priorities = priorities
+  private refreshTokenTimer: any
+
+  // 不在mounted里添加setInterval,否则会一直循环，无法加载完数据
+  created () {
+    this.refreshTokenTimer = setInterval(async function () {
+      const token = localStorage.getItem(TOKEN)
+      if (token !== null) {
+        const result = await openFreshToken(token)
+        if (result.status) {
+          // 刷新token
+          localStorage.setItem(TOKEN, result.data)
+        }
+      }
+    }, 600000)
+  }
 
   mounted () {
     // html加载完成后执行。执行顺序：子组件-父组件
@@ -209,6 +226,16 @@ export default class extends Vue {
     }
   }
 
+  beforeDestroy () {
+    // 清除定时刷新，不清除会一直运行，关闭页面也会定时刷新
+    localStorage.clear()
+    clearInterval(this.refreshTokenTimer);
+  }
+
+  private disableEditButton (status: number) {
+    return this.isOpen && status != 1 && status != 10
+  }
+
   private handleEdit (todo: ITodo) {
     this.oldTodo = todo
     this.todoForm = {
@@ -232,7 +259,8 @@ export default class extends Vue {
         || this.oldTodo.realityTime !== this.todoForm.realityTime
         || this.oldTodo.status !== this.todoForm.status)) {
       if (this.isOpen) {
-        if (this.tokenStr === undefined) {
+        const token = localStorage.getItem(TOKEN)
+        if (token === null) {
           this.$message.error('你无权操作');
           return
         }
@@ -247,10 +275,11 @@ export default class extends Vue {
         if (this.oldTodo.priority !== this.todoForm.priority) {
           param.priority = this.todoForm.priority
         }
-        const result = await openUpdateTodo(this.tokenStr, param)
+        const result = await openUpdateTodo(token, param)
         if (result.status) {
           this.oldTodo.task = result.data.task
           this.oldTodo.priority = result.data.priority
+          this.oldTodo.status = result.data.status
         }
       } else {
         const param = {
@@ -301,13 +330,11 @@ export default class extends Vue {
     const result = await openListTodo(token)
     if (result.status) {
       this.isOpen = true
-      this.tokenStr = token
-      // refresh token
-      refreshToken(this.tokenStr)
       // openAdd使用
       localStorage.setItem(TOKEN, token)
     }
     handleTodoList(result, this.todoList)
+    this.listLoading = false
   }
 
   private async getTodoList () {
@@ -320,10 +347,7 @@ export default class extends Vue {
       this.isOpen = false
     }
     handleTodoList(result, this.todoList)
-    // Just to simulate the time of the request
-    setTimeout(() => {
-      this.listLoading = false
-    }, 0.5 * 1000)
+    this.listLoading = false
   }
 
   private descPriority (priority: number) {

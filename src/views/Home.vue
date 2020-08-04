@@ -102,7 +102,7 @@
     <el-dialog title="分享url" :visible.sync="shareUrlVisible">
       <el-link type="primary">{{shareUrl}}</el-link>
       <div slot="footer" class="dialog-footer">
-        <el-button type="button" v-clipboard:copy="shareUrl">拷 贝</el-button>
+        <el-button type="button" v-clipboard:copy="shareUrl" @click="shareUrlVisible=false">拷 贝</el-button>
         <el-button @click="shareUrlVisible=false">取 消</el-button>
       </div>
     </el-dialog>

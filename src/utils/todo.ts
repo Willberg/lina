@@ -53,11 +53,3 @@ export const handleTodoList = (result: any, todoList: ITodo[], isAdd?: boolean) 
     }
   }
 }
-
-export const refreshToken = (token: string) => {
-  const interval = 10000
-  setTimeout(function () {
-    console.log(token)
-    setTimeout(arguments.callee, interval)
-  }, interval)
-}
