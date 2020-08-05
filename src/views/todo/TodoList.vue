@@ -163,7 +163,7 @@ import { UserModule } from "@/store/modules/user"
 import { openListTodo, openUpdateTodo } from "@/api/open/todo"
 import { filterArray, priorities, statusGroup, todoList } from '@/constant/todoConstant'
 import { GROUP_ID, TOKEN } from "@/constant/storageConstant"
-import { handleTodoList } from "@/utils/todo"
+import { handleTodoList, convertToTodo } from "@/utils/todo"
 import { openFreshToken } from "@/api/open/token";
 
 @Component({
@@ -228,7 +228,10 @@ export default class extends Vue {
 
   beforeDestroy () {
     // 清除定时刷新，不清除会一直运行，关闭页面也会定时刷新
-    localStorage.clear()
+    const token = localStorage.getItem(TOKEN)
+    if (token !== null) {
+      localStorage.clear()
+    }
     clearInterval(this.refreshTokenTimer);
   }
 
@@ -261,7 +264,7 @@ export default class extends Vue {
       if (this.isOpen) {
         const token = localStorage.getItem(TOKEN)
         if (token === null) {
-          this.$message.error('你无权操作');
+          this.$message.error('你无权操作')
           return
         }
         const param = {
@@ -277,9 +280,9 @@ export default class extends Vue {
         }
         const result = await openUpdateTodo(token, param)
         if (result.status) {
-          this.oldTodo.task = result.data.task
-          this.oldTodo.priority = result.data.priority
-          this.oldTodo.status = result.data.status
+          const idx = this.todoList.indexOf(this.oldTodo)
+          this.todoList.splice(idx, 1)
+          this.todoList.push(convertToTodo(result.data))
         }
       } else {
         const param = {
@@ -310,14 +313,25 @@ export default class extends Vue {
         if (this.oldTodo.status !== this.todoForm.status) {
           param.status = this.todoForm.status
         }
+        if (param.priority !== undefined || param.estimateTime !== undefined || param.value !== undefined) {
+          if (this.todoForm.status != 10) {
+            this.$message.error('必须改为等待状态，进行动态规划')
+            return
+          }
+          param.status = this.todoForm.status
+        }
+        if (param.realityTime !== undefined) {
+          if (this.todoForm.status != 100) {
+            this.$message.error('必须改为完成状态，才能设置完成时间')
+            return
+          }
+          param.status = this.todoForm.status
+        }
         const result = await updateTodo(param)
         if (result.status) {
-          this.oldTodo.task = result.data.task
-          this.oldTodo.priority = result.data.priority
-          this.oldTodo.value = result.data.value
-          this.oldTodo.estimateTime = result.data.estimateTime
-          this.oldTodo.realityTime = result.data.realityTime
-          this.oldTodo.status = result.data.status
+          const idx = this.todoList.indexOf(this.oldTodo)
+          this.todoList.splice(idx, 1)
+          this.todoList.push(convertToTodo(result.data))
         }
       }
     }

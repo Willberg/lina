@@ -1,8 +1,14 @@
 <template>
   <div>
     <el-menu class="el-menu-demo" mode="horizontal" background-color="#30B08F" text-color="#f4f4f5">
-      <el-menu-item index="1" @click.native.prevent="handleRedirectIndex">首页</el-menu-item>
-      <el-menu-item index="2" style="position:absolute;right:0;" @click.native.prevent="handleLogout">退出</el-menu-item>
+      <el-menu-item index="1" @click.native.prevent="handleRedirect('/')">首页</el-menu-item>
+      <el-menu-item index="2" @click.native.prevent="handleRedirect('/todoGroupList')">待办</el-menu-item>
+      <el-menu-item v-if="!isLogin" index="3" style="position:absolute;right:0;"
+                    @click.native.prevent="handleRedirect('/login')">登陆
+      </el-menu-item>
+      <el-menu-item v-if="isLogin" index="3" style="position:absolute;right:0;" @click.native.prevent="handleLogout">
+        退出
+      </el-menu-item>
     </el-menu>
     <el-row :gutter="10" style="margin-top: 10px; margin-bottom: 10px;">
       <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="1">
@@ -16,7 +22,7 @@
     <!-- Form -->
     <el-dialog title="添加任务" :visible.sync="todoFormVisible">
       <el-form :model="todoForm">
-        <div v-if="isHome">
+        <div v-if="isTodoGroupList">
           <el-form-item label="任务组最大时长" label-width="140px">
             <el-tooltip content="请填写任务组最长工作时间(分钟)" placement="top">
               <el-input v-model="todoForm.maxTime" autocomplete="off"></el-input>
@@ -77,7 +83,8 @@ import { handleTodoList } from "@/utils/todo";
   name: 'Nav'
 })
 export default class extends Vue {
-  private isHome = true
+  private isLogin = UserModule.userProfile !== undefined
+  private isTodoGroupList = true
   private isOpen = false
   private isClearAdd = true
   private tokenStr: string | undefined
@@ -87,9 +94,9 @@ export default class extends Vue {
   private priorities = priorities
   private todoGroupPriorities = todoGroupPriorities
 
-  private async handleRedirectIndex () {
+  private async handleRedirect (page: string) {
     await this.$router.push({
-      path: '/'
+      path: page
     })
   }
 
@@ -97,7 +104,7 @@ export default class extends Vue {
     const status = await UserModule.Logout()
     if (status) {
       await this.$router.push({
-        path: '/login'
+        path: '/'
       })
     }
   }
@@ -112,7 +119,7 @@ export default class extends Vue {
     if (groupId !== null) {
       this.todoForm.groupId = groupId
     }
-    this.isHome = this.$route.path === '/'
+    this.isTodoGroupList = this.$route.path === '/todoGroupList'
     if (token !== null) {
       this.isOpen = true
       this.tokenStr = token
@@ -125,7 +132,7 @@ export default class extends Vue {
       return false
     }
 
-    if (this.isHome) {
+    if (this.isTodoGroupList) {
       if (v.maxTime === undefined
         || v.minPriority === undefined) {
         return false
@@ -162,7 +169,7 @@ export default class extends Vue {
       return
     }
 
-    if (this.isHome) {
+    if (this.isTodoGroupList) {
       const param = {
         maxTime: this.todoForm.maxTime,
         minPriority: this.todoForm.minPriority,

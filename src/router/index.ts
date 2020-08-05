@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
 import TodoList from '@/views/todo/TodoList.vue'
+import TodoGroupList from '@/views/todo/TodoGroupList.vue'
 
 Vue.use(VueRouter)
 
@@ -20,6 +21,11 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/todoGroupList',
+    name: 'TodoGroupList',
+    component: TodoGroupList
   },
   {
     path: '/todoList',

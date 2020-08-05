@@ -24,20 +24,7 @@ export const handleTodoList = (result: any, todoList: ITodo[], isAdd?: boolean) 
     }
 
     result.data.forEach((v: IRetTodo) => {
-      let cp = calCp(v, v.status)
-      let todo: ITodo = {
-        id: v.id,
-        groupId: v.groupId,
-        cp: cp,
-        createDate: moment(v.createTime).format("YYYY-MM-DD HH:mm:ss"),
-        task: v.task,
-        value: v.value,
-        estimateTime: v.estimateTime,
-        realityTime: v.realityTime,
-        updateDateTime: moment(v.updateTime).format("YYYY-MM-DD HH:mm:ss"),
-        priority: v.priority,
-        status: v.status
-      }
+      let todo = convertToTodo(v)
       if (needClear) {
         todoList.push(todo)
       } else {
@@ -52,4 +39,22 @@ export const handleTodoList = (result: any, todoList: ITodo[], isAdd?: boolean) 
       }
     }
   }
+}
+
+export const convertToTodo = (v: any) => {
+  let cp = calCp(v, v.status)
+  let todo: ITodo = {
+    id: v.id,
+    groupId: v.groupId,
+    cp: cp,
+    createDate: moment(v.createTime).format("YYYY-MM-DD HH:mm:ss"),
+    task: v.task,
+    value: v.value,
+    estimateTime: v.estimateTime,
+    realityTime: v.realityTime,
+    updateDateTime: moment(v.updateTime).format("YYYY-MM-DD HH:mm:ss"),
+    priority: v.priority,
+    status: v.status
+  }
+  return todo
 }
