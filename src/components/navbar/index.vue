@@ -1,6 +1,7 @@
 <template>
   <div>
-    <el-menu class="el-menu-demo" mode="horizontal" background-color="#30B08F" text-color="#f4f4f5">
+    <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" active-text-color="#000000"
+             background-color="#30B08F" text-color="#f4f4f5" @select="handleSelect">
       <el-menu-item index="1" @click.native.prevent="handleRedirect('/')">首页</el-menu-item>
       <el-menu-item index="2" @click.native.prevent="handleRedirect('/todoGroupList')">待办</el-menu-item>
       <el-menu-item v-if="!isLogin" index="3" style="position:absolute;right:0;"
@@ -77,7 +78,7 @@ import { UserModule } from "@/store/modules/user";
 import { openAddTodo } from "@/api/open/todo";
 import { patchAddTodo } from "@/api/todo";
 import { priorities, todoGroupList, todoGroupPriorities, todoList } from "@/constant/todoConstant";
-import { GROUP_ID, TOKEN } from "@/constant/storageConstant";
+import { GROUP_ID, NAV_INDEX, TOKEN } from "@/constant/storageConstant";
 import moment from "moment";
 import { handleTodoList } from "@/utils/todo";
 
@@ -96,8 +97,10 @@ export default class extends Vue {
   private todoForm: any = {}
   private priorities = priorities
   private todoGroupPriorities = todoGroupPriorities
+  private activeIndex = '1'
 
   created () {
+    this.activeIndex = localStorage.getItem(NAV_INDEX) || '1'
     this.isTodo = this.$route.path.startsWith('/todo')
   }
 
@@ -105,6 +108,10 @@ export default class extends Vue {
     await this.$router.push({
       path: page
     })
+  }
+
+  private handleSelect (key: string) {
+    localStorage.setItem(NAV_INDEX, key)
   }
 
   private async handleLogout () {
