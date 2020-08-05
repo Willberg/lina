@@ -15,7 +15,7 @@
         align="center"
         prop="id"
         width="160"
-        label="id">
+        label="ID">
       </el-table-column>
       <el-table-column
         fixed="left"
@@ -84,6 +84,7 @@
       <el-table-column
         align="center"
         prop="priority"
+        width="160"
         label="优先级">
         <template slot-scope="scope">
           <el-tag :type="descPriority(scope.row.priority).startsWith('重要且紧急') ? 'danger' :

@@ -15,7 +15,7 @@
         fixed="left"
         align="center"
         prop="id"
-        label="id">
+        label="ID">
       </el-table-column>
       <el-table-column
         sortable

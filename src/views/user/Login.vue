@@ -121,7 +121,7 @@ export default class extends Vue {
     const user = UserModule.userProfile
     if (user) {
       this.$router.push({
-        path: '/todoGroupList'
+        path: '/'
       })
     }
 

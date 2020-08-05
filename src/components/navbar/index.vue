@@ -10,14 +10,16 @@
         退出
       </el-menu-item>
     </el-menu>
-    <el-row :gutter="10" style="margin-top: 10px; margin-bottom: 10px;">
-      <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="1">
-        <div style="margin-top: 10px;">功能：</div>
-      </el-col>
-      <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="1">
-        <el-button type="primary" @click.native.prevent="handleAdd">添加任务</el-button>
-      </el-col>
-    </el-row>
+    <div v-if="isTodo">
+      <el-row :gutter="10" style="margin-top: 10px; margin-bottom: 10px;">
+        <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="1">
+          <div style="margin-top: 10px;">功能：</div>
+        </el-col>
+        <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="1">
+          <el-button type="primary" @click.native.prevent="handleAdd">添加任务</el-button>
+        </el-col>
+      </el-row>
+    </div>
 
     <!-- Form -->
     <el-dialog title="添加任务" :visible.sync="todoFormVisible">
@@ -84,6 +86,7 @@ import { handleTodoList } from "@/utils/todo";
 })
 export default class extends Vue {
   private isLogin = UserModule.userProfile !== undefined
+  private isTodo = false
   private isTodoGroupList = true
   private isOpen = false
   private isClearAdd = true
@@ -93,6 +96,10 @@ export default class extends Vue {
   private todoForm: any = {}
   private priorities = priorities
   private todoGroupPriorities = todoGroupPriorities
+
+  created () {
+    this.isTodo = this.$route.path.startsWith('/todo')
+  }
 
   private async handleRedirect (page: string) {
     await this.$router.push({
