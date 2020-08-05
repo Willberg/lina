@@ -190,12 +190,12 @@ export default class extends Vue {
   // 不在mounted里添加setInterval,否则会一直循环，无法加载完数据
   created () {
     this.refreshTokenTimer = setInterval(async function () {
-      const token = localStorage.getItem(TOKEN)
+      const token = sessionStorage.getItem(TOKEN)
       if (token !== null) {
         const result = await openFreshToken(token)
         if (result.status) {
           // 刷新token
-          localStorage.setItem(TOKEN, result.data)
+          sessionStorage.setItem(TOKEN, result.data)
         }
       }
     }, 600000)
@@ -229,9 +229,9 @@ export default class extends Vue {
 
   beforeDestroy () {
     // 清除定时刷新，不清除会一直运行，关闭页面也会定时刷新
-    const token = localStorage.getItem(TOKEN)
+    const token = sessionStorage.getItem(TOKEN)
     if (token !== null) {
-      localStorage.clear()
+      sessionStorage.clear()
     }
     clearInterval(this.refreshTokenTimer);
   }
@@ -263,7 +263,7 @@ export default class extends Vue {
         || this.oldTodo.realityTime !== this.todoForm.realityTime
         || this.oldTodo.status !== this.todoForm.status)) {
       if (this.isOpen) {
-        const token = localStorage.getItem(TOKEN)
+        const token = sessionStorage.getItem(TOKEN)
         if (token === null) {
           this.$message.error('你无权操作')
           return
@@ -346,7 +346,7 @@ export default class extends Vue {
     if (result.status) {
       this.isOpen = true
       // openAdd使用
-      localStorage.setItem(TOKEN, token)
+      sessionStorage.setItem(TOKEN, token)
     }
     handleTodoList(result, this.todoList)
     this.listLoading = false
@@ -355,7 +355,7 @@ export default class extends Vue {
   private async getTodoList () {
     this.listLoading = true
     let param = {
-      groupId: parseInt(localStorage.getItem(GROUP_ID) || '0')
+      groupId: parseInt(sessionStorage.getItem(GROUP_ID) || '0')
     }
     const result = await listTodo(param)
     if (result.status) {

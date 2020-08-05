@@ -4,10 +4,11 @@
              background-color="#30B08F" text-color="#f4f4f5" @select="handleSelect">
       <el-menu-item index="1" @click.native.prevent="handleRedirect('/')">首页</el-menu-item>
       <el-menu-item index="2" @click.native.prevent="handleRedirect('/todoGroupList')">待办</el-menu-item>
-      <el-menu-item v-if="!isLogin" index="3" style="position:absolute;right:0;"
+      <el-menu-item index="3" @click.native.prevent="handleRedirect('/tool')">常用工具</el-menu-item>
+      <el-menu-item v-if="!isLogin" index="12" style="position:absolute;right:0;"
                     @click.native.prevent="handleRedirect('/login')">登陆
       </el-menu-item>
-      <el-menu-item v-if="isLogin" index="3" style="position:absolute;right:0;" @click.native.prevent="handleLogout">
+      <el-menu-item v-if="isLogin" index="12" style="position:absolute;right:0;" @click.native.prevent="handleLogout">
         退出
       </el-menu-item>
     </el-menu>
@@ -41,7 +42,7 @@
         </div>
         <el-form-item label="任务内容" label-width="140px">
           <el-tooltip content="请填写任务" placement="top">
-            <el-input v-model="todoForm.task" autocomplete="off"></el-input>
+            <el-input type="textarea" rows="5" v-model="todoForm.task" autocomplete="off"></el-input>
           </el-tooltip>
         </el-form-item>
         <el-form-item label="优先级" label-width="140px">
@@ -100,7 +101,7 @@ export default class extends Vue {
   private activeIndex = '1'
 
   created () {
-    this.activeIndex = localStorage.getItem(NAV_INDEX) || '1'
+    this.activeIndex = sessionStorage.getItem(NAV_INDEX) || '1'
     this.isTodo = this.$route.path.startsWith('/todo')
   }
 
@@ -111,12 +112,15 @@ export default class extends Vue {
   }
 
   private handleSelect (key: string) {
-    localStorage.setItem(NAV_INDEX, key)
+    if (key !== '12') {
+      sessionStorage.setItem(NAV_INDEX, key)
+    }
   }
 
   private async handleLogout () {
     const status = await UserModule.Logout()
     if (status) {
+      this.isLogin = false
       await this.$router.push({
         path: '/'
       })
@@ -124,8 +128,8 @@ export default class extends Vue {
   }
 
   private handleAdd () {
-    const token = localStorage.getItem(TOKEN)
-    const groupId = localStorage.getItem(GROUP_ID)
+    const token = sessionStorage.getItem(TOKEN)
+    const groupId = sessionStorage.getItem(GROUP_ID)
     //清空
     if (this.isClearAdd) {
       this.todoForm = {}

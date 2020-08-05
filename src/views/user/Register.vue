@@ -97,6 +97,7 @@ import { Form as ElForm, Input } from 'element-ui'
 import { isValidEmail, isValidUsername } from '@/utils/validate'
 import { UserModule } from '@/store/modules/user'
 import md5 from 'js-md5'
+import { NAV_INDEX } from "@/constant/storageConstant";
 
 @Component({
   name: 'Register'
@@ -203,6 +204,7 @@ export default class extends Vue {
       }
       const status = await UserModule.Register(registerParam)
       if (status) {
+        sessionStorage.setItem(NAV_INDEX, '1')
         // 防止router bug 不跳转
         location.reload()
       }
