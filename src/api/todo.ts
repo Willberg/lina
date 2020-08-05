@@ -61,6 +61,13 @@ export const listTodoGroup = (
     params: data
   })
 
+// 查询任务组总数
+export const countTodoGroup = () =>
+  request({
+    url: '/api/todo/group/total',
+    method: 'get'
+  })
+
 // 查询任务列表
 export const listTodo = (
   data: {

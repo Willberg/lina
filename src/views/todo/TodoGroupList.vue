@@ -8,7 +8,7 @@
       border
       fit
       highlight-current-row
-      max-height="600"
+      max-height="500"
       style="width: 100%;">
       <el-table-column
         sortable
@@ -106,13 +106,27 @@
         <el-button @click="shareUrlVisible=false">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!--分页-->
+    <div class="block" style="margin-top: 10px;">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="pageSizes"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :pager-count="pageCount"
+        :total="total">
+      </el-pagination>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { UserModule } from '@/store/modules/user'
-import { listTodoGroup, updateTodoGroup } from "@/api/todo";
+import { countTodoGroup, listTodoGroup, updateTodoGroup } from "@/api/todo";
 import moment from 'moment'
 import { ITodoGroup } from '@/types/todo/types';
 import Nav from '@/components/navbar/index.vue'
@@ -136,6 +150,43 @@ export default class extends Vue {
   private todoGroupForm: any = {}
   private pendingTodoGroup: ITodoGroup | undefined
   private priorities = todoGroupPriorities
+
+  private currentPage = 1
+  private pageSizes = ['10', '20', '50', '100']
+  private pageSize = 10
+  private pageCount = 5
+  private total = 10
+
+  mounted () {
+    // html加载完成后执行。执行顺序：子组件-父组件
+    const user = UserModule.userProfile
+    if (user === undefined) {
+      this.$router.push({
+        path: '/login'
+      })
+    } else {
+      // 获取数据总量
+      this.getTodoGroupTotal()
+      // 已登录，加载初始数据
+      this.getTodoGroupList()
+    }
+  }
+
+  private async getTodoGroupTotal () {
+    const result = await countTodoGroup()
+    if (result.status) {
+      this.total = result.data
+    }
+  }
+
+  private handleSizeChange (val: number) {
+    this.pageSize = val
+  }
+
+  private handleCurrentChange (val: number) {
+    this.currentPage = val
+    this.getTodoGroupList()
+  }
 
   private descCreateTime (createTime: number) {
     return moment(createTime).format("YYYY-MM-DD HH:mm:ss")
@@ -204,8 +255,8 @@ export default class extends Vue {
   private async getTodoGroupList () {
     this.listLoading = true
     const param = {
-      // offset: 0,
-      // count: 10,
+      offset: (this.currentPage - 1) * this.pageSize,
+      count: this.pageSize,
       // timeMillis: moment().unix() * 1000,
       sort: 'desc',
     }
@@ -228,19 +279,6 @@ export default class extends Vue {
       }
     }
     this.listLoading = false
-  }
-
-  mounted () {
-    // html加载完成后执行。执行顺序：子组件-父组件
-    const user = UserModule.userProfile
-    if (user === undefined) {
-      this.$router.push({
-        path: '/login'
-      })
-    } else {
-      // 已登录，加载初始数据
-      this.getTodoGroupList()
-    }
   }
 }
 </script>
