@@ -130,7 +130,7 @@ import { countTodoGroup, listTodoGroup, updateTodoGroup } from "@/api/todo";
 import moment from 'moment'
 import { ITodoGroup } from '@/types/todo/types';
 import Nav from '@/components/navbar/index.vue'
-import { createUrl } from "@/api/user";
+import { createUrl, getUser } from "@/api/user";
 import { todoGroupList, todoGroupPriorities } from "@/constant/todoConstant";
 import { GROUP_ID, MAX_TIME } from "@/constant/storageConstant";
 
@@ -161,14 +161,23 @@ export default class extends Vue {
     // html加载完成后执行。执行顺序：子组件-父组件
     const user = UserModule.userProfile
     if (user === undefined) {
-      this.$router.push({
+      this.getAndSetUser()
+    }
+
+    // 获取数据总量
+    this.getTodoGroupTotal()
+    // 已登录，加载初始数据
+    this.getTodoGroupList()
+  }
+
+  private async getAndSetUser () {
+    const result = await getUser()
+    if (result.status) {
+      UserModule.setUser(result.data)
+    } else {
+      await this.$router.push({
         path: '/login'
       })
-    } else {
-      // 获取数据总量
-      this.getTodoGroupTotal()
-      // 已登录，加载初始数据
-      this.getTodoGroupList()
     }
   }
 

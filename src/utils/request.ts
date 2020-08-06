@@ -40,8 +40,11 @@ service.interceptors.response.use(
         ).then(() => {
           // 重新登录，要清除vuex
           UserModule.setUser(undefined)
-          // 防止todoList页面死循环
-          location.replace('/')
+          if (!location.hash.endsWith('login') && !location.hash.endsWith('logout')) {
+            // 防止todoList页面死循环
+            location.hash = '#/login'
+            // location.replace('/')
+          }
           // location.reload() // To prevent bugs from vue-router
         })
       } else {

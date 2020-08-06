@@ -112,7 +112,7 @@
       <el-form :model="todoForm">
         <el-form-item label="任务内容" label-width="120px">
           <el-tooltip content="请修改任务" placement="top">
-            <el-input v-model="todoForm.task" autocomplete="off"></el-input>
+            <el-input type="textarea" rows="5" v-model="todoForm.task" autocomplete="off"></el-input>
           </el-tooltip>
         </el-form-item>
         <el-form-item label="优先级" label-width="120px">
@@ -164,7 +164,7 @@ import { UserModule } from "@/store/modules/user"
 import { openListTodo, openUpdateTodo } from "@/api/open/todo"
 import { filterArray, priorities, statusGroup, todoList } from '@/constant/todoConstant'
 import { GROUP_ID, TOKEN } from "@/constant/storageConstant"
-import { handleTodoList, convertToTodo } from "@/utils/todo"
+import { convertToTodo, handleTodoList } from "@/utils/todo"
 import { openFreshToken } from "@/api/open/token";
 
 @Component({
@@ -187,7 +187,6 @@ export default class extends Vue {
   private priorities = priorities
   private refreshTokenTimer: any
 
-  // 不在mounted里添加setInterval,否则会一直循环，无法加载完数据
   created () {
     this.refreshTokenTimer = setInterval(async function () {
       const token = sessionStorage.getItem(TOKEN)

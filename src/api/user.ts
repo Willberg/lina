@@ -13,6 +13,12 @@ export const login = (
     data: data
   })
 
+export const getUser = () =>
+  request({
+    url: '/api/user/profile',
+    method: 'get'
+  })
+
 export const register = (
   data: {
     userName: string;
