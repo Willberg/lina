@@ -98,7 +98,8 @@ import { Component, Vue } from 'vue-property-decorator'
 import Nav from '@/components/navbar/index.vue'
 import { UserModule } from '@/store/modules/user'
 import moment from 'moment'
-import md5 from "js-md5";
+import md5 from "js-md5"
+import { Base64 } from 'js-base64'
 
 @Component({
   name: 'Tool',
@@ -188,11 +189,13 @@ export default class extends Vue {
     if (this.encryptAlgorithm === 'MD5') {
       this.pendingDecode = md5(this.pendingEncode)
     } else {
+      this.pendingDecode = Base64.encode(this.pendingEncode)
     }
   }
 
   private handleDecode () {
-    if (this.encryptAlgorithm !== 'MD5') {
+    if (this.encryptAlgorithm === 'Base64') {
+      this.pendingEncode = Base64.decode(this.pendingDecode)
     }
   }
 

@@ -6360,6 +6360,11 @@ js-base64@^2.1.8:
   resolved "https://registry.npm.taobao.org/js-base64/download/js-base64-2.6.3.tgz?cache=0&sync_timestamp=1594230799738&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fjs-base64%2Fdownload%2Fjs-base64-2.6.3.tgz#7afdb9b57aa7717e15d370b66e8f36a9cb835dc3"
   integrity sha1-ev25tXqncX4V03C2bo82qcuDXcM=
 
+js-base64@^3.4.4:
+  version "3.4.4"
+  resolved "https://registry.npm.taobao.org/js-base64/download/js-base64-3.4.4.tgz?cache=0&sync_timestamp=1596556052185&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fjs-base64%2Fdownload%2Fjs-base64-3.4.4.tgz#4728d4a2238a8dda6a4bd66562369899264a4449"
+  integrity sha1-RyjUoiOKjdpqS9ZlYjaYmSZKREk=
+
 js-beautify@^1.6.12, js-beautify@^1.6.14:
   version "1.11.0"
   resolved "https://registry.npm.taobao.org/js-beautify/download/js-beautify-1.11.0.tgz#afb873dc47d58986360093dcb69951e8bcd5ded2"
