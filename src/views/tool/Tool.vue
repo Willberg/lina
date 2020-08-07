@@ -73,6 +73,16 @@
 
     <!--房租计算-->
     <div v-show="isShowRoomRent" style="margin-top: 10px;">
+      <el-row :gutter="24" style="margin-top: 10px;">
+        <el-col :lg="12">
+          <el-input v-model="totalCost" placeholder="请输入房租总金额" v-on:change="calRent"></el-input>
+        </el-col>
+      </el-row>
+      <el-row v-show="moreCost!==''" :gutter="24" style="margin-top: 10px;">
+        <el-col :lg="12">
+          more: ¥ <span style="color: #C03639;"> {{moreCost}} </span>, less: ¥ <span style="color: #C03639;"> {{lessCost}} </span>
+        </el-col>
+      </el-row>
     </div>
   </div>
 </template>
@@ -109,6 +119,9 @@ export default class extends Vue {
   ]
 
   private isShowRoomRent = false
+  private totalCost = ''
+  private moreCost = ''
+  private lessCost = ''
 
   mounted () {
     const user = UserModule.userProfile
@@ -166,6 +179,16 @@ export default class extends Vue {
         datetimeArray.push(parseInt(i))
       }
       this.timestamp = (moment(datetimeArray).unix() * 1000).toString()
+    }
+  }
+
+  private calRent () {
+    const total = parseFloat(this.totalCost)
+    if (total >= 200) {
+      const lessCost = (total - 200) / 2
+      const moreCost = lessCost + 200
+      this.moreCost = moreCost.toString()
+      this.lessCost = lessCost.toString()
     }
   }
 }
