@@ -19,6 +19,9 @@
         <el-col :lg="2">
           <el-button type="primary" v-clipboard:copy="timestamp">拷贝</el-button>
         </el-col>
+        <el-col :lg="2">
+          <el-button type="primary" @click="now(true)">Now</el-button>
+        </el-col>
       </el-row>
 
       <el-row :gutter="24" style="margin-top: 10px;">
@@ -30,6 +33,9 @@
         </el-col>
         <el-col :lg="2">
           <el-button type="primary" v-clipboard:copy="datetime">拷贝</el-button>
+        </el-col>
+        <el-col :lg="2">
+          <el-button type="primary" @click="now(false)">Now</el-button>
         </el-col>
       </el-row>
     </div>
@@ -146,6 +152,30 @@ export default class extends Vue {
     }
   }
 
+  private covertTimeMillisToDatetime (timeMillis: string) {
+    if (/^[1-9][0-9]{12}$/.test(timeMillis)) {
+      this.datetime = moment(parseInt(timeMillis)).format("YYYY-MM-DD HH:mm:ss")
+    }
+  }
+
+  private covertDatetimeToTimeMillis (datetime: string) {
+    if (/^[1-9][0-9]{3}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-6][0-9]:[0-6][0-9]$/.test(datetime)) {
+      const datetimeArray: number[] = []
+      for (let i of datetime.split('-| |:')) {
+        datetimeArray.push(parseInt(i))
+      }
+      this.timestamp = (moment(datetimeArray).unix() * 1000).toString()
+    }
+  }
+
+  private now (isTimestamp: boolean) {
+    if (isTimestamp) {
+      this.timestamp = (moment().unix() * 1000).toString()
+    } else {
+      this.datetime = moment().format("YYYY-MM-DD HH:mm:ss")
+    }
+  }
+
   private handleSelectAlgorithm (algorithm: string) {
     if (algorithm === 'MD5') {
       this.canDecode = false
@@ -163,22 +193,6 @@ export default class extends Vue {
 
   private handleDecode () {
     if (this.encryptAlgorithm !== 'MD5') {
-    }
-  }
-
-  private covertTimeMillisToDatetime (timeMillis: string) {
-    if (/^[1-9][0-9]{12}$/.test(timeMillis)) {
-      this.datetime = moment(parseInt(timeMillis)).format("YYYY-MM-DD HH:mm:ss")
-    }
-  }
-
-  private covertDatetimeToTimeMillis (datetime: string) {
-    if (/^[1-9][0-9]{3}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-6][0-9]:[0-6][0-9]$/.test(datetime)) {
-      const datetimeArray: number[] = []
-      for (let i of datetime.split('-| |:')) {
-        datetimeArray.push(parseInt(i))
-      }
-      this.timestamp = (moment(datetimeArray).unix() * 1000).toString()
     }
   }
 
