@@ -69,7 +69,7 @@ import { Form as ElForm, Input } from 'element-ui'
 import { isValidEmail, isValidLoginUser, isValidPhoneNumber } from '@/utils/validate'
 import { UserModule } from '@/store/modules/user'
 import md5 from 'js-md5'
-import { NAV_INDEX } from "@/constant/storageConstant";
+import { NAV_INDEX } from '@/constant/storageConstant'
 
 @Component({
   name: 'Login'

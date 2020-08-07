@@ -156,16 +156,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator"
-import Nav from "@/components/navbar/index.vue"
-import { ITodo } from "@/types/todo/types"
-import { listTodo, updateTodo } from "@/api/todo"
-import { UserModule } from "@/store/modules/user"
-import { openListTodo, openUpdateTodo } from "@/api/open/todo"
+import { Component, Vue } from 'vue-property-decorator'
+import Nav from '@/components/navbar/index.vue'
+import { ITodo } from '@/types/todo/types'
+import { listTodo, updateTodo } from '@/api/todo'
+import { UserModule } from '@/store/modules/user'
+import { openListTodo, openUpdateTodo } from '@/api/open/todo'
 import { filterArray, priorities, statusGroup, todoList } from '@/constant/todoConstant'
-import { GROUP_ID, TOKEN } from "@/constant/storageConstant"
-import { convertToTodo, handleTodoList } from "@/utils/todo"
-import { openFreshToken } from "@/api/open/token";
+import { GROUP_ID, TOKEN } from '@/constant/storageConstant'
+import { convertToTodo, handleTodoList } from '@/utils/todo'
+import { openFreshToken } from '@/api/open/token'
 
 @Component({
   name: 'TodoList',

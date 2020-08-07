@@ -126,13 +126,13 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { UserModule } from '@/store/modules/user'
-import { countTodoGroup, listTodoGroup, updateTodoGroup } from "@/api/todo";
+import { countTodoGroup, listTodoGroup, updateTodoGroup } from "@/api/todo"
 import moment from 'moment'
-import { ITodoGroup } from '@/types/todo/types';
+import { ITodoGroup } from '@/types/todo/types'
 import Nav from '@/components/navbar/index.vue'
-import { createUrl, getUser } from "@/api/user";
-import { todoGroupList, todoGroupPriorities } from "@/constant/todoConstant";
-import { GROUP_ID, MAX_TIME } from "@/constant/storageConstant";
+import { createUrl, getUser } from '@/api/user'
+import { todoGroupList, todoGroupPriorities } from '@/constant/todoConstant'
+import { GROUP_ID, MAX_TIME } from '@/constant/storageConstant'
 
 @Component({
   name: 'TodoGroupList',
