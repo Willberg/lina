@@ -47,22 +47,20 @@ service.interceptors.response.use(
           }
           // location.reload() // To prevent bugs from vue-router
         })
-      } else {
-        Message({
-          message: res.message || '解析错误',
-          type: 'error',
-          duration: 3 * 1000
-        })
+        return Promise.reject(new Error('Error'))
       }
+      return Promise.reject(new Error(res.message || 'Error'))
     }
     return res
   },
   (error) => {
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
+    if (error.message !== 'Error') {
+      Message({
+        message: error.message,
+        type: 'error',
+        duration: 5 * 1000
+      })
+    }
     return Promise.reject(error)
   }
 )
