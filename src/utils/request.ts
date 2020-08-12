@@ -3,7 +3,7 @@ import { Message, MessageBox } from 'element-ui'
 import { UserModule } from "@/store/modules/user";
 
 const service = axios.create({
-  baseURL: 'http://johntaylor.fun',
+  baseURL: 'http://acgv.fun',
   // baseURL: 'http://localhost:40001',
   withCredentials: true,
   timeout: 50 * 1000
