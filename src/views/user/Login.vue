@@ -147,13 +147,18 @@ export default class extends Vue {
         email: isValidEmail(this.loginForm.userName) ? this.loginForm.userName : undefined
       }
 
+      // 模拟请求
+      setTimeout(() => {
+        this.loading = false
+      }, 0.5 * 1000)
+
       const status = await UserModule.Login(loginParam)
       if (status) {
         sessionStorage.setItem(NAV_INDEX, '1')
         // 防止router bug 不跳转
         location.reload()
       }
-      this.loading = false
+
     })
   }
 
