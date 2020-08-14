@@ -11,16 +11,34 @@
           本阶段倒计时：<b style="color: #C03639">{{segmentTime}} s</b>
         </div>
       </el-col>
-      <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-        <div v-if="isLogin" style="margin-top: 50px;">
-          计时器：
-          <el-select v-model="timerType" placeholder="请选择计时器类别">
-            <el-option v-for="t in timerTypes" :label="t.label" :value="t.value"></el-option>
-          </el-select>
-          <el-switch style="margin-left: 20px;" v-model="timerStatus" v-on:change="" active-color="#13ce66"
-                     inactive-color="#ff4949"></el-switch>
-          <div style="margin-top: 10px;">本阶段用时：<b style="color: #C03639">{{timerUseTime}} s</b></div>
-        </div>
+      <el-col v-if="isLogin" :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+        <el-row :gutter="10" style="margin-top: 50px;">
+          <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
+            <b>计时器类别：</b>
+          </el-col>
+          <el-col :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+            <el-select v-model="timerType" placeholder="请选择计时器类别">
+              <el-option v-for="t in timerTypes" :label="t.label" :value="t.value"></el-option>
+            </el-select>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10" style="margin-top: 10px;">
+          <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
+            <b>计时开关：</b>
+          </el-col>
+          <el-col style="margin-top: 10px;" :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+            <el-switch style="margin-left: 20px;" v-model="timerStatus" v-on:change="" active-color="#13ce66"
+                       inactive-color="#ff4949"></el-switch>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10" style="margin-top: 20px;">
+          <el-col :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
+            <b>本阶段用时：</b>
+          </el-col>
+          <el-col :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+            <b style="color: #C03639">{{timerUseTime}} s</b>
+          </el-col>
+        </el-row>
       </el-col>
     </el-row>
   </div>
