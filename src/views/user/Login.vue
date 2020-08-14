@@ -150,7 +150,7 @@ export default class extends Vue {
       // 模拟请求
       setTimeout(() => {
         this.loading = false
-      }, 0.5 * 1000)
+      }, 3 * 1000)
 
       const status = await UserModule.Login(loginParam)
       if (status) {

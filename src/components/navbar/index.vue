@@ -120,6 +120,11 @@ export default class extends Vue {
   private async handleLogout () {
     const status = await UserModule.Logout()
     if (status) {
+      if (location.hash === '#/') {
+        // 首页退出，刷新首页，隐藏要登录的功能
+        location.reload()
+        return
+      }
       this.isLogin = false
       await this.$router.push({
         path: '/'

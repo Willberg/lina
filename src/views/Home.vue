@@ -1,19 +1,28 @@
 <template>
   <div>
     <Nav></Nav>
-    <el-row :gutter="24" style="margin-top: 10px;">
-      <el-col :lg="8">
-        <div id="healthyWork" style="width: 800px; height:500px;"></div>
-        <div style="width: 800px;">本阶段需要做的事：<b style="color: #409EFF">{{dailyScheduleTxt}}</b></div>
-        <div style="width: 800px;">
+    <el-row :gutter="10">
+      <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
+        <div id="healthyWork" style="width: 100%; height:400px;"></div>
+        <div style="width: 100%;">本阶段需要做的事：<b style="color: #409EFF">{{dailyScheduleTxt}}</b></div>
+        <div style="width: 100%;">
           本阶段起始时间：<b style="color: #30B08F">{{segmentGap}}</b>,
           本阶段总时长：<b style="color: #30B08F">{{segmentTotalTime}} min</b>,
           本阶段倒计时：<b style="color: #C03639">{{segmentTime}} s</b>
         </div>
-
+      </el-col>
+      <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+        <div v-if="isLogin" style="margin-top: 50px;">
+          计时器：
+          <el-select v-model="timerType" placeholder="请选择计时器类别">
+            <el-option v-for="t in timerTypes" :label="t.label" :value="t.value"></el-option>
+          </el-select>
+          <el-switch style="margin-left: 20px;" v-model="timerStatus" v-on:change="" active-color="#13ce66"
+                     inactive-color="#ff4949"></el-switch>
+          <div style="margin-top: 10px;">本阶段用时：<b style="color: #C03639">{{timerUseTime}} s</b></div>
+        </div>
       </el-col>
     </el-row>
-
   </div>
 </template>
 
@@ -22,6 +31,8 @@ import { Component, Vue } from 'vue-property-decorator'
 import Nav from '@/components/navbar/index.vue'
 import echarts, { ECharts } from 'echarts'
 import moment, { Moment } from 'moment'
+import { timerTypes } from '@/constant/timerConstant'
+import { UserModule } from "@/store/modules/user";
 
 @Component({
   name: 'Home',
@@ -30,6 +41,13 @@ import moment, { Moment } from 'moment'
   }
 })
 export default class extends Vue {
+  private isLogin = false
+  private timerStatus = false
+  private timerTypes = timerTypes
+  private timerType = 1
+  private timerCreateTime = 0
+  private timerUseTime = 0
+
   private oldStartKey = ''
   private dailyScheduleTxt = ''
   private segmentTotalTime = 0
@@ -37,7 +55,7 @@ export default class extends Vue {
   private segmentGap = ''
   private healthyWorkChart: ECharts | undefined
   private healthyWorkTimer: any | undefined
-  private healthyWorkCountdownTimer: any | undefined
+  private countdownTimer: any | undefined
   private lineStart = 0
   private lineEnd = 1
   private healthyWorkOption = {
@@ -48,7 +66,7 @@ export default class extends Vue {
     },
     series: [
       {
-        name: '作息安排',
+        // name: '作息安排',
         type: 'gauge',
         startAngle: -270,
         endAngle: 89,
@@ -67,11 +85,14 @@ export default class extends Vue {
             }
           }
         },
-        data: [{ value: this.calHour(moment()), name: '作息安排' }],
+        data: [{ value: this.calHour(moment()), name: '最佳作息安排' }],
         axisLine: {
           lineStyle: {
             color: [[0.2, '#91c7ae'], [0.8, '#c23531'], [1, '#91c7ae']]
           }
+        },
+        axisLabel: {
+          color: '#91c7ae'
         }
       }
     ]
@@ -110,6 +131,10 @@ export default class extends Vue {
   }
 
   mounted () {
+    if (UserModule.userProfile !== undefined) {
+      this.isLogin = true
+    }
+
     this.initDailyScheduleMap()
     this.healthyWorkChart = echarts.init(<HTMLDivElement>document.getElementById('healthyWork'))
     this.dailyScheduleTxt = this.calDailyScheduleTxt(moment()) || ''
@@ -122,8 +147,10 @@ export default class extends Vue {
     }, 60000)
 
     const updateHealthyWorkCountdownTimer = this.updateHealthyWorkCountdownTimer
-    this.healthyWorkCountdownTimer = setInterval(function () {
+    const updateTimerUseTime = this.updateTimerUseTime
+    this.countdownTimer = setInterval(function () {
       updateHealthyWorkCountdownTimer()
+      updateTimerUseTime()
     }, 1000)
   }
 
@@ -133,8 +160,8 @@ export default class extends Vue {
       clearInterval(this.healthyWorkTimer);
     }
 
-    if (this.healthyWorkCountdownTimer !== undefined) {
-      clearInterval(this.healthyWorkCountdownTimer);
+    if (this.countdownTimer !== undefined) {
+      clearInterval(this.countdownTimer);
     }
   }
 
@@ -147,13 +174,19 @@ export default class extends Vue {
     this.healthyWorkOption.series[0].axisLine.lineStyle.color = [[lineStart, '#91c7ae'], [lineEnd, '#c23531'], [1, '#91c7ae']]
     this.healthyWorkOption.series[0].data = [{
       value: this.calHour(mt),
-      name: '作息安排'
+      name: '最佳作息安排'
     }]
     this.healthyWorkChart?.setOption(this.healthyWorkOption, true)
   }
 
   private updateHealthyWorkCountdownTimer () {
     this.segmentTime--
+  }
+
+  private updateTimerUseTime () {
+    if (this.timerStatus) {
+      this.timerUseTime++
+    }
   }
 
   private calHour (m: Moment): number {

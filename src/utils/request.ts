@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
-import { UserModule } from "@/store/modules/user";
+import { UserModule } from '@/store/modules/user'
 
 const service = axios.create({
-  baseURL: 'http://acgv.fun',
-  // baseURL: 'http://localhost:40001',
+  baseURL: 'https://acgv.fun',
+  // baseURL: 'http://localhost:8081',
   withCredentials: true,
   timeout: 50 * 1000
 })
