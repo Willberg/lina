@@ -9,44 +9,46 @@
 
     <!--时间戳-->
     <div v-show="isShowTimeMillis" style="margin-top: 10px;">
-      <el-row :gutter="24">
-        <el-col :lg="8">
-          <div style="margin-top: 10px;">Unix时间戳（Unix timestamp）</div>
+      <el-row :gutter="10">
+        <el-col :xs="24" :sm="20" :md="16" :lg="8" :xl="8">
+          <div style="margin-top: 20px;">Unix时间戳（Unix timestamp）</div>
         </el-col>
-        <el-col :lg="6">
-          <el-input v-model="timestamp" placeholder="请输入时间戳" v-on:change="covertTimeMillisToDatetime"></el-input>
+        <el-col :xs="24" :sm="20" :md="16" :lg="8" :xl="8">
+          <el-input style="margin-top: 10px;" v-model="timestamp" placeholder="请输入时间戳"
+                    v-on:change="covertTimeMillisToDatetime"></el-input>
         </el-col>
-        <el-col :lg="2">
-          <el-button type="primary" v-clipboard:copy="timestamp">拷贝</el-button>
+        <el-col :xs="{span:8, offset:4}" :sm="{span:6, offset:3}" :md="{span:4, offset:2}" :lg="2" :xl="2">
+          <el-button style="margin-top: 10px;" type="primary" v-clipboard:copy="timestamp">拷贝</el-button>
         </el-col>
-        <el-col :lg="2">
-          <el-button type="primary" @click="now(true)">Now</el-button>
+        <el-col :xs="8" :sm="6" :md="4" :lg="2" :xl="2">
+          <el-button style="margin-top: 10px;" type="primary" @click="now(true)">Now</el-button>
         </el-col>
       </el-row>
 
-      <el-row :gutter="24" style="margin-top: 10px;">
-        <el-col :lg="8">
-          <div style="margin-top: 10px;">时间（年月日时分秒:2020-08-06 12:42:13）</div>
+      <el-row :gutter="10" style="margin-top: 10px;">
+        <el-col :xs="24" :sm="20" :md="16" :lg="8" :xl="8">
+          <div style="margin-top: 20px;">时间（年月日时分秒:2020-08-06 12:42:13）</div>
         </el-col>
-        <el-col :lg="6">
-          <el-input v-model="datetime" placeholder="请输入时间" v-on:change="covertDatetimeToTimeMillis"></el-input>
+        <el-col :xs="24" :sm="20" :md="16" :lg="8" :xl="8">
+          <el-input style="margin-top: 10px;" v-model="datetime" placeholder="请输入时间"
+                    v-on:change="covertDatetimeToTimeMillis"></el-input>
         </el-col>
-        <el-col :lg="2">
-          <el-button type="primary" v-clipboard:copy="datetime">拷贝</el-button>
+        <el-col :xs="{span:8, offset:4}" :sm="{span:6, offset:3}" :md="{span:4, offset:2}" :lg="2" :xl="2">
+          <el-button style="margin-top: 10px;" type="primary" v-clipboard:copy="datetime">拷贝</el-button>
         </el-col>
-        <el-col :lg="2">
-          <el-button type="primary" @click="now(false)">Now</el-button>
+        <el-col :xs="8" :sm="6" :md="4" :lg="2" :xl="2">
+          <el-button style="margin-top: 10px;" type="primary" @click="now(false)">Now</el-button>
         </el-col>
       </el-row>
     </div>
 
     <!--加密，解密-->
     <div v-show="isShowEncrypt" style="margin-top: 10px;">
-      <el-row :gutter="24">
-        <el-col :lg="2" style="margin-top: 10px;">
+      <el-row :gutter="10">
+        <el-col :xs="8" :sm="6" :md="4" :lg="2" :xl="2" style="margin-top: 10px;">
           加密算法：
         </el-col>
-        <el-col :lg="4">
+        <el-col :xs="14" :sm="12" :md="8" :lg="4" :xl="4">
           <el-select v-model="encryptAlgorithm" placeholder="请选择" @change="handleSelectAlgorithm">
             <el-option
               v-for="item in options"
@@ -57,22 +59,34 @@
           </el-select>
         </el-col>
       </el-row>
-      <el-row :gutter="24" style="margin-top: 10px;">
-        <el-col :lg="11">
-          <el-input type="textarea" :rows="10" v-model="pendingEncode" placeholder="请输入需要加密的内容"></el-input>
+
+      <el-row :gutter="10">
+        <el-col :xs="24" :sm="24" :md="24" :lg="11" :xl="11" style="margin-top: 10px;">
+          <el-row :gutter="24">
+            <el-col>
+              <el-input type="textarea" :rows="10" v-model="pendingEncode" placeholder="请输入需要加密的内容"></el-input>
+            </el-col>
+          </el-row>
+          <el-row style="margin-top: 10px;">
+            <el-col>
+              <el-button type="primary" @click.native.prevent="handleEncode">加密</el-button>
+              <el-button v-show="canDecode" type="info" v-clipboard:copy="pendingEncode">拷贝</el-button>
+            </el-col>
+          </el-row>
         </el-col>
-        <el-col :lg="11" :offset="2">
-          <el-input type="textarea" :rows="10" v-model="pendingDecode" placeholder="请输入需要解密的内容"></el-input>
-        </el-col>
-      </el-row>
-      <el-row :gutter="24" style="margin-top: 10px;">
-        <el-col :lg="12">
-          <el-button type="primary" @click.native.prevent="handleEncode">加密</el-button>
-          <el-button v-show="canDecode" type="info" v-clipboard:copy="pendingEncode">拷贝</el-button>
-        </el-col>
-        <el-col :lg="12">
-          <el-button v-show="canDecode" type="primary" @click.native.prevent="handleDecode">解密</el-button>
-          <el-button type="info" v-clipboard:copy="pendingDecode">拷贝</el-button>
+        <el-col :xs="24" :sm="24" :md="24" :lg="{span: 11, offset: 2}" :xl="{span: 11, offset: 2}"
+                style="margin-top: 10px;">
+          <el-row :gutter="24">
+            <el-col>
+              <el-input type="textarea" :rows="10" v-model="pendingDecode" placeholder="请输入需要解密的内容"></el-input>
+            </el-col>
+          </el-row>
+          <el-row style="margin-top: 10px;">
+            <el-col>
+              <el-button v-show="canDecode" type="primary" @click.native.prevent="handleDecode">解密</el-button>
+              <el-button type="info" v-clipboard:copy="pendingDecode">拷贝</el-button>
+            </el-col>
+          </el-row>
         </el-col>
       </el-row>
     </div>
@@ -117,7 +131,7 @@ export default class extends Vue {
 
   private isShowEncrypt = false
   private canDecode = true
-  private encryptAlgorithm = ''
+  private encryptAlgorithm = 'Base64'
   private pendingEncode = ''
   private pendingDecode = ''
   private options = [
