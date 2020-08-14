@@ -138,7 +138,7 @@ export default class extends Vue {
     this.initDailyScheduleMap()
     this.healthyWorkChart = echarts.init(<HTMLDivElement>document.getElementById('healthyWork'))
     this.dailyScheduleTxt = this.calDailyScheduleTxt(moment()) || ''
-    this.healthyWorkOption.series[0].axisLine.lineStyle.color = [[this.lineStart, '#91c7ae'], [this.lineEnd, '#c23531'], [1, '#91c7ae']]
+    this.healthyWorkOption.series[0].axisLine.lineStyle.color = this.calColorSegment(this.lineStart, this.lineEnd)
     this.healthyWorkChart.setOption(this.healthyWorkOption)
 
     const updateHealthyWorkChart = this.updateHealthyWorkChart
@@ -171,7 +171,7 @@ export default class extends Vue {
     this.dailyScheduleTxt = this.calDailyScheduleTxt(mt, startKey) || ''
     const startKeyVal = startKey.pop() || ''
     const [lineStart, lineEnd] = this.adjustDailyScheduleChart(startKeyVal)
-    this.healthyWorkOption.series[0].axisLine.lineStyle.color = [[lineStart, '#91c7ae'], [lineEnd, '#c23531'], [1, '#91c7ae']]
+    this.healthyWorkOption.series[0].axisLine.lineStyle.color = this.calColorSegment(lineStart, lineEnd)
     this.healthyWorkOption.series[0].data = [{
       value: this.calHour(mt),
       name: '最佳作息安排'
@@ -179,7 +179,19 @@ export default class extends Vue {
     this.healthyWorkChart?.setOption(this.healthyWorkOption, true)
   }
 
+  private calColorSegment (lineStart: number, lineEnd: number) {
+    if (lineStart < lineEnd) {
+      return [[lineStart, '#91c7ae'], [lineEnd, '#c23531'], [1, '#91c7ae']]
+    } else {
+      return [[lineEnd, '#c23531'], [lineStart, '#91c7ae'], [1, '#c23531']]
+    }
+  }
+
   private updateHealthyWorkCountdownTimer () {
+    if (this.segmentTime <= 0) {
+      // 出现负值时，去根据旧开始值校准时间
+      this.adjustSegmentTime()
+    }
     this.segmentTime--
   }
 
@@ -224,14 +236,21 @@ export default class extends Vue {
     this.segmentGap = startKey + '~' + endKey
     if (this.oldStartKey !== startKey) {
       this.oldStartKey = startKey
-      this.segmentTotalTime = (endKeyHour * 60 + endKeyMinute) - (startKeyHour * 60 + startKeyMinute)
+      this.segmentTotalTime = Math.abs((endKeyHour * 60 + endKeyMinute) - (startKeyHour * 60 + startKeyMinute))
       // 校准时间
       let startMoment = moment().hours(startKeyHour).minutes(startKeyMinute).seconds(0)
-      this.segmentTime = (this.segmentTotalTime * 60) - (moment().unix() - startMoment.unix())
+      this.segmentTime = Math.abs((this.segmentTotalTime * 60) - (moment().unix() - startMoment.unix()))
     }
     this.lineStart = parseFloat(((24 * 60 - endKeyHour * 60 - endKeyMinute) / (24 * 60)).toFixed(3))
     this.lineEnd = parseFloat(((24 * 60 - startKeyHour * 60 - startKeyMinute) / (24 * 60)).toFixed(3))
     return [this.lineStart, this.lineEnd]
+  }
+
+  private adjustSegmentTime () {
+    const [h, m] = this.calHourMinute(this.oldStartKey)
+    // 校准时间
+    let startMoment = moment().hours(h).minutes(m).seconds(0)
+    this.segmentTime = Math.abs((this.segmentTotalTime * 60) - (moment().unix() - startMoment.unix()))
   }
 
   private calHourMinute (v: string) {
