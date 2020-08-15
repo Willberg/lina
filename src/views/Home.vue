@@ -12,31 +12,73 @@
         </div>
       </el-col>
       <el-col v-if="isLogin" :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+        <el-row>
+          <el-col>
+            <div id="timerCalendar" style="width: 100%; height:200px;"></div>
+          </el-col>
+        </el-row>
+
         <el-row :gutter="10" style="margin-top: 50px;">
           <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
             <b>计时器类别：</b>
           </el-col>
           <el-col :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
-            <el-select v-model="timerType" placeholder="请选择计时器类别">
+            <el-select v-show="isShowTypeSelect" v-model="timerSelectType"
+                       placeholder="请选择计时器类别">
               <el-option v-for="t in timerTypes" :label="t.label" :value="t.value"></el-option>
             </el-select>
+            <el-tag style="margin-top: 5px;" v-if="!isShowTypeSelect">{{calTimerType(timerLastOne.type)}}</el-tag>
           </el-col>
         </el-row>
+
         <el-row :gutter="10" style="margin-top: 10px;">
           <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
             <b>计时开关：</b>
           </el-col>
-          <el-col style="margin-top: 10px;" :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
-            <el-switch style="margin-left: 20px;" v-model="timerStatus" v-on:change="" active-color="#13ce66"
+          <el-col v-show="timerIsEdit" style="margin-top: 10px;" :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+            <el-switch style="margin-left: 20px;" v-model="timerLastOne.status===1" disabled active-color="#13ce66"
+                       inactive-color="#ff4949"></el-switch>
+          </el-col>
+          <el-col v-show="!timerIsEdit" style="margin-top: 10px;" :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+            <el-switch style="margin-left: 20px;" v-model="timerLastOne.status===1" disabled active-color="#13ce66"
                        inactive-color="#ff4949"></el-switch>
           </el-col>
         </el-row>
-        <el-row :gutter="10" style="margin-top: 20px;">
+
+        <el-row v-show="timerIsEdit" :gutter="10" style="margin-top: 20px;">
+          <el-col :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
+            <b>开始时间：</b>
+          </el-col>
+          <el-col :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+            <el-input v-model="updateTimerCreateTime" placeholder="请输入修改的开始时间"></el-input>
+          </el-col>
+        </el-row>
+        <el-row v-show="!timerIsEdit && timerStatus" :gutter="10" style="margin-top: 20px;">
           <el-col :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
             <b>本阶段用时：</b>
           </el-col>
           <el-col :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
             <b style="color: #C03639">{{timerUseTime}} s</b>
+          </el-col>
+        </el-row>
+
+
+        <el-row :gutter="10" style="margin-top: 10px;">
+          <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
+            <b>是否编辑：</b>
+          </el-col>
+          <el-col style="margin-top: 10px;" :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+            <el-switch style="margin-left: 20px;" v-model="timerIsEdit" v-on:change="calShowTypeSelect"
+                       active-color="#13ce66"
+                       inactive-color="#ff4949"></el-switch>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10" style="margin-top: 10px;">
+          <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
+            <b>操作：</b>
+          </el-col>
+          <el-col :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+            <el-button type="primary" :loading="confirmLoading" round size="medium" @click="confirmTimer">确定</el-button>
           </el-col>
         </el-row>
       </el-col>
@@ -50,7 +92,9 @@ import Nav from '@/components/navbar/index.vue'
 import echarts, { ECharts } from 'echarts'
 import moment, { Moment } from 'moment'
 import { timerTypes } from '@/constant/timerConstant'
-import { UserModule } from "@/store/modules/user";
+import { UserModule } from '@/store/modules/user'
+import { apiAddTimer, apiSearchTimerLastOne, apiUpdateTimer } from '@/api/timer'
+import { IAddTimer, IRetTimer, IUpdateTimer } from "@/types/timer/types";
 
 @Component({
   name: 'Home',
@@ -62,9 +106,20 @@ export default class extends Vue {
   private isLogin = false
   private timerStatus = false
   private timerTypes = timerTypes
-  private timerType = 1
-  private timerCreateTime = 0
   private timerUseTime = 0
+  private timerIsEdit = false
+  private isShowTypeSelect = false
+  private timerSelectType = 1
+  private timerLastOne: IRetTimer | undefined
+  private confirmLoading = false
+  private addTimer: IAddTimer = {
+    status: 1,
+    type: 1
+  }
+  private updateTimerCreateTime: string = ''
+  private updateTimer: IUpdateTimer = {
+    id: 0
+  }
 
   private oldStartKey = ''
   private dailyScheduleTxt = ''
@@ -148,9 +203,104 @@ export default class extends Vue {
     }
   }
 
+  private calShowTypeSelect () {
+    if (this.timerLastOne === undefined) {
+      this.isShowTypeSelect = true
+    } else {
+      if (this.timerIsEdit) {
+        this.isShowTypeSelect = true
+      } else {
+        this.isShowTypeSelect = this.timerLastOne.status == 2;
+      }
+    }
+  }
+
+  private calTimerType (type: number) {
+    for (let t of this.timerTypes) {
+      if (t.value === type) {
+        return t.label
+      }
+    }
+    return ''
+  }
+
+  private async initTimer () {
+    const result = await apiSearchTimerLastOne()
+    if (result.status) {
+      this.isLogin = true
+      this.timerLastOne = result.data
+      this.calTimerLastOne()
+      if (this.timerLastOne?.status == 1) {
+        this.timerStatus = true
+        this.timerUseTime = moment().unix() - parseInt((this.timerLastOne.createTime / 1000).toString())
+      }
+    }
+  }
+
+  private calTimerLastOne () {
+    this.calShowTypeSelect()
+    if (this.timerLastOne !== undefined) {
+      if (this.timerLastOne.status == 1) {
+        this.addTimer.relatedId = this.timerLastOne.id
+        this.addTimer.type = this.timerLastOne.type
+        this.addTimer.status = 2
+
+        this.updateTimer.status = 1
+      } else {
+        this.addTimer.relatedId = undefined
+        this.addTimer.status = 1
+
+        this.updateTimer.status = 2
+      }
+
+      this.updateTimer.id = this.timerLastOne.id
+      this.updateTimer.createTime = this.timerLastOne.updateTime
+      this.updateTimer.type = this.timerLastOne.type
+      this.updateTimerCreateTime = moment(this.timerLastOne.createTime).format('YYYY-MM-DD HH:mm:ss')
+    } else {
+      this.addTimer.status = 1
+
+      this.updateTimer.type = 1
+      this.updateTimer.status = 1
+    }
+  }
+
+  private async confirmTimer () {
+    this.confirmLoading = true
+    if (this.timerIsEdit) {
+      this.updateTimer.type = this.timerSelectType
+      this.updateTimer.createTime = moment(this.updateTimerCreateTime, 'YYYY-MM-DD HH:mm:ss').unix() * 1000
+      const result = await apiUpdateTimer(this.updateTimer)
+      if (result.status) {
+        this.$message.success('更新计时器成功')
+        this.timerLastOne = result.data
+        this.calTimerLastOne()
+        if (this.timerLastOne?.status == 1) {
+          this.timerStatus = true
+          this.timerUseTime = moment().unix() - parseInt((this.timerLastOne.createTime / 1000).toString())
+        }
+      }
+    } else {
+      this.addTimer.type = this.timerSelectType
+      const result = await apiAddTimer(this.addTimer)
+      if (result.status) {
+        this.$message.success('添加计时器成功')
+        this.timerLastOne = result.data
+        this.calTimerLastOne()
+        if (this.timerLastOne?.status == 1) {
+          this.timerStatus = true
+          this.timerUseTime = moment().unix() - parseInt((this.timerLastOne.createTime / 1000).toString())
+        } else {
+          this.timerStatus = false
+        }
+      }
+    }
+    this.confirmLoading = false
+  }
+
   mounted () {
     if (UserModule.userProfile !== undefined) {
-      this.isLogin = true
+      this.initTimer()
     }
 
     this.initDailyScheduleMap()

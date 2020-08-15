@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 // 添加timer
-export const addTimer = (
+export const apiAddTimer = (
   data: {
     type: number;
     status: number;
@@ -14,7 +14,7 @@ export const addTimer = (
 }
 
 // 更新timer
-export const updateTimer = (
+export const apiUpdateTimer = (
   data: {
     id: number;
     type?: number;
@@ -28,7 +28,7 @@ export const updateTimer = (
 }
 
 // 查询timer列表
-export const listTimer = (
+export const apiListTimer = (
   data: {
     creatTime: number;
   }) => {
@@ -40,7 +40,7 @@ export const listTimer = (
 }
 
 // 查询最近的timer
-export const searchTimerLastOne = () => {
+export const apiSearchTimerLastOne = () => {
   return request({
     url: '/api/timer/last/one',
     method: 'get'
