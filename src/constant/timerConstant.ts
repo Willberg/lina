@@ -6,3 +6,5 @@ export const timerTypes = [
   { label: '睡觉', value: 4 },
   { label: '学习', value: 5 }
 ]
+
+export const timerTypeList = ['工作', '吃饭', '休闲娱乐', '睡觉', '学习', '未知']

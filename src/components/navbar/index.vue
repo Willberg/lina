@@ -74,14 +74,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { UserModule } from "@/store/modules/user";
-import { openAddTodo } from "@/api/open/todo";
-import { patchAddTodo } from "@/api/todo";
-import { priorities, todoGroupList, todoGroupPriorities, todoList } from "@/constant/todoConstant";
-import { GROUP_ID, NAV_INDEX, TOKEN } from "@/constant/storageConstant";
-import moment from "moment";
-import { handleTodoList } from "@/utils/todo";
+import { Component, Vue } from 'vue-property-decorator'
+import { UserModule } from '@/store/modules/user'
+import { openAddTodo } from '@/api/open/todo'
+import { patchAddTodo } from '@/api/todo'
+import { priorities, todoGroupList, todoGroupPriorities, todoList } from '@/constant/todoConstant'
+import { GROUP_ID, NAV_INDEX, TOKEN } from '@/constant/storageConstant'
+import moment from 'moment'
+import { handleTodoList } from '@/utils/todo'
 
 @Component({
   name: 'Nav'

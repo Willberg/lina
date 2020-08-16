@@ -30,7 +30,7 @@ export const apiUpdateTimer = (
 // 查询timer列表
 export const apiListTimer = (
   data: {
-    creatTime: number;
+    startDate: string;
   }) => {
   return request({
     url: '/api/timer/list',
