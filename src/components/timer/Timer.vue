@@ -149,6 +149,7 @@ export default class extends Vue {
   private calTimerType (type: number) {
     for (let t of this.timerTypes) {
       if (t.value === type) {
+        this.timerSelectType = t.value
         return t.label
       }
     }
