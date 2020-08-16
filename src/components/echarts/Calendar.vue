@@ -14,6 +14,7 @@ import echarts, { ECharts } from 'echarts'
 import { timerTypeList } from '@/constant/timerConstant'
 import moment from 'moment'
 import { apiListTimer } from '@/api/timer'
+import { UserModule } from '@/store/modules/user'
 
 @Component({
   name: 'Calendar'
@@ -73,6 +74,11 @@ export default class extends Vue {
     }]
   }
 
+  mounted () {
+    if (UserModule.userProfile !== undefined) {
+      this.initCalendar()
+    }
+  }
 
   // private getPie (c: string) {
   //   let center = this.timerChart?.convertToPixel('calendar', c);

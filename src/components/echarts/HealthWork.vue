@@ -68,7 +68,12 @@ export default class extends Vue {
           }
         },
         axisLabel: {
-          color: '#91c7ae'
+          formatter: function (value: number) {
+            if (value != 0) {
+              return value
+            }
+          },
+          color: '#409EFF'
         }
       }
     ]
