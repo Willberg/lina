@@ -7,7 +7,7 @@
       <el-col :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
         <el-select v-show="isShowTypeSelect" v-model="timerSelectType"
                    placeholder="请选择计时器类别">
-          <el-option v-for="t in timerTypes" :label="t.label" :value="t.value"></el-option>
+          <el-option v-for="t in timerTypes" :label="t.label" :value="t.value" :key="t.value"></el-option>
         </el-select>
         <el-tag style="margin-top: 5px;" v-if="!isShowTypeSelect">{{calTimerType(timerLastOne.type)}}</el-tag>
       </el-col>
@@ -43,7 +43,6 @@
         <b style="color: #C03639">{{timerUseTime}} s</b>
       </el-col>
     </el-row>
-
 
     <el-row :gutter="10" style="margin-top: 10px;">
       <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
