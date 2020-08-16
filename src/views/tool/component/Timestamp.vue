@@ -1,8 +1,9 @@
 <template>
   <div>
     <el-row :gutter="10">
-      <el-col :xs="6" :sm="4" :md="2" :lg="2" :xl="2">
+      <el-col :xs="16" :sm="16" :md="4" :lg="4" :xl="4">
         <el-button style="margin-top: 10px;" type="primary" @click="now()">Now</el-button>
+        <el-button style="margin-top: 10px;" type="info" @click="clear()">Clear</el-button>
       </el-col>
     </el-row>
     <el-row :gutter="10">
@@ -56,17 +57,18 @@ export default class extends Vue {
 
   private covertDatetimeToTimeMillis () {
     if (/^[1-9][0-9]{3}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-6][0-9]:[0-6][0-9]$/.test(this.datetime)) {
-      const datetimeArray: number[] = []
-      for (let i of this.datetime.split('-| |:')) {
-        datetimeArray.push(parseInt(i))
-      }
-      this.timestamp = (moment(datetimeArray).unix() * 1000).toString()
+      this.timestamp = (moment(this.datetime, 'YYYY-MM-DD HH:mm:ss').unix() * 1000).toString()
     }
   }
 
   private now () {
     this.timestamp = (moment().unix() * 1000).toString()
     this.datetime = moment().format("YYYY-MM-DD HH:mm:ss")
+  }
+
+  private clear () {
+    this.timestamp = ''
+    this.datetime = ''
   }
 }
 </script>

@@ -5,21 +5,27 @@
       <el-menu-item index="1">时间戳</el-menu-item>
       <el-menu-item index="2">加密解密</el-menu-item>
       <el-menu-item v-if="isLogin" index="3">房租计算</el-menu-item>
+      <el-menu-item v-if="isLogin" index="4">月流水</el-menu-item>
     </el-menu>
 
     <!--时间戳-->
-    <div v-show="isShowTimeMillis" style="margin-top: 10px;">
+    <div v-show="showKey ==='1'" style="margin-top: 10px;">
       <timestamp></timestamp>
     </div>
 
     <!--加密，解密-->
-    <div v-show="isShowEncrypt" style="margin-top: 10px;">
+    <div v-show="showKey ==='2'" style="margin-top: 10px;">
       <Encryption></Encryption>
     </div>
 
     <!--房租计算-->
-    <div v-show="isShowRoomRent" style="margin-top: 10px;">
+    <div v-show="showKey ==='3'" style="margin-top: 10px;">
       <Rent></Rent>
+    </div>
+
+    <!--月流水-->
+    <div v-if="showKey ==='4'" style="margin-top: 10px;">
+      <MonthlyFunds></MonthlyFunds>
     </div>
   </div>
 </template>
@@ -31,6 +37,7 @@ import { UserModule } from '@/store/modules/user'
 import Encryption from '@/views/tool/component/Encryption.vue'
 import Rent from '@/views/tool/component/Rent.vue'
 import Timestamp from '@/views/tool/component/Timestamp.vue'
+import MonthlyFunds from '@/components/echarts/MonthlyFunds.vue'
 
 @Component({
   name: 'Tool',
@@ -38,16 +45,15 @@ import Timestamp from '@/views/tool/component/Timestamp.vue'
     Nav,
     Encryption,
     Rent,
-    Timestamp
+    Timestamp,
+    MonthlyFunds
   }
 })
 export default class extends Vue {
   private activeIndex = '1'
   private isLogin = false
 
-  private isShowTimeMillis = true
-  private isShowEncrypt = false
-  private isShowRoomRent = false
+  private showKey = '1'
 
   mounted () {
     const user = UserModule.userProfile
@@ -57,19 +63,7 @@ export default class extends Vue {
   }
 
   private handleSelect (key: string) {
-    if (key === '1') {
-      this.isShowTimeMillis = true
-      this.isShowEncrypt = false
-      this.isShowRoomRent = false
-    } else if (key === '2') {
-      this.isShowTimeMillis = false
-      this.isShowEncrypt = true
-      this.isShowRoomRent = false
-    } else {
-      this.isShowTimeMillis = false
-      this.isShowEncrypt = false
-      this.isShowRoomRent = true
-    }
+    this.showKey = key
   }
 }
 </script>

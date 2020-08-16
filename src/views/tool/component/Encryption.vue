@@ -14,6 +14,9 @@
           </el-option>
         </el-select>
       </el-col>
+      <el-col :xs="8" :sm="8" :md="2" :lg="2" :xl="2">
+        <el-button type="info" @click="clear()">Clear</el-button>
+      </el-col>
     </el-row>
 
     <el-row :gutter="10">
@@ -84,6 +87,11 @@ export default class extends Vue {
     if (this.encryptAlgorithm === 'Base64') {
       this.pendingEncode = Base64.decode(this.pendingDecode)
     }
+  }
+
+  private clear () {
+    this.pendingEncode = ''
+    this.pendingDecode = ''
   }
 }
 </script>

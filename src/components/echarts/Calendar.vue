@@ -102,7 +102,7 @@ export default class extends Vue {
 
   private async initCalendar () {
     const param = {
-      startDate: moment().date(1).format('YYYY-MM-DD')
+      selectedMonth: moment().format('YYYY-MM')
     }
     const result = await apiListTimer(param)
     if (result.status) {
