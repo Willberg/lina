@@ -3,11 +3,13 @@
     <el-row :gutter="10">
       <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
         <div id="healthyWork" style="width: 100%; height:400px;"></div>
-        <div style="width: 100%;">本阶段需要做的事：<b style="color: #409EFF">{{dailyScheduleTxt}}</b></div>
+        <div style="width: 100%;">需要做的事：<b style="color: #409EFF">{{dailyScheduleTxt}}</b></div>
         <div style="width: 100%;">
-          本阶段起始时间：<b style="color: #30B08F">{{segmentGap}}</b>,
-          本阶段总时长：<b style="color: #30B08F">{{segmentTotalTime}} min</b>,
-          本阶段倒计时：<b style="color: #C03639">{{segmentTime}} s</b>
+          <div>
+            起始时间：<b style="color: #30B08F">{{segmentGap}}</b>,
+            总时长：<b style="color: #30B08F">{{segmentTotalTime}} 分钟</b>,
+          </div>
+          <div>倒计时：<b style="color: #C03639">{{segmentTime}} 分钟</b></div>
         </div>
       </el-col>
     </el-row>
@@ -30,7 +32,6 @@ export default class extends Vue {
   private segmentGap = ''
   private healthyWorkChart: ECharts | undefined
   private healthyWorkTimer: any | undefined
-  private countdownTimer: any | undefined
   private lineStart = 0
   private lineEnd = 1
   private healthyWorkOption = {
@@ -113,24 +114,17 @@ export default class extends Vue {
     this.healthyWorkChart.setOption(this.healthyWorkOption)
 
     const updateHealthyWorkChart = this.updateHealthyWorkChart
+    const updateHealthyWorkCountdownTimer = this.updateHealthyWorkCountdownTimer
     this.healthyWorkTimer = setInterval(function () {
       updateHealthyWorkChart()
-    }, 60000)
-
-    const updateHealthyWorkCountdownTimer = this.updateHealthyWorkCountdownTimer
-    this.countdownTimer = setInterval(function () {
       updateHealthyWorkCountdownTimer()
-    }, 1000)
+    }, 60000)
   }
 
   beforeDestroy () {
     // 清除定时刷新，不清除会一直运行，关闭页面也会定时刷新
     if (this.healthyWorkTimer !== undefined) {
       clearInterval(this.healthyWorkTimer);
-    }
-
-    if (this.countdownTimer !== undefined) {
-      clearInterval(this.countdownTimer);
     }
   }
 
@@ -202,7 +196,8 @@ export default class extends Vue {
       this.segmentTotalTime = Math.abs((endKeyHour * 60 + endKeyMinute) - (startKeyHour * 60 + startKeyMinute))
       // 校准时间
       let startMoment = moment().hours(startKeyHour).minutes(startKeyMinute).seconds(0)
-      this.segmentTime = Math.abs((this.segmentTotalTime * 60) - (moment().unix() - startMoment.unix()))
+      let useTime = Math.floor((moment().unix() - startMoment.unix()) / 60)
+      this.segmentTime = Math.abs(this.segmentTotalTime - useTime)
     }
     this.lineStart = parseFloat(((24 * 60 - endKeyHour * 60 - endKeyMinute) / (24 * 60)).toFixed(3))
     this.lineEnd = parseFloat(((24 * 60 - startKeyHour * 60 - startKeyMinute) / (24 * 60)).toFixed(3))
@@ -213,7 +208,8 @@ export default class extends Vue {
     const [h, m] = this.calHourMinute(this.oldStartKey)
     // 校准时间
     let startMoment = moment().hours(h).minutes(m).seconds(0)
-    this.segmentTime = Math.abs((this.segmentTotalTime * 60) - (moment().unix() - startMoment.unix()))
+    let usedTime = Math.floor((moment().unix() - startMoment.unix()) / 60)
+    this.segmentTime = Math.abs(this.segmentTotalTime - usedTime)
   }
 
   private calHourMinute (v: string) {
