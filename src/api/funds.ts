@@ -53,3 +53,15 @@ export const apiListFunds = (
     params: data
   })
 }
+
+// 查询流水
+export const apiSearchFunds = (
+  data: {
+    id: number;
+  }) => {
+  return request({
+    url: '/api/funds/select',
+    method: 'get',
+    params: data
+  })
+}
