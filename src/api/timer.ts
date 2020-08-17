@@ -4,7 +4,6 @@ import request from '@/utils/request'
 export const apiAddTimer = (
   data: {
     type: number;
-    status: number;
   }) => {
   return request({
     url: '/api/timer/add',
@@ -18,7 +17,6 @@ export const apiUpdateTimer = (
   data: {
     id: number;
     type?: number;
-    status?: number;
   }) => {
   return request({
     url: '/api/timer/update',

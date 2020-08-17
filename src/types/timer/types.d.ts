@@ -11,12 +11,10 @@ export interface IRetTimer {
 export interface IAddTimer {
   relatedId?: number;
   type: number;
-  status: number;
 }
 
 export interface IUpdateTimer {
   id: number;
   createTime?: number;
   type?: number;
-  status?: number;
 }

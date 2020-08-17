@@ -89,7 +89,6 @@ export default class extends Vue {
   private timerLastOne: IRetTimer | undefined
   private confirmLoading = false
   private addTimer: IAddTimer = {
-    status: 1,
     type: 1
   }
   private updateTimerCreateTime: string = ''
@@ -162,14 +161,8 @@ export default class extends Vue {
       if (this.timerLastOne.status == 1) {
         this.addTimer.relatedId = this.timerLastOne.id
         this.addTimer.type = this.timerLastOne.type
-        this.addTimer.status = 2
-
-        this.updateTimer.status = 1
       } else {
         this.addTimer.relatedId = undefined
-        this.addTimer.status = 1
-
-        this.updateTimer.status = 2
       }
 
       this.updateTimer.id = this.timerLastOne.id
@@ -177,10 +170,7 @@ export default class extends Vue {
       this.updateTimer.type = this.timerLastOne.type
       this.updateTimerCreateTime = moment(this.timerLastOne.createTime).format('YYYY-MM-DD HH:mm:ss')
     } else {
-      this.addTimer.status = 1
-
       this.updateTimer.type = 1
-      this.updateTimer.status = 1
     }
   }
 
@@ -189,10 +179,17 @@ export default class extends Vue {
     if (this.timerIsEdit) {
       this.updateTimer.type = this.timerSelectType
       this.updateTimer.createTime = moment(this.updateTimerCreateTime, 'YYYY-MM-DD HH:mm:ss').unix() * 1000
+      let oldStatus: number = 1
+      if (this.timerLastOne !== undefined) {
+        oldStatus = this.timerLastOne.status
+      }
       const result = await apiUpdateTimer(this.updateTimer)
       if (result.status) {
         this.$message.success('更新计时器成功')
         this.timerLastOne = result.data
+        if (this.timerLastOne !== undefined) {
+          this.timerLastOne.status = oldStatus
+        }
         this.calTimerLastOne()
         if (this.timerLastOne?.status == 1) {
           this.timerStatus = true
