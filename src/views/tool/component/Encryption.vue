@@ -55,7 +55,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import md5 from 'js-md5'
 import { Base64 } from 'js-base64'
-import { options } from '@/constant/toolConstant'
+import { encryptOptions } from '@/constant/toolConstant'
 
 @Component({
   name: 'Encryption'
@@ -65,7 +65,7 @@ export default class extends Vue {
   private encryptAlgorithm = 'Base64'
   private pendingEncode = ''
   private pendingDecode = ''
-  private options = options
+  private options = encryptOptions
 
   private handleSelectAlgorithm (algorithm: string) {
     if (algorithm === 'MD5') {

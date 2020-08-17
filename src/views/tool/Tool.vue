@@ -9,24 +9,16 @@
     </el-menu>
 
     <!--时间戳-->
-    <div v-show="showKey ==='1'" style="margin-top: 10px;">
-      <timestamp></timestamp>
-    </div>
+    <timestamp v-show="showKey ==='1'" style="margin-top: 10px;"></timestamp>
 
     <!--加密，解密-->
-    <div v-show="showKey ==='2'" style="margin-top: 10px;">
-      <Encryption></Encryption>
-    </div>
+    <Encryption v-show="showKey ==='2'" style="margin-top: 10px;"></Encryption>
 
     <!--房租计算-->
-    <div v-show="showKey ==='3'" style="margin-top: 10px;">
-      <Rent></Rent>
-    </div>
+    <Rent v-show="showKey ==='3'" style="margin-top: 10px;"></Rent>
 
     <!--月流水-->
-    <div v-if="showKey ==='4'" style="margin-top: 10px;">
-      <MonthlyFunds></MonthlyFunds>
-    </div>
+    <MonthlyFunds v-if="showKey ==='4'" style="margin-top: 10px;"></MonthlyFunds>
   </div>
 </template>
 
@@ -37,7 +29,7 @@ import { UserModule } from '@/store/modules/user'
 import Encryption from '@/views/tool/component/Encryption.vue'
 import Rent from '@/views/tool/component/Rent.vue'
 import Timestamp from '@/views/tool/component/Timestamp.vue'
-import MonthlyFunds from '@/components/echarts/MonthlyFunds.vue'
+import MonthlyFunds from '@/views/tool/component/MonthlyFunds.vue'
 
 @Component({
   name: 'Tool',
