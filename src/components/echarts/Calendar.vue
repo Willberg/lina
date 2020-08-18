@@ -75,9 +75,13 @@ export default class extends Vue {
   }
 
   mounted () {
-    if (UserModule.userProfile !== undefined) {
-      this.initCalendar()
-    }
+    const initCalendar = this.initCalendar
+    setTimeout(function () {
+      // 等待Nav渲染
+      if (UserModule.userProfile !== undefined) {
+        initCalendar()
+      }
+    }, 1000)
   }
 
   // private getPie (c: string) {
