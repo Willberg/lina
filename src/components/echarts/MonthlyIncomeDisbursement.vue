@@ -1,5 +1,17 @@
 <template>
   <div>
+    <el-row :gutter="10">
+      <!--   trick  -->
+      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2" :offset="10">
+        <span style="background-color: #c23531; color: #c23531;">**</span>
+        <span style=" margin-left: 10%;">收入</span>
+      </el-col>
+      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">
+        <span style="background-color: #2f4554; color: #2f4554;">**</span>
+        <span style="margin-left: 10%;">支出</span>
+      </el-col>
+    </el-row>
+
     <div id="monthlyIncomeDisbursement" style="width: 100%; height:400px; margin-top: 10px;"></div>
   </div>
 </template>
@@ -32,17 +44,17 @@ export default class extends Vue {
       },
       // @ts-ignore
       formatter: function (params) {
-        let tar;
-        if (params[1].value !== '-') {
-          tar = params[1];
+        let tar = params[2]
+        let seriesName = '支出'
+        let value: number
+        if (tar.value > 0) {
+          seriesName = '收入'
+          value = tar.value
         } else {
-          tar = params[0];
+          value = -tar.value
         }
-        return tar.name + '<br/>' + tar.seriesName + ' : ' + tar.value;
+        return tar.name + '<br/>' + seriesName + ' : ' + value + '<br/> 总金额 : ' + params[3].value
       }
-    },
-    legend: {
-      data: ['支出', '收入']
     },
     grid: {
       left: '3%',
@@ -69,6 +81,24 @@ export default class extends Vue {
         name: '主要',
         type: 'bar',
         stack: '总量',
+        data: []
+      },
+      {
+        name: '金额',
+        type: 'bar',
+        stack: 'amount',
+        itemStyle: {
+          color: this.transparentColor
+        },
+        data: []
+      },
+      {
+        name: '总金额',
+        type: 'bar',
+        stack: 'total',
+        itemStyle: {
+          color: this.transparentColor
+        },
         data: []
       }
     ]
@@ -218,10 +248,12 @@ export default class extends Vue {
         this.monthlyIncomeDisbursementOption.series[0].data.push(assistData)
         // @ts-ignore
         this.monthlyIncomeDisbursementOption.series[1].data.push(data)
+        // @ts-ignore
+        this.monthlyIncomeDisbursementOption.series[2].data.push(amount)
         assistAmount += amount
+        // @ts-ignore
+        this.monthlyIncomeDisbursementOption.series[3].data.push(assistAmount)
       }
-      console.log(this.monthlyIncomeDisbursementOption.series[0].data)
-      console.log(this.monthlyIncomeDisbursementOption.series[1].data)
     }
   }
 
