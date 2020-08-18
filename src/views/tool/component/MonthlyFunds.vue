@@ -179,8 +179,6 @@ export default class extends Vue {
     if (result.status) {
       this.$message.success('添加成功')
       this.updateChart()
-    } else {
-      this.$message.error('添加失败')
     }
     this.fundsFormVisible = false
     this.fundLoading = false
@@ -199,8 +197,6 @@ export default class extends Vue {
     if (result.status) {
       this.$message.success('更新成功')
       this.updateChart()
-    } else {
-      this.$message.error('更新失败')
     }
     this.fundsFormVisible = false
     this.fundLoading = false

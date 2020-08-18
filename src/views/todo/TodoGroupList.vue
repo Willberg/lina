@@ -161,23 +161,26 @@ export default class extends Vue {
     // html加载完成后执行。执行顺序：子组件-父组件
     const user = UserModule.userProfile
     if (user === undefined) {
-      this.getAndSetUser()
+      this.getUserAndInitData()
+    } else {
+      this.initData()
     }
-
-    // 获取数据总量
-    this.getTodoGroupTotal()
-    // 已登录，加载初始数据
-    this.getTodoGroupList()
   }
 
-  private async getAndSetUser () {
+  private async initData () {
+    // 已登录，加载初始数据
+    const status = await this.getTodoGroupList()
+    if (status) {
+      // 获取数据总量
+      await this.getTodoGroupTotal()
+    }
+  }
+
+  private async getUserAndInitData () {
     const result = await getUser()
     if (result.status) {
       UserModule.setUser(result.data)
-    } else {
-      await this.$router.push({
-        path: '/login'
-      })
+      await this.initData()
     }
   }
 
@@ -288,6 +291,7 @@ export default class extends Vue {
       }
     }
     this.listLoading = false
+    return result.status
   }
 }
 </script>

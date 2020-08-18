@@ -28,8 +28,18 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response) => {
     const res = response.data
-    if (!res.status) {
-      if (res.code === 'user.0002') {
+    if (res.status) {
+      return res
+    }
+
+    if (res.code === 'user.0002') {
+      if (location.hash.endsWith('login')) {
+        Message({
+          message: '用户名或密码错误',
+          type: 'error',
+          duration: 3 * 1000
+        })
+      } else {
         MessageBox.confirm(
           res.message,
           {
@@ -40,27 +50,31 @@ service.interceptors.response.use(
         ).then(() => {
           // 重新登录，要清除vuex
           UserModule.setUser(undefined)
-          if (!location.hash.endsWith('login') && !location.hash.endsWith('logout')) {
-            // 防止todoList页面死循环
-            location.hash = '#/login'
-            // location.replace('/')
-          }
+          // 防止todoList页面死循环
+          location.hash = '#/login'
+          // location.replace('/')
           // location.reload() // To prevent bugs from vue-router
         })
-        return Promise.reject(new Error('Error'))
       }
-      return Promise.reject(new Error(res.message || 'Error'))
+    } else {
+      // for debug
+      console.log(res.message)
+      Message({
+        message: res.message,
+        type: 'error',
+        duration: 3 * 1000
+      })
     }
     return res
   },
   (error) => {
-    if (error.message !== 'Error') {
-      Message({
-        message: error.message,
-        type: 'error',
-        duration: 5 * 1000
-      })
-    }
+    // for debug
+    console.log(error.message)
+    Message({
+      message: error.message,
+      type: 'error',
+      duration: 3 * 1000
+    })
     return Promise.reject(error)
   }
 )
