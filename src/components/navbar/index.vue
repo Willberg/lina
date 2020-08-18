@@ -82,6 +82,7 @@ import { priorities, todoGroupList, todoGroupPriorities, todoList } from '@/cons
 import { GROUP_ID, NAV_INDEX, TOKEN } from '@/constant/storageConstant'
 import moment from 'moment'
 import { handleTodoList } from '@/utils/todo'
+import { getUser } from '@/api/user'
 
 @Component({
   name: 'Nav'
@@ -103,6 +104,24 @@ export default class extends Vue {
   created () {
     this.activeIndex = sessionStorage.getItem(NAV_INDEX) || '1'
     this.isTodo = this.$route.path.startsWith('/todo')
+  }
+
+  mounted () {
+    const user = UserModule.userProfile
+    if (user === undefined) {
+      if (location.hash === '#/') {
+        // 首页时进行用户资料查询
+        this.getUserAndSetUser()
+      }
+    }
+  }
+
+  private async getUserAndSetUser () {
+    const result = await getUser()
+    if (result.status) {
+      this.isLogin = true
+      UserModule.setUser(result.data)
+    }
   }
 
   private async handleRedirect (page: string) {
