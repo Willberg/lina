@@ -97,9 +97,13 @@ export default class extends Vue {
   }
 
   mounted () {
-    if (UserModule.userProfile !== undefined) {
-      this.initTimer()
-    }
+    const initTimer = this.initTimer
+    setTimeout(function () {
+      // 等待Nav渲染
+      if (UserModule.userProfile !== undefined) {
+        initTimer()
+      }
+    }, 1000)
 
     const updateTimerUseTime = this.updateTimerUseTime
     this.countdownTimer = setInterval(function () {
