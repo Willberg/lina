@@ -9,6 +9,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import echarts, { ECharts } from 'echarts'
 import { apiListFunds } from '@/api/funds'
 import moment from 'moment'
+import { IFundsChartBar } from '@/types/funds/types'
 
 @Component({
   name: 'MonthlyIncomeDisbursement'
@@ -16,6 +17,9 @@ import moment from 'moment'
 export default class extends Vue {
   private selectedMonth = localStorage.getItem('selectedMonth') || moment().format('YYYY-MM')
 
+  private positiveColor = '#c23531'
+  private negativeColor = '#2f4554'
+  private transparentColor = '#00000000'
   private monthlyIncomeDisbursementChart: ECharts | undefined
   private monthlyIncomeDisbursementOption = {
     title: {
@@ -59,36 +63,12 @@ export default class extends Vue {
         name: '辅助',
         type: 'bar',
         stack: '总量',
-        itemStyle: {
-          barBorderColor: 'rgba(0,0,0,0)',
-          color: 'rgba(0,0,0,0)'
-        },
-        emphasis: {
-          itemStyle: {
-            barBorderColor: 'rgba(0,0,0,0)',
-            color: 'rgba(0,0,0,0)'
-          }
-        },
         data: []
       },
       {
-        name: '收入',
+        name: '主要',
         type: 'bar',
         stack: '总量',
-        label: {
-          show: true,
-          position: 'top'
-        },
-        data: []
-      },
-      {
-        name: '支出',
-        type: 'bar',
-        stack: '总量',
-        label: {
-          show: true,
-          position: 'bottom'
-        },
         data: []
       }
     ]
@@ -111,12 +91,166 @@ export default class extends Vue {
     }
     const result = await apiListFunds(param)
     if (result.status) {
+      let dateArray = Object.keys(result.data).sort((a, b) => {
+        const aDate = moment(a, 'YYYY-MM-DD').unix()
+        const bData = moment(b, 'YYYY-MM-DD').unix()
+        if (aDate > bData) {
+          return 1
+        } else {
+          return -1
+        }
+      })
 
-      // {
-      //   "2020-08-16": -10.0
-      // }
+      let assistAmount: number = 0
+      for (let date of dateArray) {
+        // @ts-ignore
+        this.monthlyIncomeDisbursementOption.xAxis.data.push(date)
 
+        let assistData: any = ''
+        let data: any = ''
+        const amount = result.data[date]
+        if (amount >= 0) {
+          if (assistAmount >= 0) {
+            const assistBar: IFundsChartBar = {
+              color: this.transparentColor,
+              value: assistAmount,
+              show: false
+            }
+            assistData = this.calBarData(assistBar)
 
+            const dataBar: IFundsChartBar = {
+              color: this.positiveColor,
+              value: amount,
+              show: true,
+              position: 'top',
+              adjust: 0
+            }
+            data = this.calBarData(dataBar)
+          } else {
+            if (assistAmount + amount > 0) {
+              const assistBar: IFundsChartBar = {
+                color: this.positiveColor,
+                value: assistAmount,
+                show: false
+              }
+              assistData = this.calBarData(assistBar)
+
+              const dataBar: IFundsChartBar = {
+                color: this.positiveColor,
+                value: assistAmount + amount,
+                show: true,
+                position: 'top',
+                adjust: -assistAmount
+              }
+              data = this.calBarData(dataBar)
+            } else {
+              const assistBar: IFundsChartBar = {
+                color: this.transparentColor,
+                value: assistAmount + amount,
+                show: false
+              }
+              assistData = this.calBarData(assistBar)
+
+              const dataBar: IFundsChartBar = {
+                color: this.positiveColor,
+                value: -amount,
+                show: true,
+                position: 'top',
+                adjust: 2 * amount
+              }
+              data = this.calBarData(dataBar)
+            }
+          }
+        } else {
+          if (assistAmount <= 0) {
+            const assistBar: IFundsChartBar = {
+              color: this.transparentColor,
+              value: assistAmount,
+              show: false
+            }
+            assistData = this.calBarData(assistBar)
+
+            const dataBar: IFundsChartBar = {
+              color: this.negativeColor,
+              value: amount,
+              show: true,
+              position: 'bottom',
+              adjust: -2 * amount
+            }
+            data = this.calBarData(dataBar)
+          } else {
+            if (assistAmount + amount < 0) {
+              const assistBar: IFundsChartBar = {
+                color: this.negativeColor,
+                value: assistAmount,
+                show: false
+              }
+              assistData = this.calBarData(assistBar)
+
+              const dataBar: IFundsChartBar = {
+                color: this.negativeColor,
+                value: assistAmount + amount,
+                show: true,
+                position: 'bottom',
+                adjust: -assistAmount - 2 * amount
+              }
+              data = this.calBarData(dataBar)
+            } else {
+              const assistBar: IFundsChartBar = {
+                color: this.transparentColor,
+                value: assistAmount + amount,
+                show: false
+              }
+              assistData = this.calBarData(assistBar)
+
+              const dataBar: IFundsChartBar = {
+                color: this.negativeColor,
+                value: -amount,
+                show: true,
+                position: 'bottom',
+                adjust: 0
+              }
+              data = this.calBarData(dataBar)
+            }
+          }
+        }
+        // @ts-ignore
+        this.monthlyIncomeDisbursementOption.series[0].data.push(assistData)
+        // @ts-ignore
+        this.monthlyIncomeDisbursementOption.series[1].data.push(data)
+        assistAmount += amount
+      }
+      console.log(this.monthlyIncomeDisbursementOption.series[0].data)
+      console.log(this.monthlyIncomeDisbursementOption.series[1].data)
+    }
+  }
+
+  private calBarData (bar: IFundsChartBar) {
+    if (bar.show) {
+      return {
+        itemStyle: {
+          color: bar.color
+        },
+        value: bar.value,
+        label: {
+          show: bar.show,
+          position: bar.position,
+          // @ts-ignore
+          formatter: function (param) {
+            return param.value + bar.adjust
+          }
+        }
+      }
+    } else {
+      return {
+        itemStyle: {
+          color: bar.color
+        },
+        value: bar.value,
+        label: {
+          show: bar.show
+        }
+      }
     }
   }
 }

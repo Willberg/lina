@@ -8,3 +8,11 @@ export interface IRetFunds {
   type: number;
   status: number;
 }
+
+export interface IFundsChartBar {
+  color: string;
+  value: number;
+  show: boolean;
+  position?: string;
+  adjust?: number;
+}
