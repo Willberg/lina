@@ -160,7 +160,7 @@ export default class extends Vue {
       // @ts-ignore
       this.calendarOption.series[0].data = scatterData
       // @ts-ignore
-      this.calendarChart.setOption(this.calendarOption)
+      this.calendarChart.setOption(this.calendarOption, true)
 
       let idx = 0
       const pieSeries = []
