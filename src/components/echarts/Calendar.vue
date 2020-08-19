@@ -1,13 +1,14 @@
 <template>
   <div>
-    <el-row :gutter="10" style="margin-top: 30px;">
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
-        <b>作息日历</b>
+    <el-row>
+      <el-col :xs="14" :sm="12" :md="10" :lg="4" :xl="4" style="margin-top: 20px;">
+        <el-date-picker v-model="selectedMonth" value-format="yyyy-MM" v-on:change="changeMonth" type="month"
+                        placeholder="选择月"></el-date-picker>
       </el-col>
     </el-row>
     <el-row :gutter="10" style="margin-top: 10px;">
       <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
-        <div id="calendarChart" style="width: 100%; height:560px;"></div>
+        <div id="calendarChart" style="width: 100%; height:640px;"></div>
       </el-col>
     </el-row>
   </div>
@@ -25,9 +26,15 @@ import { UserModule } from '@/store/modules/user'
   name: 'Calendar'
 })
 export default class extends Vue {
+  private oldSelectedMonth = moment().format('YYYY-MM')
+  private selectedMonth = moment().format('YYYY-MM')
+
   private timerTypeMap = timerTypeMap
   private calendarChart: ECharts | undefined
   private calendarOption = {
+    title: {
+      text: '月作息日历'
+    },
     tooltip: {
       // @ts-ignore
       formatter: function (params) {
@@ -132,7 +139,7 @@ export default class extends Vue {
 
   private async initCalendar () {
     const param = {
-      selectedMonth: moment().format('YYYY-MM')
+      selectedMonth: this.selectedMonth
     }
 
     const result = await apiListTimer(param)
@@ -167,6 +174,15 @@ export default class extends Vue {
         series: pieSeries
       })
     }
+  }
+
+  private changeMonth () {
+    if (this.selectedMonth == null || this.selectedMonth === this.oldSelectedMonth) {
+      return
+    }
+
+    this.initCalendar()
+    this.oldSelectedMonth = this.selectedMonth
   }
 }
 </script>
