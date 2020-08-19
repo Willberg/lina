@@ -1,8 +1,13 @@
 <template>
   <div>
-    <el-row :gutter="10">
-      <el-col>
-        <div id="timerCalendar" style="width: 100%; height:560px;"></div>
+    <el-row :gutter="10" style="margin-top: 30px;">
+      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
+        <b>作息日历</b>
+      </el-col>
+    </el-row>
+    <el-row :gutter="10" style="margin-top: 10px;">
+      <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
+        <div id="calendarChart" style="width: 100%; height:560px;"></div>
       </el-col>
     </el-row>
   </div>
@@ -11,7 +16,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import echarts, { ECharts } from 'echarts'
-import { timerTypeList } from '@/constant/timerConstant'
+import { timerTypeList, timerTypeMap } from '@/constant/timerConstant'
 import moment from 'moment'
 import { apiListTimer } from '@/api/timer'
 import { UserModule } from '@/store/modules/user'
@@ -20,13 +25,16 @@ import { UserModule } from '@/store/modules/user'
   name: 'Calendar'
 })
 export default class extends Vue {
-  private cellSize = [80, 80]
-  private pieRadius = 30
-  private calendarYearMonth = '1970-01'
-  private scatterData: any[] = []
-  private timerChart: ECharts | undefined
-  private timerOption = {
-    tooltip: {},
+  private timerTypeMap = timerTypeMap
+  private calendarChart: ECharts | undefined
+  private calendarOption = {
+    tooltip: {
+      // @ts-ignore
+      formatter: function (params) {
+        return params.marker + params.data.name + ' : ' + params.data.value + '分钟'
+          + '(' + (params.data.value / 60).toFixed(2) + '小时)'
+      }
+    },
     legend: {
       data: timerTypeList,
       bottom: 20
@@ -35,7 +43,7 @@ export default class extends Vue {
       top: 'middle',
       left: 'center',
       orient: 'vertical',
-      cellSize: [80, 80],
+      cellSize: [],
       yearLabel: {
         show: false,
         textStyle: {
@@ -50,7 +58,7 @@ export default class extends Vue {
       monthLabel: {
         show: false
       },
-      range: this.calendarYearMonth
+      range: ''
     },
     series: [{
       id: 'label',
@@ -63,14 +71,14 @@ export default class extends Vue {
           formatter: function (params: any) {
             return moment(params.value[0], 'YYYY-MM-DD').format('DD')
           },
-          offset: [-this.cellSize[0] / 2 + 10, -this.cellSize[1] / 2 + 10],
+          offset: [],
           textStyle: {
             color: '#000',
             fontSize: 14
           }
         }
       },
-      data: this.scatterData
+      data: []
     }]
   }
 
@@ -84,46 +92,80 @@ export default class extends Vue {
     }, 1000)
   }
 
-  // private getPie (c: string) {
-  //   let center = this.timerChart?.convertToPixel('calendar', c);
-  //   return {
-  //     type: 'pie',
-  //     center: center,
-  //     label: {
-  //       normal: {
-  //         formatter: '{c}',
-  //         position: 'inside'
-  //       }
-  //     },
-  //     radius: this.pieRadius,
-  //     data: [
-  //       { name: '工作', value:  },
-  //       { name: '娱乐', value: Math.round(Math.random() * 24) },
-  //       { name: '睡觉', value: Math.round(Math.random() * 24) }
-  //     ]
-  //   };
-  // }
+  private getPie (idx: number, item: any[], data: any) {
+    // @ts-ignore
+    let center = this.calendarChart.convertToPixel('calendar', item)
+
+    const retData = []
+    let restTime = 24 * 60
+    for (let key of Object.keys(data)) {
+      const useTime = parseFloat((data[key] / 60).toFixed(2))
+      if (key !== '6') {
+        restTime -= useTime
+        retData.push({
+          // @ts-ignore
+          name: this.timerTypeMap[key],
+          value: useTime
+        })
+      }
+    }
+    retData.push({
+      // @ts-ignore
+      name: this.timerTypeMap['6'],
+      value: parseFloat(restTime.toFixed(2))
+    })
+
+    return {
+      id: idx + 'pie',
+      type: 'pie',
+      center: center,
+      label: {
+        normal: {
+          formatter: '{c}',
+          position: 'inside'
+        }
+      },
+      radius: 30,
+      data: retData
+    }
+  }
 
   private async initCalendar () {
     const param = {
       selectedMonth: moment().format('YYYY-MM')
     }
+
     const result = await apiListTimer(param)
     if (result.status) {
       const data = result.data
+      this.calendarChart = echarts.init(<HTMLDivElement>document.getElementById('calendarChart'))
+      const cellSize = [80, 80]
+      // @ts-ignore
+      this.calendarOption.calendar.cellSize = cellSize
+      // @ts-ignore
+      this.calendarOption.calendar.range = Object.keys(data)[0].substr(0, 7)
+      // @ts-ignore
+      this.calendarOption.series[0].label.normal.offset = [-cellSize[0] / 2 + 10, -cellSize[1] / 2 + 10]
+      const scatterData = []
+      for (const date of Object.keys(data)) {
+        scatterData.push([date, 1])
+      }
+      // @ts-ignore
+      this.calendarOption.series[0].data = scatterData
+      // @ts-ignore
+      this.calendarChart.setOption(this.calendarOption)
 
+      let idx = 0
       const pieSeries = []
-      for (const k in Object.keys(data)) {
-        this.scatterData.push([k, 1])
-        // const pie = this.getPie()
-        pieSeries.push()
+      for (const date of Object.keys(data)) {
+        const pie = this.getPie(idx++, [date, 1], data[date])
+        pieSeries.push(pie)
       }
 
-      this.calendarYearMonth = this.scatterData[0][0].substr(0, 7)
-
-      this.timerChart = echarts.init(<HTMLDivElement>document.getElementById('timerCalendar'))
       // @ts-ignore
-      this.timerChart.setOption(this.timerOption)
+      this.calendarChart.setOption({
+        series: pieSeries
+      })
     }
   }
 }
