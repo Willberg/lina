@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row>
+    <el-row v-show="showSelectedMonth">
       <el-col :xs="14" :sm="12" :md="10" :lg="4" :xl="4" style="margin-top: 20px;">
         <el-date-picker v-model="selectedMonth" value-format="yyyy-MM" v-on:change="changeMonth" type="month"
                         placeholder="选择月"></el-date-picker>
@@ -26,6 +26,8 @@ import { UserModule } from '@/store/modules/user'
   name: 'Calendar'
 })
 export default class extends Vue {
+  private showSelectedMonth = false
+
   private oldSelectedMonth = moment().format('YYYY-MM')
   private selectedMonth = moment().format('YYYY-MM')
 
@@ -144,6 +146,7 @@ export default class extends Vue {
 
     const result = await apiListTimer(param)
     if (result.status) {
+      this.showSelectedMonth = true
       const data = result.data
       this.calendarChart = echarts.init(<HTMLDivElement>document.getElementById('calendarChart'))
       const cellSize = [80, 80]
