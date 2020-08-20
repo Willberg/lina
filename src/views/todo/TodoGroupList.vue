@@ -102,7 +102,7 @@
     <el-dialog title="分享url" :visible.sync="shareUrlVisible">
       <el-link type="primary">{{shareUrl}}</el-link>
       <div slot="footer" class="dialog-footer">
-        <el-button type="button" v-clipboard:copy="shareUrl" @click="shareUrlVisible=false">拷 贝</el-button>
+        <el-button type="primary" v-clipboard:copy="shareUrl" @click="shareUrlVisible=false">拷 贝</el-button>
         <el-button @click="shareUrlVisible=false">取 消</el-button>
       </div>
     </el-dialog>
@@ -244,8 +244,14 @@ export default class extends Vue {
       }
       const result = await updateTodoGroup(param)
       if (result.status) {
-        this.pendingTodoGroup.maxTime = result.data.maxTime
-        this.pendingTodoGroup.minPriority = result.data.minPriority
+        if (param.maxTime !== undefined) {
+          this.pendingTodoGroup.maxTime = result.data.maxTime
+        }
+        if (param.minPriority !== undefined) {
+          this.pendingTodoGroup.minPriority = result.data.minPriority
+        }
+
+        this.$message.success('修改成功')
       }
     }
     this.todoGroupFormVisible = false

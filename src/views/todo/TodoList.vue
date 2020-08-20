@@ -254,6 +254,7 @@ export default class extends Vue {
   }
 
   private async submitEdit () {
+    this.editLoading = true
     if (this.oldTodo !== undefined
       && (this.oldTodo.task !== this.todoForm.task
         || this.oldTodo.priority !== this.todoForm.priority
@@ -280,6 +281,7 @@ export default class extends Vue {
         }
         const result = await openUpdateTodo(token, param)
         if (result.status) {
+          this.$message.success('修改成功')
           const idx = this.todoList.indexOf(this.oldTodo)
           this.todoList.splice(idx, 1)
           this.todoList.push(convertToTodo(result.data))
@@ -332,6 +334,7 @@ export default class extends Vue {
           const idx = this.todoList.indexOf(this.oldTodo)
           this.todoList.splice(idx, 1)
           this.todoList.push(convertToTodo(result.data))
+          this.$message.success('修改成功')
         }
       }
     }

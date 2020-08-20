@@ -139,15 +139,12 @@ export default class extends Vue {
   private async handleLogout () {
     const status = await UserModule.Logout()
     if (status) {
-      if (location.hash === '#/') {
-        // 首页退出，刷新首页，隐藏要登录的功能
-        location.reload()
-        return
-      }
+      UserModule.setUser(undefined)
       this.isLogin = false
-      await this.$router.push({
-        path: '/'
-      })
+    }
+    if (location.hash === '#/') {
+      // 首页退出，刷新首页，隐藏要登录的功能
+      location.reload()
     }
   }
 
@@ -211,6 +208,7 @@ export default class extends Vue {
       return
     }
 
+    this.addLoading = true
     if (this.isTodoGroupList) {
       const param = {
         maxTime: this.todoForm.maxTime,
@@ -237,7 +235,7 @@ export default class extends Vue {
           status: t.status
         }
         todoGroupList.unshift(todoGroup)
-
+        this.$message.success('添加成功')
       }
     } else {
       if (this.isOpen) {
@@ -249,6 +247,9 @@ export default class extends Vue {
           task: this.todoForm.task,
           priority: this.todoForm.priority
         })
+        if (result.status) {
+          this.$message.success('添加成功')
+        }
         this.changeIsClearAdd(result.status)
         handleTodoList(result, todoList, true)
       } else {
@@ -264,6 +265,9 @@ export default class extends Vue {
           }]
         }
         const result = await patchAddTodo(param)
+        if (result.status) {
+          this.$message.success('添加成功')
+        }
         this.changeIsClearAdd(result.status)
         handleTodoList(result, todoList, true)
       }

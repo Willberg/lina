@@ -6,6 +6,7 @@
       <el-menu-item index="2">加密解密</el-menu-item>
       <el-menu-item v-if="isLogin" index="3">房租计算</el-menu-item>
       <el-menu-item v-if="isLogin" index="4">月流水</el-menu-item>
+      <el-menu-item v-if="isLogin" index="5">密码器</el-menu-item>
     </el-menu>
 
     <!--时间戳-->
@@ -19,6 +20,9 @@
 
     <!--月流水-->
     <MonthlyFunds v-if="showKey ==='4'" style="margin-top: 10px;"></MonthlyFunds>
+
+    <!--月流水-->
+    <Cipher v-if="showKey ==='5'" style="margin-top: 10px;"></Cipher>
   </div>
 </template>
 
@@ -30,10 +34,12 @@ import Encryption from '@/views/tool/component/Encryption.vue'
 import Rent from '@/views/tool/component/Rent.vue'
 import Timestamp from '@/views/tool/component/Timestamp.vue'
 import MonthlyFunds from '@/views/tool/component/MonthlyFunds.vue'
+import Cipher from '@/views/tool/component/Cipher.vue'
 
 @Component({
   name: 'Tool',
   components: {
+    Cipher,
     Nav,
     Encryption,
     Rent,
