@@ -141,6 +141,11 @@ export default class extends Vue {
     if (status) {
       UserModule.setUser(undefined)
       this.isLogin = false
+      if (location.hash !== '#/') {
+        await this.$router.push({
+          path: '/'
+        })
+      }
     }
     if (location.hash === '#/') {
       // 首页退出，刷新首页，隐藏要登录的功能

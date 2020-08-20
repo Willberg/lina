@@ -94,7 +94,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { Form as ElForm, Input } from 'element-ui'
-import { isValidEmail, isValidUsername } from '@/utils/validate'
+import { isValidEmail, isValidPhoneNumber, isValidUsername } from '@/utils/validate'
 import { UserModule } from '@/store/modules/user'
 import md5 from 'js-md5'
 import { NAV_INDEX } from '@/constant/storageConstant'
@@ -129,7 +129,7 @@ export default class extends Vue {
     if (value === '') {
       callback()
     }
-    if (!isValidEmail(value)) {
+    if (!isValidPhoneNumber(value)) {
       callback(new Error('请输入正确的手机号'))
     } else {
       callback()
