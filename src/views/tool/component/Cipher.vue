@@ -91,7 +91,7 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" v-clipboard:copy="scope.row.password">密码</el-button>
           <el-button @click="showDialog(false, scope.row)" type="text" size="small">编辑</el-button>
-          <el-button @click="handleShare(scope.row)" type="text" size="small">分享</el-button>
+          <el-button @click="handleRedirect(scope.row)" type="text" size="small">跳转</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -99,9 +99,6 @@
     <!--  dialog -->
     <el-dialog :title="dialogTitle" :visible.sync="isShowDialog">
       <el-form :model="cipher">
-        <el-form-item v-show="!isAdd" label="ID" label-width="120px">
-          <el-input v-model="cipher.id" autocomplete="off"></el-input>
-        </el-form-item>
         <el-form-item label="网站名" label-width="120px">
           <el-input v-model="cipher.name" autocomplete="off"></el-input>
         </el-form-item>
@@ -139,12 +136,12 @@
       </div>
     </el-dialog>
 
-    <!--  分享  -->
-    <el-dialog title="分享url" :visible.sync="shareUrlVisible">
-      <el-link type="primary">{{shareUrl}}</el-link>
+    <!--  跳转  -->
+    <el-dialog title="跳转url" :visible.sync="redirectUrlVisible">
+      <el-link :herf="redirectUrl" type="primary" target="_blank">{{redirectUrl}}</el-link>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" v-clipboard:copy="shareUrl" @click="shareUrlVisible=false">拷 贝</el-button>
-        <el-button @click="shareUrlVisible=false">取 消</el-button>
+        <el-button type="primary" v-clipboard:copy="redirectUrl" @click="redirectUrlVisible=false">拷 贝</el-button>
+        <el-button @click="redirectUrlVisible=false">取 消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -166,8 +163,8 @@ export default class extends Vue {
   private listLoading = false
   private cipherList: ICipher[] = []
 
-  private shareUrlVisible = false
-  private shareUrl = ''
+  private redirectUrlVisible = false
+  private redirectUrl = ''
 
   private isShowDialog = false
   private submitLoading = false
@@ -175,6 +172,7 @@ export default class extends Vue {
   private isAdd = true
   private dialogTitle = '添加密码'
   private statusMap = statusMap
+  private oldCipher: ICipher | undefined
   private cipher: ICipher = {
     id: 0,
     createTime: 0,
@@ -189,11 +187,11 @@ export default class extends Vue {
   }
 
   private descCreateTime (createTime: number) {
-    return moment(createTime).format("YYYY-MM-DD HH:mm:ss")
+    return moment(createTime).format('YYYY-MM-DD HH:mm:ss')
   }
 
   private descStatus (status: number) {
-    return status == 1 ? '正常' : '删除'
+    return status === 1 ? '正常' : '删除'
   }
 
   private async searchByName () {
@@ -208,7 +206,7 @@ export default class extends Vue {
     const result = await apiSearchCipher(param)
     if (result.status) {
       this.cipherList = []
-      for (let c of result.data) {
+      for (const c of result.data) {
         const cipher: ICipher = {
           id: c.id,
           createTime: c.createTime,
@@ -218,7 +216,7 @@ export default class extends Vue {
           email: c.email,
           phoneNumber: c.phoneNumber,
           link: c.link,
-          updateDateTime: moment(c.updateTime).format("YYYY-MM-DD HH:mm:ss"),
+          updateDateTime: moment(c.updateTime).format('YYYY-MM-DD HH:mm:ss'),
           status: c.status
         }
         this.cipherList.push(cipher)
@@ -235,14 +233,17 @@ export default class extends Vue {
     } else {
       if (c !== undefined) {
         this.cipher = c
+        // 深拷贝，不能拷贝function
+        this.oldCipher = JSON.parse(JSON.stringify(c))
       }
+      this.isChangePassword = false
       this.dialogTitle = '修改网站密码'
     }
   }
 
-  private handleShare (cipher: ICipher) {
-    this.shareUrlVisible = true
-    this.shareUrl = cipher.link
+  private handleRedirect (cipher: ICipher) {
+    this.redirectUrlVisible = true
+    this.redirectUrl = cipher.link
   }
 
   private async submit () {
@@ -267,33 +268,60 @@ export default class extends Vue {
           email: c.email,
           phoneNumber: c.phoneNumber,
           link: c.link,
-          updateDateTime: moment(c.updateTime).format("YYYY-MM-DD HH:mm:ss"),
+          updateDateTime: moment(c.updateTime).format('YYYY-MM-DD HH:mm:ss'),
           status: c.status
         }
         this.cipherList.push(cipher)
         this.$message.success('添加成功')
       }
     } else {
-      const newCipherList: ICipher[] = []
-      for (let i in this.cipherList) {
-        if (this.cipherList[i].id !== this.cipher.id) {
-          newCipherList.push(this.cipherList[i])
-        }
+      if (this.oldCipher === undefined ||
+        (this.oldCipher.name === this.cipher.name &&
+          this.oldCipher.userName === this.cipher.userName &&
+          !this.isChangePassword &&
+          this.oldCipher.email === this.cipher.email &&
+          this.oldCipher.phoneNumber === this.cipher.phoneNumber &&
+          this.oldCipher.link === this.cipher.link &&
+          this.oldCipher.status === this.cipher.status)) {
+        this.$message.warning('请修改内容')
+        this.isShowDialog = false
+        this.submitLoading = false
+        return
       }
 
       const param = {
         id: this.cipher.id,
-        name: this.cipher.name !== '' ? this.cipher.name : undefined,
-        userName: this.cipher.userName !== '' ? this.cipher.userName : undefined,
+        name: this.cipher.name !== this.oldCipher.name ? this.cipher.name : undefined,
+        userName: this.cipher.userName !== this.oldCipher.userName ? this.cipher.userName : undefined,
         password: this.isChangePassword ? '1' : undefined,
-        email: this.cipher.email !== '' ? this.cipher.email : undefined,
-        phoneNumber: this.cipher.phoneNumber !== '' ? this.cipher.phoneNumber : undefined,
-        link: this.cipher.link !== '' ? this.cipher.link : undefined,
-        status: this.cipher.status
+        email: this.cipher.email !== this.oldCipher.email ? this.cipher.email : undefined,
+        phoneNumber: this.cipher.phoneNumber !== this.oldCipher.phoneNumber ? this.cipher.phoneNumber : undefined,
+        link: this.cipher.link !== this.oldCipher.link ? this.cipher.link : undefined,
+        status: this.cipher.status !== this.oldCipher.status ? this.cipher.status : undefined
       }
       const result = await apiUpdateCipher(param)
       if (result.status) {
-        newCipherList.push(result.data)
+        const newCipherList: ICipher[] = []
+        for (const i in this.cipherList) {
+          if (this.cipherList[i].id !== this.cipher.id) {
+            newCipherList.push(this.cipherList[i])
+          }
+        }
+
+        const c = result.data
+        const cipher: ICipher = {
+          id: c.id,
+          createTime: c.createTime,
+          name: c.name,
+          userName: c.userName,
+          password: c.password,
+          email: c.email,
+          phoneNumber: c.phoneNumber,
+          link: c.link,
+          updateDateTime: moment(c.updateTime).format('YYYY-MM-DD HH:mm:ss'),
+          status: c.status
+        }
+        newCipherList.push(cipher)
         this.cipherList = newCipherList
 
         this.$message.success('修改成功')

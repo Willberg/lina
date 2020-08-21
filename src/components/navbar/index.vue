@@ -35,7 +35,8 @@
           <el-form-item label="任务组最小优先级" label-width="140px">
             <el-tooltip content="请选择最小优先级(数字越小优先级越高，表示高于此优先级的任务会优先处理)" placement="top">
               <el-select v-model="todoForm.minPriority" placeholder="请选择优先级">
-                <el-option v-for="p in todoGroupPriorities" :label="p.label" :value="p.value"></el-option>
+                <el-option v-for="p in todoGroupPriorities" :label="p.label" :value="p.value"
+                           :key="p.value"></el-option>
               </el-select>
             </el-tooltip>
           </el-form-item>
@@ -48,7 +49,7 @@
         <el-form-item label="优先级" label-width="140px">
           <el-tooltip content="请选择优先级(数字越小优先级越高,重要且紧急>紧急不重要>重要不紧急>既不重要也不紧急)" placement="top">
             <el-select v-model="todoForm.priority" placeholder="请选择优先级">
-              <el-option v-for="p in priorities" :label="p.label" :value="p.value"></el-option>
+              <el-option v-for="p in priorities" :label="p.label" :value="p.value" :key="p.value"></el-option>
             </el-select>
           </el-tooltip>
         </el-form-item>
@@ -156,7 +157,7 @@ export default class extends Vue {
   private handleAdd () {
     const token = sessionStorage.getItem(TOKEN)
     const groupId = sessionStorage.getItem(GROUP_ID)
-    //清空
+    // 清空
     if (this.isClearAdd) {
       this.todoForm = {}
     }
@@ -177,8 +178,8 @@ export default class extends Vue {
     }
 
     if (this.isTodoGroupList) {
-      if (v.maxTime === undefined
-        || v.minPriority === undefined) {
+      if (v.maxTime === undefined ||
+        v.minPriority === undefined) {
         return false
       }
     } else {
@@ -188,15 +189,15 @@ export default class extends Vue {
     }
 
     if (this.isOpen) {
-      if (v.task === undefined
-        || v.priority === undefined) {
+      if (v.task === undefined ||
+        v.priority === undefined) {
         return false
       }
     } else {
-      if (v.task === undefined
-        || v.value === undefined
-        || v.estimateTime === undefined
-        || v.priority === undefined) {
+      if (v.task === undefined ||
+        v.value === undefined ||
+        v.estimateTime === undefined ||
+        v.priority === undefined) {
         return false
       }
     }
@@ -209,7 +210,7 @@ export default class extends Vue {
 
   private async submitAdd () {
     if (!this.checkParam(this.todoForm)) {
-      this.$message.error('请填写完任务信息');
+      this.$message.error('请填写完任务信息')
       return
     }
 
@@ -236,7 +237,7 @@ export default class extends Vue {
           totalTime: t.totalTime,
           maxTime: t.maxTime,
           minPriority: t.minPriority,
-          updateDateTime: moment(t.updateTime).format("YYYY-MM-DD HH:mm:ss"),
+          updateDateTime: moment(t.updateTime).format('YYYY-MM-DD HH:mm:ss'),
           status: t.status
         }
         todoGroupList.unshift(todoGroup)
@@ -245,7 +246,7 @@ export default class extends Vue {
     } else {
       if (this.isOpen) {
         if (this.tokenStr === undefined) {
-          this.$message.error('你无权操作');
+          this.$message.error('你无权操作')
           return
         }
         const result = await openAddTodo(this.tokenStr, {
