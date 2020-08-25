@@ -7,6 +7,7 @@
       <el-menu-item v-if="isLogin" index="3">房租计算</el-menu-item>
       <el-menu-item v-if="isLogin" index="4">月流水</el-menu-item>
       <el-menu-item v-if="isLogin" index="5">密码器</el-menu-item>
+      <el-menu-item v-if="isLogin" index="6">投资</el-menu-item>
     </el-menu>
 
     <!--时间戳-->
@@ -23,6 +24,9 @@
 
     <!--月流水-->
     <Cipher v-if="showKey ==='5'" style="margin-top: 10px;"></Cipher>
+
+    <!--投资-->
+    <Invest v-if="showKey ==='6'" style="margin-top: 10px;"></Invest>
   </div>
 </template>
 
@@ -35,6 +39,7 @@ import Rent from '@/views/tool/component/Rent.vue'
 import Timestamp from '@/views/tool/component/Timestamp.vue'
 import MonthlyFunds from '@/views/tool/component/MonthlyFunds.vue'
 import Cipher from '@/views/tool/component/Cipher.vue'
+import Invest from '@/views/tool/component/Invest.vue'
 
 @Component({
   name: 'Tool',
@@ -44,7 +49,8 @@ import Cipher from '@/views/tool/component/Cipher.vue'
     Encryption,
     Rent,
     Timestamp,
-    MonthlyFunds
+    MonthlyFunds,
+    Invest
   }
 })
 export default class extends Vue {
