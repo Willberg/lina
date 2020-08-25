@@ -31,94 +31,114 @@
         <el-button @click="calInvest">计算</el-button>
       </el-col>
     </el-row>
-    <el-row style="margin-top: 10px;">
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2" :offset="2">贷款月利率(%)</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">期数</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">首付（元）</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">月供（元）</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">总还款（元）</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">总利息（元）</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">贷款总利率(%)</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">理论总还款（元）</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">理论总利息（元）</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">理论贷款总利率(%)</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">差额(元)</el-col>
-    </el-row>
-    <el-row>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">等额本息</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{lendMonthRate}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{lendPeriod}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(downPay, 4)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(monthlyPayEqualInterest,4)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalRepayEqualInterest,4)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalInterestEqualInterest,4)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{calRate(lendMoney, totalInterestEqualInterest)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalRepayEqualInterestOriginal,4)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalInterestEqualInterestOriginal,4)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{calRate(lendMoney, totalInterestEqualInterestOriginal)}}
-      </el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">
-        {{descAmount(totalInterestEqualInterest - totalInterestEqualInterestOriginal,4)}}
-      </el-col>
-    </el-row>
-    <el-row>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">等额本金</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{lendMonthRate}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{lendPeriod}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(downPay, 4)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">
-        <el-button @click="" type="text" size="small">详情</el-button>
-      </el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalRepayEqualPrincipal,4)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalInterestEqualPrincipal,4)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{calRate(lendMoney, totalInterestEqualPrincipal)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalRepayEqualPrincipalOriginal,4)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalInterestEqualPrincipalOriginal,4)}}</el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{calRate(lendMoney, totalInterestEqualPrincipalOriginal)}}
-      </el-col>
-      <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">
-        {{descAmount(totalInterestEqualPrincipal-totalInterestEqualPrincipalOriginal,4)}}
-      </el-col>
-    </el-row>
 
-    <el-row style="margin-top: 10px;">
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3" :offset="3">最终总金额(元)</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">最终年回报率（%）</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">月回报率（%）</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">投资额（元）</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">投资收益额（元）</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">投资总收益率（%）</el-col>
-    </el-row>
-    <el-row>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">等额本金</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
-        {{descAmount(add(add(totalRepayEqualPrincipal, downPay), buildingInterestInvest),4)}}
-      </el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
-        {{calRateAvg(lendYear,calRate(totalRepayEqualPrincipal, buildingInterestInvest))}}
-      </el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{monthBuildingRate}}</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{descAmount(add(totalRepayEqualPrincipal, downPay), 4)}}</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{descAmount(buildingInterestInvest,4)}}</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
-        {{calRate(add(totalRepayEqualPrincipal, downPay), buildingInterestInvest)}}
-      </el-col>
-    </el-row>
-    <el-row>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">投资</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
-        {{descAmount(add(add(totalRepayEqualPrincipal, downPay), totalInterestInvest),4)}}
-      </el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
-        {{calRateAvg(lendYear,calRate(totalRepayEqualPrincipal, totalInterestInvest))}}
-      </el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{monthInvestRate}}</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{descAmount(add(totalRepayEqualPrincipal, downPay), 4)}}</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{descAmount(totalInterestInvest,4)}}</el-col>
-      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
-        {{calRate(add(totalRepayEqualPrincipal, downPay), totalInterestInvest)}}
-      </el-col>
-    </el-row>
+    <div v-show="isShowCal">
+      <el-row style="margin-top: 10px;">
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2" :offset="2">贷款月利率(%)</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">期数</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">首付（元）</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">月供（元）</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">总还款（元）</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">总利息（元）</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">贷款总利率(%)</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">理论总还款（元）</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">理论总利息（元）</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">理论贷款总利率(%)</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">差额(元)</el-col>
+      </el-row>
+      <el-row>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">等额本息</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{lendMonthRate}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{lendPeriod}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(downPay, 4)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(monthlyPayEqualInterest,4)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalRepayEqualInterest,4)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalInterestEqualInterest,4)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{calRate(lendMoney, totalInterestEqualInterest)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalRepayEqualInterestOriginal,4)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalInterestEqualInterestOriginal,4)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{calRate(lendMoney, totalInterestEqualInterestOriginal)}}
+        </el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">
+          {{descAmount(totalInterestEqualInterest - totalInterestEqualInterestOriginal,4)}}
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">等额本金</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{lendMonthRate}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{lendPeriod}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(downPay, 4)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">
+          <el-button @click="showDialog" type="text" size="small">详情</el-button>
+        </el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalRepayEqualPrincipal,4)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalInterestEqualPrincipal,4)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{calRate(lendMoney, totalInterestEqualPrincipal)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalRepayEqualPrincipalOriginal,4)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{descAmount(totalInterestEqualPrincipalOriginal,4)}}</el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">{{calRate(lendMoney, totalInterestEqualPrincipalOriginal)}}
+        </el-col>
+        <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">
+          {{descAmount(totalInterestEqualPrincipal-totalInterestEqualPrincipalOriginal,4)}}
+        </el-col>
+      </el-row>
+
+      <el-row style="margin-top: 10px;">
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3" :offset="3">最终总金额(元)</el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">最终年回报率（%）</el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">月回报率（%）</el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">投资额（元）</el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">投资收益额（元）</el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">投资总收益率（%）</el-col>
+      </el-row>
+      <el-row>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">等额本金</el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+          {{descAmount(add(add(totalRepayEqualPrincipal, downPay), buildingInterestInvest),4)}}
+        </el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+          {{calRateAvg(lendYear,calRate(totalRepayEqualPrincipal, buildingInterestInvest))}}
+        </el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{monthBuildingRate}}</el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{descAmount(add(totalRepayEqualPrincipal, downPay), 4)}}
+        </el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{descAmount(buildingInterestInvest,4)}}</el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+          {{calRate(add(totalRepayEqualPrincipal, downPay), buildingInterestInvest)}}
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">投资</el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+          {{descAmount(add(add(totalRepayEqualPrincipal, downPay), totalInterestInvest),4)}}
+        </el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+          {{calRateAvg(lendYear,calRate(totalRepayEqualPrincipal, totalInterestInvest))}}
+        </el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{monthInvestRate}}</el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{descAmount(add(totalRepayEqualPrincipal, downPay), 4)}}
+        </el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{descAmount(totalInterestInvest,4)}}</el-col>
+        <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+          {{calRate(add(totalRepayEqualPrincipal, downPay), totalInterestInvest)}}
+        </el-col>
+      </el-row>
+    </div>
+
+    <!--  等额本金月付  -->
+    <el-dialog title="等额本金月付" :visible.sync="equalPrincipalVisible">
+      <el-row v-for="(item, index) in monthlyPayEqualPrincipalList">
+        <el-col :xs="12" :sm="12" :md="10" :lg="8" :xl="8">
+          {{item}}
+        </el-col>
+      </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" v-clipboard:copy="monthlyPayEqualPrincipalList" @click="equalPrincipalVisible=false">
+          拷 贝
+        </el-button>
+        <el-button @click="equalPrincipalVisible=false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -147,7 +167,7 @@ export default class extends Vue {
   // 期数
   private lendPeriod = 0
   // 等额本金月付
-  private monthlyPayEqualPrincipalList: number[] = []
+  private monthlyPayEqualPrincipalList: string[] = []
   // 等额本金还款总额
   private totalRepayEqualPrincipal = 0
   // 等额本金总利息
@@ -181,11 +201,17 @@ export default class extends Vue {
   // 房产收益
   private buildingInterestInvest: number = 0
 
-  mounted () {
-    this.calInvest()
+  private equalPrincipalVisible = false
+
+  private isShowCal = false
+
+  private showDialog () {
+    this.equalPrincipalVisible = true
   }
 
   private calInvest () {
+    this.isShowCal = true
+
     // 计算初始参数
     this.lendMonthRate = this.descRate(this.lendYearRate / 12, 2)
     this.monthInvestRate = this.descRate(this.investRate / 12, 2)
@@ -207,7 +233,8 @@ export default class extends Vue {
     const p = this.descRate(this.monthInvestRate / 100, 4)
     for (let i = 0; i < this.lendPeriod; i++) {
       let monthlyPayEqualPrincipal = this.calMonthlyPayEqualPrincipal(this.lendMoney, b, i + 1, this.lendPeriod)
-      this.monthlyPayEqualPrincipalList.push(monthlyPayEqualPrincipal)
+      let mr = '第' + (i + 1) + '期月供： '.concat(this.descAmount(monthlyPayEqualPrincipal, 4)).concat(' 元')
+      this.monthlyPayEqualPrincipalList.push(mr)
       this.totalRepayEqualPrincipal += monthlyPayEqualPrincipal
 
       investTotalRate += this.calMonthlyInterestRateInvest(b, i + 1, this.lendPeriod, p)
