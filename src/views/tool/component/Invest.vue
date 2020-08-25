@@ -1,39 +1,51 @@
 <template>
   <div>
-    <el-row style="margin-top: 20px;">
-      <el-col :xs="12" :sm="10" :md="8" :lg="4" :xl="4">
+    <el-row style="margin-top: 20px;" :gutter="10">
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3" style="margin-top: 10px;">
         总金额(万元)
+      </el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
         <el-input v-model="totalAmount" placeholder="请输入总金额"></el-input>
       </el-col>
-      <el-col :xs="12" :sm="10" :md="8" :lg="4" :xl="4">
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3" style="margin-top: 10px;">
         首付比例（%）
+      </el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
         <el-input v-model="downPayRate" placeholder="请输入首付比例"></el-input>
       </el-col>
-      <el-col :xs="12" :sm="10" :md="8" :lg="4" :xl="4">
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3" style="margin-top: 10px;">
         贷款年利率（%）
+      </el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
         <el-input v-model="lendYearRate" placeholder="请输入贷款年利率"></el-input>
       </el-col>
-      <el-col :xs="12" :sm="10" :md="8" :lg="4" :xl="4">
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3" style="margin-top: 10px;">
         贷款年数
+      </el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
         <el-input v-model="lendYear" placeholder="请输入贷款年数"></el-input>
       </el-col>
     </el-row>
-    <el-row>
-      <el-col :xs="12" :sm="10" :md="8" :lg="4" :xl="4">
+    <el-row style="margin-top: 20px;" :gutter="10">
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3" style="margin-top: 10px;">
         房价年增率（%）
+      </el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
         <el-input v-model="buildingRate" placeholder="请输入房价年增率"></el-input>
       </el-col>
-      <el-col :xs="12" :sm="10" :md="8" :lg="4" :xl="4">
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3" style="margin-top: 10px;">
         投资回报率（%）
+      </el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
         <el-input v-model="investRate" placeholder="请输入投资回报率"></el-input>
       </el-col>
-      <el-col :xs="12" :sm="10" :md="8" :lg="4" :xl="4">
-        <el-button @click="calInvest">计算</el-button>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+        <el-button type="primary" @click="calInvest">计算</el-button>
       </el-col>
     </el-row>
 
-    <div v-show="isShowCal">
-      <el-row style="margin-top: 10px;">
+    <div v-show="isShowCal" style="margin-top: 20px;">
+      <el-row>
         <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2" :offset="2">贷款月利率(%)</el-col>
         <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">期数</el-col>
         <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">首付（元）</el-col>
@@ -127,7 +139,7 @@
 
     <!--  等额本金月付  -->
     <el-dialog title="等额本金月付" :visible.sync="equalPrincipalVisible">
-      <el-row v-for="(item, index) in monthlyPayEqualPrincipalList">
+      <el-row v-for="item in monthlyPayEqualPrincipalList">
         <el-col :xs="12" :sm="12" :md="10" :lg="8" :xl="8">
           {{item}}
         </el-col>
