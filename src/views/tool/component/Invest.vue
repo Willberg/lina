@@ -29,7 +29,6 @@
       </el-col>
       <el-col :xs="12" :sm="10" :md="8" :lg="4" :xl="4">
         <el-button @click="calInvest">计算</el-button>
-        <el-button @click="descAmount(1230672.01, 4)">计算</el-button>
       </el-col>
     </el-row>
     <el-row style="margin-top: 10px;">
@@ -83,32 +82,41 @@
     </el-row>
 
     <el-row style="margin-top: 10px;">
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4" :offset="4">最终年回报率（%）</el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">月回报率（%）</el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">投资额（元）</el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">投资收益额（元）</el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">投资总收益率（%）</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3" :offset="3">最终总金额(元)</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">最终年回报率（%）</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">月回报率（%）</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">投资额（元）</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">投资收益额（元）</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">投资总收益率（%）</el-col>
     </el-row>
     <el-row>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">等额本金</el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">等额本金</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+        {{descAmount(add(add(totalRepayEqualPrincipal, downPay), buildingInterestInvest),4)}}
+      </el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
         {{calRateAvg(lendYear,calRate(totalRepayEqualPrincipal, buildingInterestInvest))}}
       </el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">{{monthBuildingRate}}</el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">{{descAmount(totalRepayEqualPrincipal, 4)}}</el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">{{descAmount(buildingInterestInvest,4)}}</el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">{{calRate(totalRepayEqualPrincipal, buildingInterestInvest)}}
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{monthBuildingRate}}</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{descAmount(add(totalRepayEqualPrincipal, downPay), 4)}}</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{descAmount(buildingInterestInvest,4)}}</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+        {{calRate(add(totalRepayEqualPrincipal, downPay), buildingInterestInvest)}}
       </el-col>
     </el-row>
     <el-row>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">投资</el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">投资</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+        {{descAmount(add(add(totalRepayEqualPrincipal, downPay), totalInterestInvest),4)}}
+      </el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
         {{calRateAvg(lendYear,calRate(totalRepayEqualPrincipal, totalInterestInvest))}}
       </el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">{{monthInvestRate}}</el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">{{descAmount(totalRepayEqualPrincipal, 4)}}</el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">{{descAmount(totalInterestInvest,4)}}</el-col>
-      <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">{{calRate(totalRepayEqualPrincipal, totalInterestInvest)}}
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{monthInvestRate}}</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{descAmount(add(totalRepayEqualPrincipal, downPay), 4)}}</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">{{descAmount(totalInterestInvest,4)}}</el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+        {{calRate(add(totalRepayEqualPrincipal, downPay), totalInterestInvest)}}
       </el-col>
     </el-row>
   </div>
@@ -212,7 +220,7 @@ export default class extends Vue {
     this.totalRepayEqualInterestOriginal = this.calOriginalTotalEqualInterest()
     this.totalInterestEqualInterestOriginal = this.calOriginalTotalInterest(this.lendMoney, this.totalRepayEqualInterestOriginal)
 
-    const bRate = this.lendYearRate / 100
+    const bRate = this.buildingRate / 100
     this.buildingInterestInvest = t * ((1 + bRate) ** this.lendYear) - (this.downPay + this.totalRepayEqualPrincipal)
     this.buildingInterestInvest = Math.ceil(this.buildingInterestInvest * 100) / 100
 
@@ -232,7 +240,11 @@ export default class extends Vue {
       b *= 10
     }
     let intVal = parseInt((a / b).toString())
-    let floatVal = this.descFloatVal(a % b, d)
+    let floatVal = (a % b).toString()
+    if (intVal != 0) {
+      floatVal = this.descFloatVal(a % b, d)
+    }
+
 
     let retVal = ''
     while (intVal != 0) {
@@ -280,6 +292,10 @@ export default class extends Vue {
 
   private calRateAvg (a: number, b: number) {
     return Math.ceil((b / a) * 100) / 100
+  }
+
+  private add (a: number, b: number) {
+    return Math.ceil((a + b) * 100) / 100
   }
 
   private calMonthlyPayEqualPrincipal (a: number, b: number, m: number, n: number) {
