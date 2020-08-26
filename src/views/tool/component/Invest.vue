@@ -247,7 +247,7 @@ export default class extends Vue {
   private totalInterestEqualInterestOriginal = 0
 
   // 投资回报率
-  private investRate = 5
+  private investRate = 6
   // 房价年增率
   private buildingRate = 2
   // 月投资回报率
@@ -325,7 +325,7 @@ export default class extends Vue {
     this.buildingInterestInvest = Math.ceil(this.buildingInterestInvest * 100) / 100
 
     const downPayInterest = this.downPay * (1 + p) ** this.lendPeriod - this.downPay
-    this.totalInterestInvest = Math.ceil((downPayInterest + investTotalInterest - investTotalMoney) * 100) / 100
+    this.totalInterestInvest = Math.ceil((downPayInterest + investTotalInterest - investTotalMoney - rentTotalMoney) * 100) / 100
 
     this.lendTable = []
     this.lendTable.push({
@@ -370,7 +370,7 @@ export default class extends Vue {
     })
     this.investTable.push({
       investType: '投资(住房相同)',
-      total: this.descAmount(this.add(investTotalMoney + this.downPay, this.totalInterestInvest - rentTotalMoney), 4),
+      total: this.descAmount(this.add(investTotalMoney + this.downPay, this.totalInterestInvest), 4),
       totalYearRate: this.calRateAvg(this.lendYear, this.calRate(this.add(investTotalMoney, this.downPay), this.totalInterestInvest)),
       monthYearRate: this.monthInvestRate,
       investMoney: this.descAmount(this.add(investTotalMoney, this.downPay), 4),
