@@ -21,4 +21,5 @@ export interface IInvest {
   investMoney: string;
   investInterest: string;
   investTotalRate: number;
+  rentTotalMoney: string;
 }

@@ -39,6 +39,14 @@
       <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
         <el-input v-model="investRate" placeholder="请输入投资回报率"></el-input>
       </el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3" style="margin-top: 10px;">
+        租售比
+      </el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+        <el-tooltip content="（1/200（0.005）-1/300（0.0034）合理，越小买房越不合算）" placement="top">
+          <el-input v-model="rentBugRate" placeholder="请输入租售比"></el-input>
+        </el-tooltip>
+      </el-col>
       <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
         <el-button type="primary" @click="calInvest" :loading="calLoading">计算</el-button>
       </el-col>
@@ -167,11 +175,16 @@
         prop="investTotalRate"
         label="投资总收益率（%）">
       </el-table-column>
+      <el-table-column
+        align="center"
+        prop="rentTotalMoney"
+        label="租房总金额（元）">
+      </el-table-column>
     </el-table>
 
     <!--  等额本金月付  -->
     <el-dialog title="等额本金月付" :visible.sync="equalPrincipalVisible">
-      <el-row v-for="item in monthlyPayEqualPrincipalList">
+      <el-row v-for="item in monthlyPayEqualPrincipalList" :key="item">
         <el-col :xs="12" :sm="12" :md="10" :lg="8" :xl="8">
           {{item}}
         </el-col>
@@ -236,15 +249,17 @@ export default class extends Vue {
   // 投资回报率
   private investRate = 5
   // 房价年增率
-  private buildingRate = 10
+  private buildingRate = 2
   // 月投资回报率
   private monthInvestRate = 5
   // 月房价年增率
   private monthBuildingRate = 10
   // 投资收益
-  private totalInterestInvest: number = 0
+  private totalInterestInvest = 0
   // 房产收益
-  private buildingInterestInvest: number = 0
+  private buildingInterestInvest = 0
+  // 租售比
+  private rentBugRate = 0.0012
 
   private equalPrincipalVisible = false
 
@@ -278,15 +293,24 @@ export default class extends Vue {
     this.totalInterestEqualInterest = this.totalRepayEqualInterest - this.lendMoney
 
     this.totalRepayEqualPrincipal = 0
-    let investTotalRate = 0
+    let investTotalInterest = 0
+    let investTotalMoney = 0
+    let rentTotalMoney = 0
     const p = this.descRate(this.monthInvestRate / 100, 4)
     for (let i = 0; i < this.lendPeriod; i++) {
-      let monthlyPayEqualPrincipal = this.calMonthlyPayEqualPrincipal(this.lendMoney, b, i + 1, this.lendPeriod)
-      let mr = '第' + (i + 1) + '期月供： '.concat(this.descAmount(monthlyPayEqualPrincipal, 4)).concat(' 元')
+      const monthlyPayEqualPrincipal = this.calMonthlyPayEqualPrincipal(this.lendMoney, b, i + 1, this.lendPeriod)
+      const mr = '第' + (i + 1) + '期月供： '.concat(this.descAmount(monthlyPayEqualPrincipal, 4)).concat(' 元')
       this.monthlyPayEqualPrincipalList.push(mr)
       this.totalRepayEqualPrincipal += monthlyPayEqualPrincipal
 
-      investTotalRate += this.calMonthlyInterestRateInvest(b, i + 1, this.lendPeriod, p)
+      const rentMoney = this.calMonthlyPayForRent(i + 1)
+      const investMoney = monthlyPayEqualPrincipal - rentMoney
+      rentTotalMoney += rentMoney
+      investTotalMoney += monthlyPayEqualPrincipal
+      if (investMoney > 0) {
+        const investInterest = investMoney * ((1 + p) ** (this.lendPeriod - i))
+        investTotalInterest += investInterest
+      }
     }
     this.totalRepayEqualPrincipal = Math.ceil(this.totalRepayEqualPrincipal * 100) / 100
     this.totalInterestEqualPrincipal = this.totalRepayEqualPrincipal - this.lendMoney
@@ -300,8 +324,8 @@ export default class extends Vue {
     this.buildingInterestInvest = t * ((1 + bRate) ** this.lendYear) - (this.downPay + this.totalRepayEqualPrincipal)
     this.buildingInterestInvest = Math.ceil(this.buildingInterestInvest * 100) / 100
 
-    const downPayInterest = this.downPay * (1 + p) ** this.lendPeriod
-    this.totalInterestInvest = Math.ceil((downPayInterest + this.lendMoney * investTotalRate - this.totalRepayEqualPrincipal) * 100) / 100
+    const downPayInterest = this.downPay * (1 + p) ** this.lendPeriod - this.downPay
+    this.totalInterestInvest = Math.ceil((downPayInterest + investTotalInterest - investTotalMoney) * 100) / 100
 
     this.lendTable = []
     this.lendTable.push({
@@ -336,30 +360,37 @@ export default class extends Vue {
     this.investTable = []
     this.investTable.push({
       investType: '等额本金',
-      total: this.descAmount(this.add(this.add(this.totalRepayEqualPrincipal, this.downPay), this.buildingInterestInvest), 4),
-      totalYearRate: this.calRateAvg(this.lendYear, this.calRate(this.totalRepayEqualPrincipal, this.buildingInterestInvest)),
+      total: this.descAmount(this.add(this.totalRepayEqualPrincipal + this.downPay, this.buildingInterestInvest), 4),
+      totalYearRate: this.calRateAvg(this.lendYear, this.calRate(this.add(this.totalRepayEqualPrincipal, this.downPay), this.buildingInterestInvest)),
       monthYearRate: this.monthBuildingRate,
       investMoney: this.descAmount(this.add(this.totalRepayEqualPrincipal, this.downPay), 4),
       investInterest: this.descAmount(this.buildingInterestInvest, 4),
-      investTotalRate: this.calRate(this.add(this.totalRepayEqualPrincipal, this.downPay), this.buildingInterestInvest)
+      investTotalRate: this.calRate(this.add(this.totalRepayEqualPrincipal, this.downPay), this.buildingInterestInvest),
+      rentTotalMoney: '0.00'
     })
     this.investTable.push({
-      investType: '投资',
-      total: this.descAmount(this.add(this.add(this.totalRepayEqualPrincipal, this.downPay), this.totalInterestInvest), 4),
-      totalYearRate: this.calRateAvg(this.lendYear, this.calRate(this.totalRepayEqualPrincipal, this.totalInterestInvest)),
+      investType: '投资(住房相同)',
+      total: this.descAmount(this.add(investTotalMoney + this.downPay, this.totalInterestInvest - rentTotalMoney), 4),
+      totalYearRate: this.calRateAvg(this.lendYear, this.calRate(this.add(investTotalMoney, this.downPay), this.totalInterestInvest)),
       monthYearRate: this.monthInvestRate,
-      investMoney: this.descAmount(this.add(this.totalRepayEqualPrincipal, this.downPay), 4),
+      investMoney: this.descAmount(this.add(investTotalMoney, this.downPay), 4),
       investInterest: this.descAmount(this.totalInterestInvest, 4),
-      investTotalRate: this.calRate(this.add(this.totalRepayEqualPrincipal, this.downPay), this.totalInterestInvest)
+      investTotalRate: this.calRate(this.add(investTotalMoney, this.downPay), this.totalInterestInvest),
+      rentTotalMoney: this.descAmount(rentTotalMoney, 4)
     })
     this.calLoading = false
   }
 
   private descAmount (a: number, d: number) {
-    let dp = Math.ceil((a - parseInt(a.toString())) * 100) / 100
+    let isNegative = false
+    if (a < 0) {
+      isNegative = true
+      a = -a
+    }
+    const dp = Math.ceil((a - parseInt(a.toString())) * 100) / 100
     a = parseInt((a - dp).toString())
     let dpStr = (dp * 100) % 10 > 0 ? dp.toString() : dp.toString().concat('0')
-    if (dp == 0) {
+    if (dp === 0) {
       dpStr = '0.00'
     }
     let b = 1
@@ -368,23 +399,23 @@ export default class extends Vue {
     }
     let intVal = parseInt((a / b).toString())
     let floatVal = (a % b).toString()
-    if (intVal != 0) {
+    if (intVal !== 0) {
       floatVal = this.descFloatVal(a % b, d)
     }
 
-
     let retVal = ''
-    while (intVal != 0) {
+    while (intVal !== 0) {
       retVal = ','.concat(floatVal).concat(retVal)
       a = intVal
       intVal = parseInt((a / b).toString())
-      if (intVal != 0) {
+      if (intVal !== 0) {
         floatVal = this.descFloatVal(a % b, d)
       } else {
         floatVal = (a % b).toString()
       }
     }
-    return floatVal.concat(retVal).concat(dpStr.substr(1))
+    retVal = floatVal.concat(retVal).concat(dpStr.substr(1))
+    return isNegative ? '-'.concat(retVal) : retVal
   }
 
   private descFloatVal (floatVal: number, d: number) {
@@ -392,7 +423,7 @@ export default class extends Vue {
     let f = floatVal
     for (; n < d; n++) {
       f = parseInt((f / 10).toString())
-      if (f == 0) {
+      if (f === 0) {
         break
       }
     }
@@ -453,10 +484,11 @@ export default class extends Vue {
     return Math.ceil(retVal * 100) / 100
   }
 
-  private calMonthlyInterestRateInvest (b: number, m: number, n: number, p: number) {
-    const r = 1 - (m - 1) / n
-    const v = (1 / n + r * b) * (1 + p) ** (n - m)
-    return Math.ceil(v * 10000) / 10000
+  private calMonthlyPayForRent (m: number) {
+    const exp = Math.floor((m - 1) / 12)
+    const t = this.totalAmount * 10000
+    const pay = (t * (1 + this.lendYearRate * 0.01) ** exp) * ((1 + this.buildingRate * 0.01) ** exp) * this.rentBugRate
+    return Math.ceil(pay * 100) / 100
   }
 }
 </script>
