@@ -51,6 +51,14 @@
         <el-button type="primary" @click="calInvest" :loading="calLoading">计算</el-button>
       </el-col>
     </el-row>
+    <el-row style="margin-top: 20px;" :gutter="10">
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+        <el-button type="primary" @click="managementVisible=true">物业费</el-button>
+      </el-col>
+      <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+        <el-button type="primary" @click="plotVisible=true">容积率</el-button>
+      </el-col>
+    </el-row>
 
     <el-table
       v-show="isShowCal"
@@ -196,6 +204,96 @@
         <el-button @click="equalPrincipalVisible=false">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!--  物业费  -->
+    <el-dialog title="等额本金月付" :visible.sync="managementVisible">
+      <el-row style="margin-top: 10px;">
+        <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="10" style="margin-top: 10px;">
+          物业费（元/平方米·月）
+        </el-col>
+        <el-col :xs="14" :sm="14" :md="14" :lg="14" :xl="14">
+          <el-input v-model="managementFee" placeholder="请输入物业费"></el-input>
+        </el-col>
+      </el-row>
+      <el-row style="margin-top: 10px;">
+        <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="10" style="margin-top: 10px;">
+          建筑面积（平米）
+        </el-col>
+        <el-col :xs="14" :sm="14" :md="14" :lg="14" :xl="14">
+          <el-input v-model="buildingArea" placeholder="请输入建筑面积"></el-input>
+        </el-col>
+      </el-row>
+      <el-row style="margin-top: 10px;">
+        <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="10" style="margin-top: 10px;">
+          使用面积（平米）
+        </el-col>
+        <el-col :xs="14" :sm="14" :md="14" :lg="14" :xl="14">
+          <el-input v-model="useArea" placeholder="请输入使用面积"></el-input>
+        </el-col>
+      </el-row>
+      <el-row style="margin-top: 10px;">
+        <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="10" style="margin-top: 10px;">
+          年物业费：
+        </el-col>
+        <el-col :xs="14" :sm="14" :md="14" :lg="14" :xl="14">
+          <b style="color: #30B08F">{{totalManagementFee}}</b>
+        </el-col>
+      </el-row>
+      <el-row style="margin-top: 10px;">
+        <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="10" style="margin-top: 10px;">
+          建筑均价：
+        </el-col>
+        <el-col :xs="14" :sm="14" :md="14" :lg="14" :xl="14">
+          <b style="color: #30B08F">{{buildingAvgMoney}}</b>
+        </el-col>
+      </el-row>
+      <el-row style="margin-top: 10px;">
+        <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="10" style="margin-top: 10px;">
+          使用均价：
+        </el-col>
+        <el-col :xs="14" :sm="14" :md="14" :lg="14" :xl="14">
+          <b style="color: #30B08F">{{useAvgMoney}}</b>
+        </el-col>
+      </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="calManagementFee">计算</el-button>
+        <el-button @click="managementVisible=false">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!--  容积率  -->
+    <el-dialog title="容积率" :visible.sync="plotVisible">
+      <el-row style="margin-top: 10px;">
+        <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="10">
+          小区面积（平米）
+        </el-col>
+        <el-col :xs="14" :sm="14" :md="14" :lg="14" :xl="14">
+          <el-input v-model="districtArea" placeholder="请输入物业费"></el-input>
+        </el-col>
+      </el-row>
+      <el-row style="margin-top: 10px;">
+        <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="10">
+          小区建筑面积（平米）
+        </el-col>
+        <el-col :xs="14" :sm="14" :md="14" :lg="14" :xl="14">
+          <el-input v-model="districtBuildingArea" placeholder="请输入建筑面积"></el-input>
+        </el-col>
+      </el-row>
+      <el-row style="margin-top: 10px;">
+        <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="10">
+          <el-tooltip content="高层住宅(10层以上)容积率应不超过5，多层住宅（六层及以下）应不超过3，绿地率应不低于30%,越小越好" placement="top">
+            <div>容积率</div>
+          </el-tooltip>
+        </el-col>
+        <el-col :xs="14" :sm="14" :md="14" :lg="14" :xl="14">
+          <b style="color: #30B08F">{{plotRatio}}</b>
+        </el-col>
+      </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="calPlotRatio">计算</el-button>
+        <el-button @click="plotVisible=false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -268,6 +366,19 @@ export default class extends Vue {
   private lendTable: ILend[] = []
   private investTable: IInvest[] = []
 
+  private managementVisible = false
+  private managementFee = 1
+  private buildingArea = 100
+  private useArea = 80
+  private totalManagementFee = ''
+  private buildingAvgMoney = ''
+  private useAvgMoney = ''
+
+  private plotVisible = false
+  private districtArea = 10000
+  private districtBuildingArea = 50000
+  private plotRatio = ''
+
   private showDialog () {
     this.equalPrincipalVisible = true
   }
@@ -296,6 +407,7 @@ export default class extends Vue {
     let investTotalInterest = 0
     let investTotalMoney = 0
     let rentTotalMoney = 0
+    this.monthlyPayEqualPrincipalList = []
     const p = this.descRate(this.monthInvestRate / 100, 4)
     for (let i = 0; i < this.lendPeriod; i++) {
       const monthlyPayEqualPrincipal = this.calMonthlyPayEqualPrincipal(this.lendMoney, b, i + 1, this.lendPeriod)
@@ -489,6 +601,17 @@ export default class extends Vue {
     const t = this.totalAmount * 10000
     const pay = (t * (1 + this.lendYearRate * 0.01) ** exp) * ((1 + this.buildingRate * 0.01) ** exp) * this.rentBugRate
     return Math.ceil(pay * 100) / 100
+  }
+
+  private calManagementFee () {
+    const fee = this.managementFee * this.buildingArea * 12
+    this.totalManagementFee = this.descAmount(fee, 4) + ' 元'
+    this.buildingAvgMoney = this.descAmount(Math.ceil(((this.totalAmount * 10000) / this.buildingArea) * 100) / 100, 4) + ' 元'
+    this.useAvgMoney = this.descAmount(Math.ceil(((this.totalAmount * 10000) / this.useArea) * 100) / 100, 4) + ' 元'
+  }
+
+  private calPlotRatio () {
+    this.plotRatio = (Math.ceil((this.districtBuildingArea / this.districtArea) * 100) / 100).toString()
   }
 }
 </script>
