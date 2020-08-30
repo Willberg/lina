@@ -40,7 +40,7 @@
         <b>本阶段用时：</b>
       </el-col>
       <el-col :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
-        <b style="color: #C03639">{{timerUseTime}} s</b>
+        <b style="color: #C03639">{{timerUseTime}} s （{{timerFormatUseTime}}）</b>
       </el-col>
     </el-row>
 
@@ -83,6 +83,7 @@ export default class extends Vue {
   private timerStatus = false
   private timerTypes = timerTypes
   private timerUseTime = 0
+  private timerFormatUseTime = ''
   private timerIsEdit = false
   private isShowTypeSelect = false
   private timerSelectType = 1
@@ -134,6 +135,7 @@ export default class extends Vue {
   private updateTimerUseTime () {
     if (this.timerStatus) {
       this.timerUseTime++
+      this.calTimerFormatUseTime()
     }
   }
 
@@ -216,6 +218,13 @@ export default class extends Vue {
       }
     }
     this.confirmLoading = false
+  }
+
+  private calTimerFormatUseTime () {
+    const h = parseInt((this.timerUseTime / 3600).toString())
+    const m = parseInt(((this.timerUseTime % 3600) / 60).toString())
+    const s = (this.timerUseTime % 3600) % 60
+    this.timerFormatUseTime = h + '时' + m + '分' + s + '秒'
   }
 }
 </script>
