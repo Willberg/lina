@@ -14,7 +14,7 @@
         fixed="left"
         align="center"
         prop="id"
-        width="160"
+        width="40"
         label="ID">
       </el-table-column>
       <el-table-column
@@ -27,6 +27,7 @@
       <el-table-column
         align="center"
         prop="status"
+        width="80"
         :filters="filterArray"
         :filter-method="filterHandler"
         label="状态">
@@ -45,17 +46,19 @@
         prop="task"
         label="任务">
         <template slot-scope="scope">
-          <el-popover trigger="hover" placement="top">
-            <p>{{ scope.row.task }}</p>
-            <div slot="reference" class="name-wrapper">
-              <el-tag size="medium">{{ scope.row.task.substr(0, 5) }}</el-tag>
-            </div>
-          </el-popover>
+          <!--          <el-popover trigger="hover" placement="top">-->
+          <!--            <p>{{ scope.row.task }}</p>-->
+          <!--            <div slot="reference" class="name-wrapper">-->
+          <!--              <el-tag size="medium">{{ scope.row.task.substr(0, 28) }}</el-tag>-->
+          <!--            </div>-->
+          <!--          </el-popover>-->
+          <div style="white-space: pre-line;">{{ scope.row.task }}</div>
         </template>
       </el-table-column>
       <el-table-column
         align="center"
         prop="cp"
+        width="80"
         :sort-method="sortStatusCp"
         label="性价比">
         <template slot-scope="scope">{{scope.row.cp}}</template>
@@ -63,15 +66,18 @@
       <el-table-column
         align="center"
         prop="value"
+        width="80"
         label="价值">
       </el-table-column>
       <el-table-column
         align="center"
         prop="estimateTime"
+        width="80"
         label="预估时间（分钟）">
       </el-table-column>
       <el-table-column
         align="center"
+        width="80"
         prop="realityTime"
         label="实际用时（分钟）">
       </el-table-column>
@@ -84,7 +90,7 @@
       <el-table-column
         align="center"
         prop="priority"
-        width="160"
+        width="120"
         label="优先级">
         <template slot-scope="scope">
           <el-tag :type="descPriority(scope.row.priority).startsWith('重要且紧急') ? 'danger' :
@@ -98,6 +104,7 @@
       <el-table-column
         align="center"
         fixed="right"
+        width="80"
         label="操作">
         <template slot-scope="scope">
           <el-button :disabled="disableEditButton(scope.row.status)" @click="handleEdit(scope.row)"
