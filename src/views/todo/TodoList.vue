@@ -52,7 +52,7 @@
           <!--              <el-tag size="medium">{{ scope.row.task.substr(0, 28) }}</el-tag>-->
           <!--            </div>-->
           <!--          </el-popover>-->
-          <div style="white-space: pre-line;">{{ scope.row.task }}</div>
+          <div style="text-align:left; white-space: pre-line;">{{ scope.row.task }}</div>
         </template>
       </el-table-column>
       <el-table-column
