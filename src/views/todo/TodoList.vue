@@ -428,9 +428,15 @@ export default class extends Vue {
     } else if (aStatus < bStatus) {
       return -1
     } else {
-      const aCp = parseFloat(a.cp)
-      const bCp = parseFloat(b.cp)
-      return aCp > bCp ? 1 : -1
+      if (a.priority < b.priority) {
+        return 1
+      } else if (a.priority > b.priority) {
+        return -1
+      } else {
+        const aCp = parseFloat(a.cp)
+        const bCp = parseFloat(b.cp)
+        return aCp > bCp ? 1 : -1
+      }
     }
   }
 }
