@@ -48,3 +48,14 @@ export const createUrl = (
     method: 'get',
     params: data
   })
+
+export const updatePassword = (
+  data: {
+    oldPassword: string;
+    newPassword: string;
+  }) =>
+  request({
+    url: '/api/user/password/change',
+    method: 'post',
+    data: data
+  })

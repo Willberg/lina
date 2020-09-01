@@ -66,7 +66,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { Form as ElForm, Input } from 'element-ui'
-import { isValidEmail, isValidLoginUser, isValidPhoneNumber } from '@/utils/validate'
+import { isValidEmail, isValidLoginUser, isValidPassword, isValidPhoneNumber } from '@/utils/validate'
 import { UserModule } from '@/store/modules/user'
 import md5 from 'js-md5'
 import { NAV_INDEX } from '@/constant/storageConstant'
@@ -86,7 +86,7 @@ export default class extends Vue {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private validatePassword = (rule: any, value: string, callback: Function) => {
-    if (value.length < 6) {
+    if (!isValidPassword(value)) {
       callback(new Error('请输入正确的密码'))
     } else {
       callback()

@@ -94,7 +94,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { Form as ElForm, Input } from 'element-ui'
-import { isValidEmail, isValidPhoneNumber, isValidUsername } from '@/utils/validate'
+import { isValidEmail, isValidPassword, isValidPhoneNumber, isValidUsername } from '@/utils/validate'
 import { UserModule } from '@/store/modules/user'
 import md5 from 'js-md5'
 import { NAV_INDEX } from '@/constant/storageConstant'
@@ -138,8 +138,8 @@ export default class extends Vue {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private validatePassword = (rule: any, value: string, callback: Function) => {
-    if (value.length < 6) {
-      callback(new Error('请输入正确的密码'))
+    if (!isValidPassword(value)) {
+      callback(new Error('请输入正确的密码,必须包含6位以上，并且含大写字母，小写字母，数字，特殊符号中的三种及以上'))
     } else {
       callback()
     }

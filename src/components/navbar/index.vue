@@ -8,9 +8,14 @@
       <el-menu-item v-if="!isLogin" index="12" style="position:absolute;right:0;"
                     @click.native.prevent="handleRedirect('/login')">登陆
       </el-menu-item>
-      <el-menu-item v-if="isLogin" index="12" style="position:absolute;right:0;" @click.native.prevent="handleLogout">
-        退出
-      </el-menu-item>
+      <!--      <el-menu-item v-if="isLogin" index="12" style="position:absolute;right:0;" @click.native.prevent="handleLogout">-->
+      <!--        退出-->
+      <!--      </el-menu-item>-->
+      <el-submenu v-if="isLogin" index="12" style="position:absolute;right:0;">
+        <template slot="title">个人中心</template>
+        <el-menu-item index="12-1" @click.native.prevent="editPasswordVisible=true">修改密码</el-menu-item>
+        <el-menu-item index="12-2" @click.native.prevent="handleLogout">退出</el-menu-item>
+      </el-submenu>
     </el-menu>
     <div v-if="isTodo">
       <el-row :gutter="10" style="margin-top: 10px; margin-bottom: 10px;">
@@ -71,6 +76,22 @@
         <el-button type="primary" @click="submitAdd" :loading="addLoading">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- Form -->
+    <el-dialog title="添加任务" :visible.sync="editPasswordVisible">
+      <el-form :model="updatePassword">
+        <el-form-item label="原密码" label-width="140px">
+          <el-input v-model="updatePassword.oldPassword" placeholder="请输入原密码" show-password></el-input>
+        </el-form-item>
+        <el-form-item label="新密码" label-width="140px">
+          <el-input v-model="updatePassword.newPassword" placeholder="请输入新密码" show-password></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editPasswordVisible=false">取 消</el-button>
+        <el-button type="primary" @click="submitUpdatePassword" :loading="editLoading">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -83,7 +104,9 @@ import { priorities, todoGroupList, todoGroupPriorities, todoList } from '@/cons
 import { GROUP_ID, NAV_INDEX, TOKEN } from '@/constant/storageConstant'
 import moment from 'moment'
 import { handleTodoList } from '@/utils/todo'
-import { getUser } from '@/api/user'
+import { getUser, updatePassword } from '@/api/user'
+import md5 from 'js-md5'
+import { isValidPassword } from "@/utils/validate";
 
 @Component({
   name: 'Nav'
@@ -101,6 +124,13 @@ export default class extends Vue {
   private priorities = priorities
   private todoGroupPriorities = todoGroupPriorities
   private activeIndex = '1'
+
+  private editPasswordVisible = false
+  private editLoading = false
+  private updatePassword = {
+    oldPassword: '',
+    newPassword: ''
+  }
 
   created () {
     this.activeIndex = sessionStorage.getItem(NAV_INDEX) || '1'
@@ -281,6 +311,36 @@ export default class extends Vue {
 
     this.todoFormVisible = false
     this.addLoading = false
+  }
+
+  private async submitUpdatePassword () {
+    if (this.updatePassword.oldPassword === ''
+      || this.updatePassword.newPassword === ''
+      || this.updatePassword.oldPassword === this.updatePassword.newPassword) {
+      this.$message.error('请完善信息')
+      return
+    }
+
+    if (!isValidPassword(this.updatePassword.newPassword)) {
+      this.$message.error('请填写正确的密码，必须包含6位以上，并且含大写字母，小写字母，数字，特殊符号中的三种及以上')
+      return
+    }
+
+    this.editLoading = true
+    const param = {
+      oldPassword: md5(this.updatePassword.oldPassword),
+      newPassword: md5(this.updatePassword.newPassword)
+    }
+    const result = await updatePassword(param)
+    if (result.status) {
+      this.$message.success('修改成功')
+    }
+    this.updatePassword = {
+      oldPassword: '',
+      newPassword: ''
+    }
+    this.editLoading = false
+    this.editPasswordVisible = false
   }
 }
 </script>
