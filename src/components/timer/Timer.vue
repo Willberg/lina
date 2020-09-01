@@ -17,13 +17,9 @@
       <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
         <b>计时开关：</b>
       </el-col>
-      <el-col v-show="timerIsEdit" style="margin-top: 10px;" :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
-        <el-switch style="margin-left: 20px;" v-model="timerLastOne.status===1" disabled active-color="#13ce66"
-                   inactive-color="#ff4949"></el-switch>
-      </el-col>
-      <el-col v-show="!timerIsEdit" style="margin-top: 10px;" :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
-        <el-switch style="margin-left: 20px;" v-model="timerLastOne.status===1" disabled active-color="#13ce66"
-                   inactive-color="#ff4949"></el-switch>
+      <el-col style="margin-top: 10px;" :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+        <el-switch style="margin-left: 20px;" v-model="timerLastOne!==undefined && timerLastOne.status===1" disabled
+                   active-color="#13ce66" inactive-color="#ff4949"></el-switch>
       </el-col>
     </el-row>
 
