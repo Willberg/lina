@@ -133,7 +133,7 @@ export default class extends Vue {
   }
 
   created () {
-    this.activeIndex = sessionStorage.getItem(NAV_INDEX) || '1'
+    this.activeIndex = localStorage.getItem(NAV_INDEX) || '1'
     this.isTodo = this.$route.path.startsWith('/todo')
   }
 
@@ -177,14 +177,13 @@ export default class extends Vue {
 
   private handleSelect (key: string) {
     if (!key.startsWith('12')) {
-      sessionStorage.setItem(NAV_INDEX, key)
+      localStorage.setItem(NAV_INDEX, key)
     }
   }
 
   private async handleLogout () {
     const status = await UserModule.Logout()
     if (status) {
-      UserModule.setUser(undefined)
       this.isLogin = false
       if (location.hash !== '#/') {
         await this.$router.push({
@@ -199,8 +198,8 @@ export default class extends Vue {
   }
 
   private handleAdd () {
-    const token = sessionStorage.getItem(TOKEN)
-    const groupId = sessionStorage.getItem(GROUP_ID)
+    const token = localStorage.getItem(TOKEN)
+    const groupId = localStorage.getItem(GROUP_ID)
     // 清空
     if (this.isClearAdd) {
       this.todoForm = {}

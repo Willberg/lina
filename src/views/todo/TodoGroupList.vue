@@ -209,9 +209,9 @@ export default class extends Vue {
   }
 
   private async handleDetails (row: any) {
-    sessionStorage.setItem(GROUP_ID, row.id)
-    sessionStorage.setItem(MAX_TIME, row.maxTime)
-    sessionStorage.setItem(NAV_INDEX, '0')
+    localStorage.setItem(GROUP_ID, row.id)
+    localStorage.setItem(MAX_TIME, row.maxTime)
+    localStorage.setItem(NAV_INDEX, '0')
     await this.$router.push({
       path: '/todoList'
     })

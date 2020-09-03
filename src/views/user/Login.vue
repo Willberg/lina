@@ -154,11 +154,10 @@ export default class extends Vue {
 
       const status = await UserModule.Login(loginParam)
       if (status) {
-        sessionStorage.setItem(NAV_INDEX, '1')
+        localStorage.setItem(NAV_INDEX, '1')
         // 防止router bug 不跳转
         location.reload()
       }
-
     })
   }
 

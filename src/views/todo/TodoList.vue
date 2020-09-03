@@ -196,12 +196,12 @@ export default class extends Vue {
 
   created () {
     this.refreshTokenTimer = setInterval(async function () {
-      const token = sessionStorage.getItem(TOKEN)
+      const token = localStorage.getItem(TOKEN)
       if (token !== null) {
         const result = await openFreshToken(token)
         if (result.status) {
           // 刷新token
-          sessionStorage.setItem(TOKEN, result.data)
+          localStorage.setItem(TOKEN, result.data)
         }
       }
     }, 600000)
@@ -212,7 +212,7 @@ export default class extends Vue {
     const user = UserModule.userProfile
     if (user === undefined) {
       const token = this.$route.query.token
-      if ('string' !== typeof token) {
+      if (typeof token !== 'string') {
         this.$router.push({
           path: '/login'
         })
@@ -235,15 +235,15 @@ export default class extends Vue {
 
   beforeDestroy () {
     // 清除定时刷新，不清除会一直运行，关闭页面也会定时刷新
-    const token = sessionStorage.getItem(TOKEN)
+    const token = localStorage.getItem(TOKEN)
     if (token !== null) {
-      sessionStorage.clear()
+      localStorage.clear()
     }
-    clearInterval(this.refreshTokenTimer);
+    clearInterval(this.refreshTokenTimer)
   }
 
   private disableEditButton (status: number) {
-    return this.isOpen && status != 1 && status != 10
+    return this.isOpen && status !== 1 && status !== 10
   }
 
   private handleEdit (todo: ITodo) {
@@ -271,15 +271,15 @@ export default class extends Vue {
     setTimeout(function () {
       setEditLoading(false)
     }, 1000)
-    if (this.oldTodo !== undefined
-      && (this.oldTodo.task !== this.todoForm.task
-        || this.oldTodo.priority !== this.todoForm.priority
-        || this.oldTodo.value !== this.todoForm.value
-        || this.oldTodo.estimateTime !== this.todoForm.estimateTime
-        || this.oldTodo.realityTime !== this.todoForm.realityTime
-        || this.oldTodo.status !== this.todoForm.status)) {
+    if (this.oldTodo !== undefined &&
+      (this.oldTodo.task !== this.todoForm.task ||
+        this.oldTodo.priority !== this.todoForm.priority ||
+        this.oldTodo.value !== this.todoForm.value ||
+        this.oldTodo.estimateTime !== this.todoForm.estimateTime ||
+        this.oldTodo.realityTime !== this.todoForm.realityTime ||
+        this.oldTodo.status !== this.todoForm.status)) {
       if (this.isOpen) {
-        const token = sessionStorage.getItem(TOKEN)
+        const token = localStorage.getItem(TOKEN)
         if (token === null) {
           this.$message.error('你无权操作')
           return
@@ -332,14 +332,14 @@ export default class extends Vue {
           param.status = this.todoForm.status
         }
         if (param.priority !== undefined || param.estimateTime !== undefined || param.value !== undefined) {
-          if (this.todoForm.status != 10) {
+          if (this.todoForm.status !== 10) {
             this.$message.error('必须改为等待状态，进行动态规划')
             return
           }
           param.status = this.todoForm.status
         }
         if (param.realityTime !== undefined) {
-          if (this.todoForm.status != 100) {
+          if (this.todoForm.status !== 100) {
             this.$message.error('必须改为完成状态，才能设置完成时间')
             return
           }
@@ -364,7 +364,7 @@ export default class extends Vue {
     if (result.status) {
       this.isOpen = true
       // openAdd使用
-      sessionStorage.setItem(TOKEN, token)
+      localStorage.setItem(TOKEN, token)
     }
     handleTodoList(result, this.todoList)
     this.listLoading = false
@@ -372,8 +372,8 @@ export default class extends Vue {
 
   private async getTodoList () {
     this.listLoading = true
-    let param = {
-      groupId: parseInt(sessionStorage.getItem(GROUP_ID) || '0')
+    const param = {
+      groupId: parseInt(localStorage.getItem(GROUP_ID) || '0')
     }
     const result = await listTodo(param)
     if (result.status) {
@@ -396,13 +396,13 @@ export default class extends Vue {
   }
 
   private descStatus (status: number) {
-    if (status == 1) {
+    if (status === 1) {
       return '初始'
-    } else if (status == 10) {
+    } else if (status === 10) {
       return '等待'
-    } else if (status == 20) {
+    } else if (status === 20) {
       return '处理中'
-    } else if (status == 50) {
+    } else if (status === 50) {
       return '已删除'
     } else {
       return '已完成'
@@ -411,18 +411,18 @@ export default class extends Vue {
 
   private filterHandler (value: string, row: any, column: any) {
     const property = column['property']
-    return row[property] == value
+    return row[property] === value
   }
 
   private changeStatusForSort (s: number) {
     // 1>20>10>100>50
-    if (s == 1) {
+    if (s === 1) {
       return 5
-    } else if (s == 10) {
+    } else if (s === 10) {
       return 3
-    } else if (s == 20) {
+    } else if (s === 20) {
       return 4
-    } else if (s == 50) {
+    } else if (s === 50) {
       return 1
     } else {
       return 2

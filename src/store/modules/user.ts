@@ -6,7 +6,7 @@ import { USER } from "@/constant/storageConstant";
 // dynamic: 必须为true,否则会无法引用这里的函数
 @Module({ name: 'User', dynamic: true, store: store, namespaced: true })
 class User extends VuexModule {
-  user = sessionStorage.getItem(USER) || undefined
+  user = localStorage.getItem(USER) || undefined
 
   get userProfile () {
     return this.user
@@ -40,6 +40,7 @@ class User extends VuexModule {
     const result = await logout()
     if (result.status) {
       this.context.commit('setUser', undefined)
+      localStorage.clear()
     }
     return result.status
   }
