@@ -35,11 +35,18 @@
       </el-table-column>
       <el-table-column
         align="center"
+        prop="finishValue"
+        label="完成价值">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        width="100"
         prop="totalTime"
         label="总用时（分钟）">
       </el-table-column>
       <el-table-column
         align="center"
+        width="100"
         prop="maxTime"
         label="最大用时（分钟）">
       </el-table-column>
@@ -288,6 +295,7 @@ export default class extends Vue {
           id: t.id,
           createTime: t.createTime,
           totalValue: t.value,
+          finishValue: t.finishValue,
           totalTime: t.totalTime,
           maxTime: t.maxTime,
           minPriority: t.minPriority,

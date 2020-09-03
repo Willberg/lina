@@ -2,6 +2,7 @@ export interface ITodoGroup {
   id: number
   createTime: number
   totalValue: number
+  finishValue: number
   totalTime: number
   maxTime: number
   minPriority: number

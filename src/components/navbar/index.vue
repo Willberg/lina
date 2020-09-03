@@ -277,6 +277,7 @@ export default class extends Vue {
           id: t.id,
           createTime: t.createTime,
           totalValue: t.value,
+          finishValue: t.finishValue,
           totalTime: t.totalTime,
           maxTime: t.maxTime,
           minPriority: t.minPriority,
