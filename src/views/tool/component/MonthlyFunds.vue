@@ -86,11 +86,21 @@
         align="center"
         prop="category"
         label="类型">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.type===2?'success': 'danger'">
+            {{descCategory(scope.row.category)}}
+          </el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         align="center"
         prop="type"
         label="类别">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.type===2?'success': 'danger'">
+            {{descType(scope.row.type)}}
+          </el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         align="center"
@@ -348,6 +358,33 @@ export default class extends Vue {
 
   private descTime (createTime: number) {
     return moment(createTime).format('YYYY-MM-DD HH:mm:ss')
+  }
+
+  private descCategory (c: number) {
+    let categories = fundCategoryOptions1
+    if (c > 100) {
+      categories = fundCategoryOptions2
+    }
+
+    let l = ''
+    for (const d of categories) {
+      if (d.value === c) {
+        l = d.label
+        break
+      }
+    }
+    return l
+  }
+
+  private descType (t: number) {
+    let l = ''
+    for (const d of fundTypeOptions) {
+      if (d.value === t) {
+        l = d.label
+        break
+      }
+    }
+    return l
   }
 }
 </script>
