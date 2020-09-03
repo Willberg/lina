@@ -101,13 +101,14 @@ export default class extends Vue {
       this.monthlyDisbursementOption.series[0].data = []
       this.monthlyDisbursementOption.series[1].data = []
       for (const key of keys) {
-        const money = d[key] || 0
+        const money = Math.round((d[key] || 0) * 100) / 100
         if (key === 'total') {
           restMoney = money
           // @ts-ignore
           this.monthlyDisbursementOption.series[0].data.push(0)
         } else {
           restMoney -= money
+          restMoney = Math.round(restMoney * 100) / 100
           // @ts-ignore
           this.monthlyDisbursementOption.series[0].data.push(restMoney)
         }

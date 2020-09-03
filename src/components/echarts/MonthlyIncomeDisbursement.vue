@@ -248,11 +248,13 @@ export default class extends Vue {
         this.monthlyIncomeDisbursementOption.series[0].data.push(assistData)
         // @ts-ignore
         this.monthlyIncomeDisbursementOption.series[1].data.push(data)
+        const amountCeil = Math.round(amount * 100) / 100
         // @ts-ignore
-        this.monthlyIncomeDisbursementOption.series[2].data.push(amount)
+        this.monthlyIncomeDisbursementOption.series[2].data.push(amountCeil)
         assistAmount += amount
+        const assistAmountCeil = Math.round(assistAmount * 100) / 100
         // @ts-ignore
-        this.monthlyIncomeDisbursementOption.series[3].data.push(assistAmount)
+        this.monthlyIncomeDisbursementOption.series[3].data.push(assistAmountCeil)
       }
     }
   }
@@ -263,7 +265,7 @@ export default class extends Vue {
         itemStyle: {
           color: bar.color
         },
-        value: bar.value,
+        value: Math.round(bar.value * 100) / 100,
         label: {
           show: bar.show,
           position: bar.position,
