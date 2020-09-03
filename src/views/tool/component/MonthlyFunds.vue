@@ -333,6 +333,8 @@ export default class extends Vue {
     this.fundsForm.type = fund.type
     this.fundsForm.status = fund.status
 
+    this.fundCategoryOptions = this.fundsForm.type === 1 ? fundCategoryOptions1 : fundCategoryOptions2
+
     this.fundTitle = '更新资金流水'
     this.fundIsAdd = false
     this.fundsFormVisible = true
