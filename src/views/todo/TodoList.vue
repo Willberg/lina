@@ -260,8 +260,17 @@ export default class extends Vue {
     this.todoFormVisible = true
   }
 
+  private setEditLoading (status: boolean) {
+    this.editLoading = status
+  }
+
   private async submitEdit () {
     this.editLoading = true
+    // 模拟请求耗时
+    const setEditLoading = this.setEditLoading
+    setTimeout(function () {
+      setEditLoading(false)
+    }, 1000)
     if (this.oldTodo !== undefined
       && (this.oldTodo.task !== this.todoForm.task
         || this.oldTodo.priority !== this.todoForm.priority
