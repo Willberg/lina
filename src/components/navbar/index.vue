@@ -156,13 +156,27 @@ export default class extends Vue {
   }
 
   private async handleRedirect (page: string) {
-    await this.$router.push({
-      path: page
-    })
+    if (this.descPage(page) !== this.activeIndex) {
+      await this.$router.push({
+        path: page
+      })
+    }
+  }
+
+  private descPage (page: string) {
+    if (page === '/') {
+      return '1'
+    } else if (page === '/todoGroupList') {
+      return '2'
+    } else if (page === '/tool') {
+      return '3'
+    } else {
+      return '12'
+    }
   }
 
   private handleSelect (key: string) {
-    if (key !== '12') {
+    if (!key.startsWith('12')) {
       sessionStorage.setItem(NAV_INDEX, key)
     }
   }

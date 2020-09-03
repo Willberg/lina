@@ -132,7 +132,7 @@ import { ITodoGroup } from '@/types/todo/types'
 import Nav from '@/components/navbar/index.vue'
 import { createUrl, getUser } from '@/api/user'
 import { todoGroupList, todoGroupPriorities } from '@/constant/todoConstant'
-import { GROUP_ID, MAX_TIME } from '@/constant/storageConstant'
+import { GROUP_ID, MAX_TIME, NAV_INDEX } from '@/constant/storageConstant'
 
 @Component({
   name: 'TodoGroupList',
@@ -211,6 +211,7 @@ export default class extends Vue {
   private async handleDetails (row: any) {
     sessionStorage.setItem(GROUP_ID, row.id)
     sessionStorage.setItem(MAX_TIME, row.maxTime)
+    sessionStorage.setItem(NAV_INDEX, '0')
     await this.$router.push({
       path: '/todoList'
     })
