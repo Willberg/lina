@@ -20,6 +20,7 @@ export const apiUpdateFunds = (
     id: number;
     amount?: number;
     category?: number;
+    createTime?: number;
     type?: number;
     status?: number;
   }) => {
@@ -61,6 +62,19 @@ export const apiSearchFunds = (
   }) => {
   return request({
     url: '/api/funds/select',
+    method: 'get',
+    params: data
+  })
+}
+
+// 查询流水
+export const apiSearchFundsList = (
+  data: {
+    startTime: number;
+    endTime: number;
+  }) => {
+  return request({
+    url: '/api/funds/search',
     method: 'get',
     params: data
   })

@@ -4,7 +4,7 @@
     <el-table
       v-loading="listLoading"
       :data="todoGroupList"
-      :default-sort="{prop: 'createDate', order: 'descending'}"
+      :default-sort="{prop: 'createTime', order: 'descending'}"
       border
       fit
       highlight-current-row

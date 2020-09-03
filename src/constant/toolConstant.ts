@@ -17,6 +17,7 @@ export const fundCategoryOptions1 = [
   { label: '住房物业', value: 6 },
   { label: '图书教育', value: 7 },
   { label: '娱乐聚餐', value: 8 },
+  { label: '理财亏损', value: 9 },
 ]
 
 export const fundCategoryOptions2 = [

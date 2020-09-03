@@ -43,7 +43,7 @@ export default class extends Vue {
     xAxis: {
       type: 'category',
       splitLine: { show: false },
-      data: ['总费用', '餐饮食物', '服饰美容', '交通出行', '通讯网络', '医疗保健', '住房物业', '图书教育', '娱乐聚餐']
+      data: ['总费用', '餐饮食物', '服饰美容', '交通出行', '通讯网络', '医疗保健', '住房物业', '图书教育', '娱乐聚餐', '理财亏损']
     },
     yAxis: {
       type: 'value'
@@ -97,7 +97,7 @@ export default class extends Vue {
     if (result.status) {
       const d = result.data
       let restMoney = 0
-      const keys = ['total', '1', '2', '3', '4', '5', '6', '7', '8']
+      const keys = ['total', '1', '2', '3', '4', '5', '6', '7', '8', '9']
       this.monthlyDisbursementOption.series[0].data = []
       this.monthlyDisbursementOption.series[1].data = []
       for (const key of keys) {

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <el-row>
-      <el-col :xs="14" :sm="12" :md="10" :lg="4" :xl="4" style="margin-top: 10px;">
+    <el-row style="margin-top: 10px;">
+      <el-col :xs="8" :sm="8" :md="8" :lg="4" :xl="4">
         <el-select v-model="optionValue" placeholder="请选择">
           <el-option
             v-for="item in options"
@@ -11,26 +11,101 @@
           </el-option>
         </el-select>
       </el-col>
-    </el-row>
-    <el-row>
-      <el-col :xs="14" :sm="12" :md="10" :lg="4" :xl="4" style="margin-top: 10px;">
+      <el-col :xs="8" :sm="8" :md="8" :lg="4" :xl="4">
         <el-date-picker v-model="selectedMonth" value-format="yyyy-MM" v-on:change="changeMonth" type="month"
                         placeholder="选择月"></el-date-picker>
       </el-col>
-      <el-col :xs="16" :sm="14" :md="8" :lg="4" :xl="4" style="margin-top: 10px;">
+      <el-col :xs="8" :sm="8" :md="8" :lg="4" :xl="4">
         <el-button type="primary" @click="addFundButton">添加</el-button>
-        <el-button type="warning" @click="updateFundButton">修改</el-button>
+      </el-col>
+    </el-row>
+    <el-row style="margin-top: 10px;" :gutter="10">
+      <el-col :xs="16" :sm="14" :md="12" :lg="8" :xl="8">
+        <el-date-picker
+          v-model="dateTimeRange"
+          type="datetimerange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          value-format="yyyy-MM-dd HH:mm:ss">
+        </el-date-picker>
+      </el-col>
+      <el-col :xs="8" :sm="6" :md="4" :lg="6" :xl="6">
+        <el-button type="primary" @click="searchFunds">查询流水</el-button>
+        <el-button type="primary" @click="isShowFundsList=false">显示图表</el-button>
       </el-col>
     </el-row>
 
-    <MonthlyDisbursement v-if="!needUpdateChart && optionValue === 1"></MonthlyDisbursement>
-    <MonthlyIncomeDisbursement v-if="!needUpdateChart && optionValue===2"></MonthlyIncomeDisbursement>
+    <MonthlyDisbursement v-if="!isShowFundsList && !needUpdateChart && optionValue === 1">
+    </MonthlyDisbursement>
+    <MonthlyIncomeDisbursement style="margin-top: 10px;" v-if="!isShowFundsList && !needUpdateChart && optionValue===2">
+    </MonthlyIncomeDisbursement>
+
+    <el-table
+      v-if="isShowFundsList"
+      v-loading="listLoading"
+      :data="fundsList"
+      :default-sort="{prop: 'createTime', order: 'descending'}"
+      border
+      fit
+      highlight-current-row
+      max-height="500"
+      style="width: 100%; margin-top: 10px;">
+      <el-table-column
+        sortable
+        fixed="left"
+        align="center"
+        prop="id"
+        label="ID">
+      </el-table-column>
+      <el-table-column
+        sortable
+        width="160"
+        fixed="left"
+        align="center"
+        prop="createTime"
+        label="创建日期">
+        <template slot-scope="scope">
+          {{descTime(scope.row.createTime)}}
+        </template>
+      </el-table-column>
+      <el-table-column
+        align="center"
+        prop="amount"
+        label="金额">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        prop="updateTime"
+        label="更新时间">
+        <template slot-scope="scope">
+          {{descTime(scope.row.updateTime)}}
+        </template>
+      </el-table-column>
+      <el-table-column
+        align="center"
+        prop="category"
+        label="类型">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        prop="type"
+        label="类别">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        fixed="right"
+        label="操作">
+        <template slot-scope="scope">
+          <el-button @click="updateFundButton(scope.row)" type="text" size="small">编辑</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
 
     <el-dialog :title="fundTitle" :visible.sync="fundsFormVisible">
       <el-form :model="fundsForm">
         <el-form-item v-show="!fundIsAdd" label="ID" label-width="120px">
-          <el-input style="width: 60%;" v-model="fundsForm.id" autocomplete="off"></el-input>
-          <el-button style="margin-left: 10%;" type="primary" @click="searchFunds">查询</el-button>
+          {{fundsForm.id}}
         </el-form-item>
         <el-form-item label="金额（元）" label-width="120px">
           <el-input v-model="fundsForm.amount" autocomplete="off"></el-input>
@@ -46,7 +121,12 @@
           </el-select>
         </el-form-item>
         <el-form-item v-show="!fundIsAdd" label="创建时间" label-width="120px">
-          {{fundsForm.createTime}}
+          <el-date-picker
+            v-model="fundsForm.createTime"
+            type="datetime"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="选择日期时间">
+          </el-date-picker>
         </el-form-item>
         <el-form-item v-show="!fundIsAdd" label="更新时间" label-width="120px">
           {{fundsForm.updateTime}}
@@ -67,7 +147,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { apiAddFunds, apiSearchFunds, apiUpdateFunds } from '@/api/funds'
+import { apiAddFunds, apiSearchFundsList, apiUpdateFunds } from '@/api/funds'
 import MonthlyDisbursement from '@/components/echarts/MonthlyDisbursement.vue'
 import MonthlyIncomeDisbursement from '@/components/echarts/MonthlyIncomeDisbursement.vue'
 import moment from 'moment'
@@ -88,7 +168,6 @@ import { IRetFunds } from '@/types/funds/types'
   }
 })
 export default class extends Vue {
-  private searchLoading = false
   private fundLoading = false
   private fundsFormVisible = false
   private fundIsAdd = true
@@ -105,6 +184,12 @@ export default class extends Vue {
     type: 1,
     status: 1
   }
+
+  private listLoading = false
+  private isShowFundsList = false
+  private dateTimeRange = ''
+  private oldFund: IRetFunds | undefined
+  private fundsList: IRetFunds[] = []
 
   private options = fundsOptions
   private optionValue = 1
@@ -150,25 +235,37 @@ export default class extends Vue {
   }
 
   private async searchFunds () {
-    this.searchLoading = true
+    if (this.dateTimeRange === '' ||
+      this.dateTimeRange == null) {
+      this.$message.error('请选择时间范围')
+      return
+    }
+
+    this.listLoading = true
+    this.isShowFundsList = true
+    const startTime = moment(this.dateTimeRange[0], 'YYYY-MM-DD HH:mm:ss').unix() * 1000
+    const endTime = moment(this.dateTimeRange[1], 'YYYY-MM-DD HH:mm:ss').unix() * 1000
     const param = {
-      id: this.fundsForm.id
+      startTime: startTime,
+      endTime: endTime
     }
-    const result = await apiSearchFunds(param)
+    this.fundsList = []
+    const result = await apiSearchFundsList(param)
     if (result.status) {
-      const data: IRetFunds = result.data
-      this.fundsForm.id = data.id
-      this.fundsForm.amount = data.amount
-      this.fundsForm.createTime = moment(data.createTime).format('YYYY-MM-DD HH:mm:ss')
-      this.fundsForm.updateTime = moment(data.updateTime).format('YYYY-MM-DD HH:mm:ss')
-      this.fundsForm.category = data.category
-      this.fundsForm.type = data.type
-      this.fundsForm.status = data.status
+      const dataList: IRetFunds[] = result.data
+      for (const data of dataList) {
+        this.fundsList.push(data)
+      }
     }
-    this.searchLoading = false
+    this.listLoading = false
   }
 
   private async addFunds () {
+    if (this.fundsForm.amount <= 0) {
+      this.$message.error('金额要大于0')
+      return
+    }
+
     this.fundLoading = true
     const param = {
       amount: this.fundsForm.amount,
@@ -186,17 +283,24 @@ export default class extends Vue {
 
   private async updateFunds () {
     this.fundLoading = true
+    const createTime = moment(this.fundsForm.createTime, 'YYYY-MM-DD HH:mm:ss').unix() * 1000
     const param = {
       id: this.fundsForm.id,
       amount: this.fundsForm.amount,
       category: this.fundsForm.category,
+      createTime: createTime,
       type: this.fundsForm.type,
       status: this.fundsForm.status
     }
     const result = await apiUpdateFunds(param)
     if (result.status) {
       this.$message.success('更新成功')
-      this.updateChart()
+      // this.updateChart()
+      if (this.oldFund !== undefined) {
+        const idx = this.fundsList.indexOf(this.oldFund)
+        this.fundsList.splice(idx, 1)
+        this.fundsList.push(result.data)
+      }
     }
     this.fundsFormVisible = false
     this.fundLoading = false
@@ -208,16 +312,26 @@ export default class extends Vue {
     this.fundsFormVisible = true
   }
 
-  private updateFundButton () {
+  private updateFundButton (fund: IRetFunds) {
+    this.oldFund = fund
+
+    this.fundsForm.id = fund.id
+    this.fundsForm.amount = fund.amount
+    this.fundsForm.createTime = this.descTime(fund.createTime)
+    this.fundsForm.updateTime = this.descTime(fund.updateTime)
+    this.fundsForm.category = fund.category
+    this.fundsForm.type = fund.type
+    this.fundsForm.status = fund.status
+
     this.fundTitle = '更新资金流水'
     this.fundIsAdd = false
     this.fundsFormVisible = true
   }
 
   private changeType () {
-    if (this.fundsForm.type == 1) {
+    if (this.fundsForm.type === 1) {
       this.fundCategoryOptions = fundCategoryOptions1
-    } else if (this.fundsForm.type == 2) {
+    } else if (this.fundsForm.type === 2) {
       this.fundCategoryOptions = fundCategoryOptions2
     }
 
@@ -230,6 +344,10 @@ export default class extends Vue {
     } else {
       this.updateFunds()
     }
+  }
+
+  private descTime (createTime: number) {
+    return moment(createTime).format('YYYY-MM-DD HH:mm:ss')
   }
 }
 </script>
