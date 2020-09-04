@@ -31,7 +31,7 @@
         </el-date-picker>
       </el-col>
       <el-col :xs="8" :sm="6" :md="4" :lg="6" :xl="6">
-        <el-button type="primary" @click="searchFunds">查询流水</el-button>
+        <el-button type="primary" @click="searchFunds">查询</el-button>
         <el-button type="primary" @click="isShowFundsList=false">显示图表</el-button>
       </el-col>
     </el-row>
@@ -130,13 +130,18 @@
             <el-option v-for="c in fundCategoryOptions" :label="c.label" :value="c.value" :key="c.value"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item v-show="!fundIsAdd" label="创建时间" label-width="120px">
-          <el-date-picker
-            v-model="fundsForm.createTime"
-            type="datetime"
-            value-format="yyyy-MM-dd HH:mm:ss"
-            placeholder="选择日期时间">
+        <el-form-item label="创建时间" label-width="120px">
+          <span v-show="fundIsAdd && createTimeDisable">{{fundsForm.createTime}}</span>
+          <el-date-picker v-show="!fundIsAdd || !createTimeDisable"
+                          style="width: 60%;"
+                          v-model="fundsForm.createTime"
+                          type="datetime"
+                          value-format="yyyy-MM-dd HH:mm:ss"
+                          placeholder="选择日期时间">
           </el-date-picker>
+          <el-button v-show="fundIsAdd" style="margin-left: 5%;" type="primary" @click="changeCreateTime">
+            {{changeCreateTimeVal}}
+          </el-button>
         </el-form-item>
         <el-form-item v-show="!fundIsAdd" label="更新时间" label-width="120px">
           {{fundsForm.updateTime}}
@@ -188,7 +193,7 @@ export default class extends Vue {
   private fundsForm: any = {
     id: 0,
     amount: 0,
-    createTime: '',
+    createTime: moment().format('YYYY-MM-DD HH:mm:ss'),
     updateTime: '',
     category: 1,
     type: 1,
@@ -197,9 +202,11 @@ export default class extends Vue {
 
   private listLoading = false
   private isShowFundsList = false
-  private dateTimeRange = ''
   private oldFund: IRetFunds | undefined
   private fundsList: IRetFunds[] = []
+  private createTimeDisable = true
+  private changeCreateTimeVal = '编辑'
+  private dateTimeRange: string[] | null = []
 
   private options = fundsOptions
   private optionValue = 1
@@ -212,6 +219,11 @@ export default class extends Vue {
   mounted () {
     localStorage.setItem('selectedMonth', this.selectedMonth)
     this.needUpdateChart = false
+
+    this.dateTimeRange = [
+      moment().subtract(7, 'days').format('YYYY-MM-DD HH:mm:ss'),
+      moment().add(1, 'days').format('YYYY-MM-DD HH:mm:ss')
+    ]
   }
 
   private changeMonth () {
@@ -245,8 +257,8 @@ export default class extends Vue {
   }
 
   private async searchFunds () {
-    if (this.dateTimeRange === '' ||
-      this.dateTimeRange == null) {
+    if (this.dateTimeRange == null ||
+      this.dateTimeRange.length < 2) {
       this.$message.error('请选择时间范围')
       return
     }
@@ -279,13 +291,17 @@ export default class extends Vue {
     this.fundLoading = true
     const param = {
       amount: this.fundsForm.amount,
+      createTime: !this.createTimeDisable ? moment(this.fundsForm.createTime, 'YYYY-MM-DD HH:mm:ss').unix() * 1000 : undefined,
       category: this.fundsForm.category,
       type: this.fundsForm.type
     }
     const result = await apiAddFunds(param)
     if (result.status) {
       this.$message.success('添加成功')
-      this.updateChart()
+      this.fundsList.push(result.data)
+      if (!this.isShowFundsList) {
+        this.updateChart()
+      }
     }
     this.fundsFormVisible = false
     this.fundLoading = false
@@ -305,11 +321,16 @@ export default class extends Vue {
     const result = await apiUpdateFunds(param)
     if (result.status) {
       this.$message.success('更新成功')
-      // this.updateChart()
       if (this.oldFund !== undefined) {
         const idx = this.fundsList.indexOf(this.oldFund)
         this.fundsList.splice(idx, 1)
-        this.fundsList.push(result.data)
+        if (result.data.status === 1) {
+          this.fundsList.push(result.data)
+        }
+      }
+
+      if (!this.isShowFundsList) {
+        this.updateChart()
       }
     }
     this.fundsFormVisible = false
@@ -319,6 +340,9 @@ export default class extends Vue {
   private addFundButton () {
     this.fundTitle = '添加资金流水'
     this.fundIsAdd = true
+    this.createTimeDisable = true
+    this.changeCreateTimeVal = '编辑'
+    this.fundsForm.createTime = moment().format('YYYY-MM-DD HH:mm:ss')
     this.fundsFormVisible = true
   }
 
@@ -387,6 +411,15 @@ export default class extends Vue {
       }
     }
     return l
+  }
+
+  private changeCreateTime () {
+    this.createTimeDisable = !this.createTimeDisable
+    if (this.createTimeDisable) {
+      this.changeCreateTimeVal = '编辑'
+    } else {
+      this.changeCreateTimeVal = '取消'
+    }
   }
 }
 </script>

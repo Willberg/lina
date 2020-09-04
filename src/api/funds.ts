@@ -4,6 +4,7 @@ import request from '@/utils/request'
 export const apiAddFunds = (
   data: {
     amount: number;
+    createTime?: number;
     category: number;
     type: number;
   }) => {
