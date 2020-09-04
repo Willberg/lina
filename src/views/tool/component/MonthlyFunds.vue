@@ -85,6 +85,8 @@
       <el-table-column
         align="center"
         prop="category"
+        :filters="filterCategoryArray"
+        :filter-method="filterHandler"
         label="类型">
         <template slot-scope="scope">
           <el-tag :type="scope.row.type===2?'success': 'danger'">
@@ -95,6 +97,8 @@
       <el-table-column
         align="center"
         prop="type"
+        :filters="filterTypeArray"
+        :filter-method="filterHandler"
         label="类别">
         <template slot-scope="scope">
           <el-tag :type="scope.row.type===2?'success': 'danger'">
@@ -167,6 +171,8 @@ import MonthlyDisbursement from '@/components/echarts/MonthlyDisbursement.vue'
 import MonthlyIncomeDisbursement from '@/components/echarts/MonthlyIncomeDisbursement.vue'
 import moment from 'moment'
 import {
+  filterCategoryArray,
+  filterTypeArray,
   fundCategoryOptions1,
   fundCategoryOptions2,
   fundsOptions,
@@ -207,6 +213,8 @@ export default class extends Vue {
   private createTimeDisable = true
   private changeCreateTimeVal = '编辑'
   private dateTimeRange: string[] | null = []
+  private filterCategoryArray = filterCategoryArray
+  private filterTypeArray = filterTypeArray
 
   private options = fundsOptions
   private optionValue = 1
@@ -420,6 +428,11 @@ export default class extends Vue {
     } else {
       this.changeCreateTimeVal = '取消'
     }
+  }
+
+  private filterHandler (value: number, row: any, column: any) {
+    const property = column['property']
+    return row[property] === value
   }
 }
 </script>
