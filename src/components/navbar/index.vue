@@ -4,7 +4,9 @@
              background-color="#30B08F" text-color="#f4f4f5" @select="handleSelect">
       <el-menu-item index="1" @click.native.prevent="handleRedirect('/')">首页</el-menu-item>
       <el-menu-item index="2" @click.native.prevent="handleRedirect('/todoGroupList')">待办</el-menu-item>
-      <el-menu-item index="3" @click.native.prevent="handleRedirect('/tool')">常用工具</el-menu-item>
+      <el-menu-item index="3" @click.native.prevent="handleRedirect('/funds')">记账</el-menu-item>
+      <el-menu-item index="4" @click.native.prevent="handleRedirect('/cipher')">密码器</el-menu-item>
+      <el-menu-item index="11" @click.native.prevent="handleRedirect('/tool')">常用工具</el-menu-item>
       <el-menu-item v-if="!isLogin" index="12" style="position:absolute;right:0;"
                     @click.native.prevent="handleRedirect('/login')">登陆
       </el-menu-item>
@@ -94,7 +96,7 @@ export default class extends Vue {
     } else if (page === '/todoGroupList') {
       return '2'
     } else if (page === '/tool') {
-      return '3'
+      return '11'
     } else {
       return '12'
     }

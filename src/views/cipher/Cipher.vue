@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Nav></Nav>
     <el-row :gutter="24">
       <el-col :xs="16" :sm="16" :md="16" :lg="6" :xl="6" style="margin-top: 10px;">
         <el-input v-model="searchName" placeholder="请输入网站名"></el-input>
@@ -153,9 +154,13 @@ import moment from 'moment'
 import { ICipher } from '@/types/cipher/types'
 import { statusMap } from '@/constant/cipherConstant'
 import { apiAddCipher, apiSearchCipher, apiUpdateCipher } from '@/api/cipher'
+import Nav from '@/components/navbar/index.vue'
 
 @Component({
-  name: 'Cipher'
+  name: 'Cipher',
+  components: {
+    Nav
+  }
 })
 export default class extends Vue {
   private oldSearchName = ''

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Nav></Nav>
     <el-row style="margin-top: 10px;">
       <el-col :xs="8" :sm="8" :md="8" :lg="4" :xl="4">
         <el-select v-model="optionValue" placeholder="请选择">
@@ -180,12 +181,14 @@ import {
   fundTypeOptions
 } from '@/constant/toolConstant'
 import { IRetFunds } from '@/types/funds/types'
+import Nav from '@/components/navbar/index.vue'
 
 @Component({
-  name: 'MonthlyFunds',
+  name: 'Funds',
   components: {
     MonthlyDisbursement,
-    MonthlyIncomeDisbursement
+    MonthlyIncomeDisbursement,
+    Nav
   }
 })
 export default class extends Vue {

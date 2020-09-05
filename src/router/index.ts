@@ -4,6 +4,8 @@ import Home from '@/views/Home.vue'
 import TodoList from '@/views/todo/TodoList.vue'
 import TodoGroupList from '@/views/todo/TodoGroupList.vue'
 import Tool from '@/views/tool/Tool.vue'
+import Cipher from '@/views/cipher/Cipher.vue'
+import Funds from '@/views/funds/Funds.vue'
 import Page404 from '@/views/error/404.vue'
 
 Vue.use(VueRouter)
@@ -33,6 +35,16 @@ const routes = [
     path: '/todoList',
     name: 'TodoList',
     component: TodoList
+  },
+  {
+    path: '/funds',
+    name: 'Funds',
+    component: Funds
+  },
+  {
+    path: '/cipher',
+    name: 'Cipher',
+    component: Cipher
   },
   {
     path: '/tool',
