@@ -15,7 +15,7 @@
         fixed="left"
         align="center"
         prop="id"
-        width="40"
+        width="50"
         label="ID">
       </el-table-column>
       <el-table-column
