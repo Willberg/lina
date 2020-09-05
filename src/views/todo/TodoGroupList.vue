@@ -1,6 +1,7 @@
 <template>
   <div>
     <Nav></Nav>
+    <TodoNav></TodoNav>
     <el-table
       v-loading="listLoading"
       :data="todoGroupList"
@@ -140,11 +141,13 @@ import Nav from '@/components/navbar/index.vue'
 import { createUrl, getUser } from '@/api/user'
 import { todoGroupList, todoGroupPriorities } from '@/constant/todoConstant'
 import { GROUP_ID, MAX_TIME, NAV_INDEX } from '@/constant/storageConstant'
+import TodoNav from '@/views/todo/component/TodoNav.vue'
 
 @Component({
   name: 'TodoGroupList',
   components: {
-    Nav
+    Nav,
+    TodoNav
   }
 })
 export default class extends Vue {

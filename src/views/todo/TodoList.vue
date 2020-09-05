@@ -1,6 +1,7 @@
 <template>
   <div>
     <Nav></Nav>
+    <TodoNav></TodoNav>
     <el-table
       v-loading="listLoading"
       :data="todoList"
@@ -173,11 +174,13 @@ import { filterArray, priorities, statusGroup, todoList } from '@/constant/todoC
 import { GROUP_ID, TOKEN } from '@/constant/storageConstant'
 import { convertToTodo, handleTodoList } from '@/utils/todo'
 import { openFreshToken } from '@/api/open/token'
+import TodoNav from '@/views/todo/component/TodoNav.vue'
 
 @Component({
   name: 'TodoList',
   components: {
-    Nav
+    Nav,
+    TodoNav
   }
 })
 export default class extends Vue {
