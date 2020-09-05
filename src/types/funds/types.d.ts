@@ -2,6 +2,7 @@ export interface IRetFunds {
   id: number;
   uid: number;
   amount: number;
+  memo: string;
   createTime: number;
   updateTime: number;
   category: number;

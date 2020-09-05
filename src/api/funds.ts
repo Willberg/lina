@@ -4,6 +4,7 @@ import request from '@/utils/request'
 export const apiAddFunds = (
   data: {
     amount: number;
+    memo: string;
     createTime?: number;
     category: number;
     type: number;
@@ -20,6 +21,7 @@ export const apiUpdateFunds = (
   data: {
     id: number;
     amount?: number;
+    memo?: string;
     category?: number;
     createTime?: number;
     type?: number;

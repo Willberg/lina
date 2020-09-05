@@ -57,6 +57,7 @@
         fixed="left"
         align="center"
         prop="id"
+        width="60"
         label="ID">
       </el-table-column>
       <el-table-column
@@ -73,11 +74,21 @@
       <el-table-column
         align="center"
         prop="amount"
+        width="100"
         label="金额">
       </el-table-column>
       <el-table-column
         align="center"
+        prop="memo"
+        label="备注">
+        <template slot-scope="scope">
+          <div style="text-align:left; white-space: pre-line;">{{ scope.row.memo }}</div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        align="center"
         prop="updateTime"
+        width="160"
         label="更新时间">
         <template slot-scope="scope">
           {{descTime(scope.row.updateTime)}}
@@ -86,6 +97,7 @@
       <el-table-column
         align="center"
         prop="category"
+        width="100"
         :filters="filterCategoryArray"
         :filter-method="filterHandler"
         label="类型">
@@ -98,6 +110,7 @@
       <el-table-column
         align="center"
         prop="type"
+        width="80"
         :filters="filterTypeArray"
         :filter-method="filterHandler"
         label="类别">
@@ -109,6 +122,7 @@
       </el-table-column>
       <el-table-column
         align="center"
+        width="80"
         fixed="right"
         label="操作">
         <template slot-scope="scope">
@@ -124,6 +138,9 @@
         </el-form-item>
         <el-form-item label="金额（元）" label-width="120px">
           <el-input v-model="fundsForm.amount" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="备注" label-width="120px">
+          <el-input type="textarea" rows="5" v-model="fundsForm.memo" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="类型" label-width="120px">
           <el-select v-model="fundsForm.type" v-on:change="changeType" placeholder="请选择类型">
@@ -202,6 +219,7 @@ export default class extends Vue {
   private fundsForm: any = {
     id: 0,
     amount: 0,
+    memo: '',
     createTime: moment().format('YYYY-MM-DD HH:mm:ss'),
     updateTime: '',
     category: 1,
@@ -299,9 +317,15 @@ export default class extends Vue {
       return
     }
 
+    if (this.fundsForm.memo === '') {
+      this.$message.error('请填写备注')
+      return
+    }
+
     this.fundLoading = true
     const param = {
       amount: this.fundsForm.amount,
+      memo: this.fundsForm.memo,
       createTime: !this.createTimeDisable ? moment(this.fundsForm.createTime, 'YYYY-MM-DD HH:mm:ss').unix() * 1000 : undefined,
       category: this.fundsForm.category,
       type: this.fundsForm.type
@@ -321,11 +345,13 @@ export default class extends Vue {
   private async updateFunds () {
     this.fundLoading = true
     const createTime = moment(this.fundsForm.createTime, 'YYYY-MM-DD HH:mm:ss').unix() * 1000
+    const memo = this.oldFund?.memo !== this.fundsForm.memo ? this.fundsForm.memo : undefined
     const param = {
       id: this.fundsForm.id,
       amount: this.fundsForm.amount,
+      memo: memo,
       category: this.fundsForm.category,
-      createTime: createTime,
+      createTime: this.oldFund?.createTime !== createTime ? createTime : undefined,
       type: this.fundsForm.type,
       status: this.fundsForm.status
     }
@@ -362,6 +388,7 @@ export default class extends Vue {
 
     this.fundsForm.id = fund.id
     this.fundsForm.amount = fund.amount
+    this.fundsForm.memo = fund.memo
     this.fundsForm.createTime = this.descTime(fund.createTime)
     this.fundsForm.updateTime = this.descTime(fund.updateTime)
     this.fundsForm.category = fund.category
