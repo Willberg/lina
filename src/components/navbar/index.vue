@@ -51,7 +51,7 @@ import { isValidPassword } from "@/utils/validate";
 })
 export default class extends Vue {
   private isLogin = UserModule.userProfile !== undefined
-  private activeIndex = '1'
+  private activeIndex = localStorage.getItem(NAV_INDEX) || '1'
 
   private editPasswordVisible = false
   private editLoading = false
@@ -60,11 +60,12 @@ export default class extends Vue {
     newPassword: ''
   }
 
-  created () {
-    this.activeIndex = localStorage.getItem(NAV_INDEX) || '1'
-  }
-
   mounted () {
+    if (location.hash === '#/') {
+      localStorage.setItem(NAV_INDEX, '1')
+    }
+    this.activeIndex = localStorage.getItem(NAV_INDEX) || '1'
+
     const user = UserModule.userProfile
     if (user === undefined) {
       if (location.hash === '#/') {

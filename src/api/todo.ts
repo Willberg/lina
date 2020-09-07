@@ -52,7 +52,9 @@ export const listTodoGroup = (
   data: {
     offset?: number;
     count?: number;
-    timeMillis?: number;
+    status?: number;
+    startTime?: number;
+    endTime?: number;
     sort?: string;
   }) =>
   request({
@@ -62,10 +64,17 @@ export const listTodoGroup = (
   })
 
 // 查询任务组总数
-export const countTodoGroup = () =>
+export const countTodoGroup = (
+  data: {
+    status?: number;
+    startTime?: number;
+    endTime?: number;
+  }
+) =>
   request({
     url: '/api/todo/group/total',
-    method: 'get'
+    method: 'get',
+    params: data
   })
 
 // 查询任务列表

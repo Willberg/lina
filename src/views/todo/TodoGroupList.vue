@@ -2,6 +2,27 @@
   <div>
     <Nav></Nav>
     <TodoNav></TodoNav>
+    <el-row style="margin-top: 10px;" :gutter="10">
+      <el-col :xs="16" :sm="14" :md="12" :lg="8" :xl="8">
+        <el-date-picker
+          v-model="dateTimeRange"
+          type="datetimerange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          value-format="yyyy-MM-dd HH:mm:ss">
+        </el-date-picker>
+      </el-col>
+      <el-col :xs="4" :sm="3" :md="2" :lg="2" :xl="2">
+        <el-select v-model="status" placeholder="请选择任务组状态">
+          <el-option v-for="s in todoGroupStatusGroup" :key="s.value" :label="s.label" :value="s.value"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :xs="4" :sm="3" :md="2" :lg="2" :xl="2">
+        <el-button type="primary" @click="searchList">查询</el-button>
+      </el-col>
+    </el-row>
+
     <el-table
       v-loading="listLoading"
       :data="todoGroupList"
@@ -10,7 +31,7 @@
       fit
       highlight-current-row
       max-height="500"
-      style="width: 100%;">
+      style="width: 100%; margin-top: 10px;">
       <el-table-column
         sortable
         fixed="left"
@@ -65,6 +86,8 @@
       <el-table-column
         align="center"
         prop="status"
+        :filters="filterArray"
+        :filter-method="filterHandler"
         label="状态">
         <template slot-scope="scope">
           <el-tag
@@ -139,9 +162,11 @@ import moment from 'moment'
 import { ITodoGroup } from '@/types/todo/types'
 import Nav from '@/components/navbar/index.vue'
 import { createUrl, getUser } from '@/api/user'
-import { todoGroupList, todoGroupPriorities } from '@/constant/todoConstant'
+import { todoGroupFilterArray, todoGroupList, todoGroupPriorities, todoGroupStatusGroup } from '@/constant/todoConstant'
 import { GROUP_ID, MAX_TIME, NAV_INDEX } from '@/constant/storageConstant'
 import TodoNav from '@/views/todo/component/TodoNav.vue'
+import { cvtTimeMillisByDateTimeStr, startDateTimeStr } from '@/utils/time'
+import { filterHandlerMethod } from '@/utils/table'
 
 @Component({
   name: 'TodoGroupList',
@@ -166,8 +191,19 @@ export default class extends Vue {
   private pageSize = 10
   private pageCount = 5
   private total = 10
+  private todoGroupStatusGroup = todoGroupStatusGroup
+  private dateTimeRange: string[] | null = []
+  private status = 0
+  private filterArray = todoGroupFilterArray
+  private filterHandler = filterHandlerMethod
 
   mounted () {
+    this.dateTimeRange = [
+      startDateTimeStr(moment()),
+      startDateTimeStr(moment().add(1, 'days'))
+    ]
+
+    console.log(1)
     // html加载完成后执行。执行顺序：子组件-父组件
     const user = UserModule.userProfile
     if (user === undefined) {
@@ -195,7 +231,14 @@ export default class extends Vue {
   }
 
   private async getTodoGroupTotal () {
-    const result = await countTodoGroup()
+    const startTime = this.dateTimeRange !== null ? cvtTimeMillisByDateTimeStr(this.dateTimeRange[0]) : undefined
+    const endTime = this.dateTimeRange !== null ? cvtTimeMillisByDateTimeStr(this.dateTimeRange[1]) : undefined
+    const param = {
+      startTime: startTime,
+      endTime: endTime,
+      status: this.status
+    }
+    const result = await countTodoGroup(param)
     if (result.status) {
       this.total = result.data
     }
@@ -283,10 +326,14 @@ export default class extends Vue {
 
   private async getTodoGroupList () {
     this.listLoading = true
+    const startTime = this.dateTimeRange !== null ? cvtTimeMillisByDateTimeStr(this.dateTimeRange[0]) : undefined
+    const endTime = this.dateTimeRange !== null ? cvtTimeMillisByDateTimeStr(this.dateTimeRange[1]) : undefined
     const param = {
       offset: (this.currentPage - 1) * this.pageSize,
       count: this.pageSize,
-      // timeMillis: moment().unix() * 1000,
+      startTime: startTime,
+      endTime: endTime,
+      status: this.status,
       sort: 'desc',
     }
     const result = await listTodoGroup(param)
@@ -310,6 +357,11 @@ export default class extends Vue {
     }
     this.listLoading = false
     return result.status
+  }
+
+  private searchList () {
+    this.getTodoGroupList()
+    this.getTodoGroupTotal()
   }
 }
 </script>
