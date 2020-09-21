@@ -11,3 +11,7 @@ export const nowDateTimeStr = () => {
 export const startDateTimeStr = (m: Moment) => {
   return m.format('YYYY-MM-DD') + " 00:00:00"
 }
+
+export const thisStartWeekDay = () => {
+  return startDateTimeStr(moment().day(1))
+}

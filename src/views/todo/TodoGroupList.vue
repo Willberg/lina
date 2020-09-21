@@ -165,7 +165,7 @@ import { createUrl, getUser } from '@/api/user'
 import { todoGroupFilterArray, todoGroupList, todoGroupPriorities, todoGroupStatusGroup } from '@/constant/todoConstant'
 import { GROUP_ID, MAX_TIME, NAV_INDEX } from '@/constant/storageConstant'
 import TodoNav from '@/views/todo/component/TodoNav.vue'
-import { cvtTimeMillisByDateTimeStr, startDateTimeStr } from '@/utils/time'
+import { cvtTimeMillisByDateTimeStr, startDateTimeStr, thisStartWeekDay } from '@/utils/time'
 import { filterHandlerMethod } from '@/utils/table'
 
 @Component({
@@ -199,7 +199,7 @@ export default class extends Vue {
 
   mounted () {
     this.dateTimeRange = [
-      startDateTimeStr(moment()),
+      thisStartWeekDay(),
       startDateTimeStr(moment().add(1, 'days'))
     ]
 
