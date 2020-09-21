@@ -199,6 +199,7 @@ import {
 } from '@/constant/toolConstant'
 import { IRetFunds } from '@/types/funds/types'
 import Nav from '@/components/navbar/index.vue'
+import { startDateTimeStr, thisStartWeekDay } from '@/utils/time'
 
 @Component({
   name: 'Funds',
@@ -250,8 +251,8 @@ export default class extends Vue {
     this.needUpdateChart = false
 
     this.dateTimeRange = [
-      moment().subtract(7, 'days').format('YYYY-MM-DD HH:mm:ss'),
-      moment().add(1, 'days').format('YYYY-MM-DD HH:mm:ss')
+      thisStartWeekDay(),
+      startDateTimeStr(moment().add(1, 'days'))
     ]
   }
 
