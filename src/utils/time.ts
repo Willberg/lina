@@ -15,3 +15,7 @@ export const startDateTimeStr = (m: Moment) => {
 export const thisStartWeekDay = () => {
   return startDateTimeStr(moment().day(1))
 }
+
+export const thisStartMonthDay = () => {
+  return startDateTimeStr(moment().date(1))
+}
