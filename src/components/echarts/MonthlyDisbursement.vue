@@ -66,7 +66,7 @@ export default class extends Vue {
         data: []
       },
       {
-        name: '生活费',
+        name: '费用',
         type: 'bar',
         stack: '总量',
         label: {
