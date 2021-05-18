@@ -7,7 +7,7 @@
       </el-col>
     </el-row>
     <el-row :gutter="10" style="margin-top: 10px;">
-      <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
+      <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
         <div id="calendarChart" style="width: 100%; height:640px;"></div>
       </el-col>
     </el-row>

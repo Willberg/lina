@@ -1,10 +1,10 @@
 <template>
   <div v-if="isLogin">
     <el-row :gutter="10" style="margin-top: 50px;">
-      <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
+      <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
         <b>计时器类别：</b>
       </el-col>
-      <el-col :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+      <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16">
         <el-select v-show="isShowTypeSelect" v-model="timerSelectType"
                    placeholder="请选择计时器类别">
           <el-option v-for="t in timerTypes" :label="t.label" :value="t.value" :key="t.value"></el-option>
@@ -14,47 +14,47 @@
     </el-row>
 
     <el-row :gutter="10" style="margin-top: 10px;">
-      <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
+      <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
         <b>计时开关：</b>
       </el-col>
-      <el-col style="margin-top: 10px;" :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+      <el-col style="margin-top: 10px;" :xs="16" :sm="16" :md="16" :lg="16" :xl="16">
         <el-switch style="margin-left: 20px;" v-model="timerLastOne!==undefined && timerLastOne.status===1" disabled
                    active-color="#13ce66" inactive-color="#ff4949"></el-switch>
       </el-col>
     </el-row>
 
     <el-row v-show="timerIsEdit" :gutter="10" style="margin-top: 20px;">
-      <el-col :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
+      <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
         <b>开始时间：</b>
       </el-col>
-      <el-col :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+      <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16">
         <el-input v-model="updateTimerCreateTime" placeholder="请输入修改的开始时间"></el-input>
       </el-col>
     </el-row>
     <el-row v-show="!timerIsEdit && timerStatus" :gutter="10" style="margin-top: 20px;">
-      <el-col :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
+      <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
         <b>本阶段用时：</b>
       </el-col>
-      <el-col :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+      <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16">
         <b style="color: #C03639">{{timerUseTime}} s （{{timerFormatUseTime}}）</b>
       </el-col>
     </el-row>
 
     <el-row :gutter="10" style="margin-top: 10px;">
-      <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
+      <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
         <b>是否编辑：</b>
       </el-col>
-      <el-col style="margin-top: 10px;" :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+      <el-col style="margin-top: 10px;" :xs="16" :sm="16" :md="16" :lg="16" :xl="16">
         <el-switch style="margin-left: 20px;" v-model="timerIsEdit" v-on:change="calShowTypeSelect"
                    active-color="#13ce66"
                    inactive-color="#ff4949"></el-switch>
       </el-col>
     </el-row>
     <el-row :gutter="10" style="margin-top: 10px;">
-      <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="6" :lg="6" :xl="6">
+      <el-col style="margin-top: 10px;" :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
         <b>操作：</b>
       </el-col>
-      <el-col :xs="16" :sm="16" :md="10" :lg="10" :xl="10">
+      <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16">
         <el-button type="primary" :loading="confirmLoading" round size="medium" @click="confirmTimer">确定</el-button>
       </el-col>
     </el-row>
