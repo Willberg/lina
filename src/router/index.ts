@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
+import Record from '@/views/record/Record.vue'
 import TodoList from '@/views/todo/TodoList.vue'
 import TodoGroupList from '@/views/todo/TodoGroupList.vue'
 import Tool from '@/views/tool/Tool.vue'
@@ -25,6 +26,11 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/record',
+    name: 'Record',
+    component: Record
   },
   {
     path: '/todoGroupList',

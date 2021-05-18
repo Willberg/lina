@@ -3,20 +3,21 @@
     <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" active-text-color="#000000"
              background-color="#30B08F" text-color="#f4f4f5" @select="handleSelect">
       <el-menu-item index="1" @click.native.prevent="handleRedirect('/')">首页</el-menu-item>
-      <el-menu-item index="2" @click.native.prevent="handleRedirect('/todoGroupList')">待办</el-menu-item>
-      <el-menu-item index="3" @click.native.prevent="handleRedirect('/funds')">记账</el-menu-item>
-      <el-menu-item index="4" @click.native.prevent="handleRedirect('/cipher')">密码器</el-menu-item>
-      <el-menu-item index="11" @click.native.prevent="handleRedirect('/tool')">常用工具</el-menu-item>
-      <el-menu-item v-if="!isLogin" index="12" style="position:absolute;right:0;"
+      <el-menu-item index="11" @click.native.prevent="handleRedirect('/record')">记录器</el-menu-item>
+      <el-menu-item index="21" @click.native.prevent="handleRedirect('/todoGroupList')">待办</el-menu-item>
+      <el-menu-item index="31" @click.native.prevent="handleRedirect('/funds')">记账</el-menu-item>
+      <el-menu-item index="41" @click.native.prevent="handleRedirect('/cipher')">密码器</el-menu-item>
+      <el-menu-item index="51" @click.native.prevent="handleRedirect('/tool')">常用工具</el-menu-item>
+      <el-menu-item v-if="!isLogin" index="91" style="position:absolute;right:0;"
                     @click.native.prevent="handleRedirect('/login')">登陆
       </el-menu-item>
       <!--      <el-menu-item v-if="isLogin" index="12" style="position:absolute;right:0;" @click.native.prevent="handleLogout">-->
       <!--        退出-->
       <!--      </el-menu-item>-->
-      <el-submenu v-if="isLogin" index="12" style="position:absolute;right:0;">
+      <el-submenu v-if="isLogin" index="91" style="position:absolute;right:0;">
         <template slot="title">个人中心</template>
-        <el-menu-item index="12-1" @click.native.prevent="editPasswordVisible=true">修改密码</el-menu-item>
-        <el-menu-item index="12-2" @click.native.prevent="handleLogout">退出</el-menu-item>
+        <el-menu-item index="91-1" @click.native.prevent="editPasswordVisible=true">修改密码</el-menu-item>
+        <el-menu-item index="91-2" @click.native.prevent="handleLogout">退出</el-menu-item>
       </el-submenu>
     </el-menu>
 
@@ -44,7 +45,7 @@ import { UserModule } from '@/store/modules/user'
 import { NAV_INDEX } from '@/constant/storageConstant'
 import { getUser, updatePassword } from '@/api/user'
 import md5 from 'js-md5'
-import { isValidPassword } from "@/utils/validate";
+import { isValidPassword } from '@/utils/validate'
 
 @Component({
   name: 'Nav'
@@ -94,17 +95,23 @@ export default class extends Vue {
   private descPage (page: string) {
     if (page === '/') {
       return '1'
-    } else if (page === '/todoGroupList') {
-      return '2'
-    } else if (page === '/tool') {
+    } else if (page === '/record') {
       return '11'
+    } else if (page === '/todoGroupList') {
+      return '21'
+    } else if (page === '/funds') {
+      return '31'
+    } else if (page === '/cipher') {
+      return '41'
+    } else if (page === '/tool') {
+      return '51'
     } else {
-      return '12'
+      return '91'
     }
   }
 
   private handleSelect (key: string) {
-    if (!key.startsWith('12')) {
+    if (!key.startsWith('91')) {
       localStorage.setItem(NAV_INDEX, key)
     }
   }
@@ -126,9 +133,9 @@ export default class extends Vue {
   }
 
   private async submitUpdatePassword () {
-    if (this.updatePassword.oldPassword === ''
-      || this.updatePassword.newPassword === ''
-      || this.updatePassword.oldPassword === this.updatePassword.newPassword) {
+    if (this.updatePassword.oldPassword === '' ||
+      this.updatePassword.newPassword === '' ||
+      this.updatePassword.oldPassword === this.updatePassword.newPassword) {
       this.$message.error('请完善信息')
       return
     }
