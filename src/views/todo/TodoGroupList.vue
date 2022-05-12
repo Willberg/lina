@@ -47,7 +47,7 @@
         prop="createTime"
         label="创建日期">
         <template slot-scope="scope">
-          {{descCreateTime(scope.row.createTime)}}
+          {{ descCreateTime(scope.row.createTime) }}
         </template>
       </el-table-column>
       <el-table-column
@@ -92,7 +92,7 @@
         <template slot-scope="scope">
           <el-tag
             :type="scope.row.status === 1 ? 'info' : scope.row.status === 50? 'danger': 'success'"
-            disable-transitions>{{descStatus(scope.row.status)}}
+            disable-transitions>{{ descStatus(scope.row.status) }}
           </el-tag>
         </template>
       </el-table-column>
@@ -131,7 +131,7 @@
     </el-dialog>
 
     <el-dialog title="分享url" :visible.sync="shareUrlVisible">
-      <el-link type="primary">{{shareUrl}}</el-link>
+      <el-link type="primary">{{ shareUrl }}</el-link>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" v-clipboard:copy="shareUrl" @click="shareUrlVisible=false">拷 贝</el-button>
         <el-button @click="shareUrlVisible=false">取 消</el-button>
@@ -157,7 +157,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { UserModule } from '@/store/modules/user'
-import { countTodoGroup, listTodoGroup, updateTodoGroup } from "@/api/todo"
+import { countTodoGroup, listTodoGroup, updateTodoGroup } from '@/api/todo'
 import moment from 'moment'
 import { ITodoGroup } from '@/types/todo/types'
 import Nav from '@/components/navbar/index.vue'
@@ -165,7 +165,7 @@ import { createUrl, getUser } from '@/api/user'
 import { todoGroupFilterArray, todoGroupList, todoGroupPriorities, todoGroupStatusGroup } from '@/constant/todoConstant'
 import { GROUP_ID, MAX_TIME, NAV_INDEX } from '@/constant/storageConstant'
 import TodoNav from '@/views/todo/component/TodoNav.vue'
-import { cvtTimeMillisByDateTimeStr, startDateTimeStr, thisStartWeekDay } from '@/utils/time'
+import { cvtTimeMillisByDateTimeStr, originalStartDay, startDateTimeStr } from '@/utils/time'
 import { filterHandlerMethod } from '@/utils/table'
 
 @Component({
@@ -193,17 +193,16 @@ export default class extends Vue {
   private total = 10
   private todoGroupStatusGroup = todoGroupStatusGroup
   private dateTimeRange: string[] | null = []
-  private status = 0
+  private status = 1
   private filterArray = todoGroupFilterArray
   private filterHandler = filterHandlerMethod
 
   mounted () {
     this.dateTimeRange = [
-      thisStartWeekDay(),
+      originalStartDay(),
       startDateTimeStr(moment().add(1, 'days'))
     ]
 
-    console.log(1)
     // html加载完成后执行。执行顺序：子组件-父组件
     const user = UserModule.userProfile
     if (user === undefined) {
@@ -254,7 +253,7 @@ export default class extends Vue {
   }
 
   private descCreateTime (createTime: number) {
-    return moment(createTime).format("YYYY-MM-DD HH:mm:ss")
+    return moment(createTime).format('YYYY-MM-DD HH:mm:ss')
   }
 
   private descStatus (status: number) {
@@ -282,9 +281,9 @@ export default class extends Vue {
 
   private async submitEdit () {
     this.editLoading = true
-    if (this.pendingTodoGroup !== undefined
-      && (this.pendingTodoGroup.maxTime !== this.todoGroupForm.maxTime
-        || this.pendingTodoGroup.minPriority !== this.todoGroupForm.minPriority)) {
+    if (this.pendingTodoGroup !== undefined &&
+      (this.pendingTodoGroup.maxTime !== this.todoGroupForm.maxTime ||
+        this.pendingTodoGroup.minPriority !== this.todoGroupForm.minPriority)) {
       const param = {
         id: this.todoGroupForm.id,
         maxTime: undefined,
@@ -349,7 +348,7 @@ export default class extends Vue {
           totalTime: t.totalTime,
           maxTime: t.maxTime,
           minPriority: t.minPriority,
-          updateDateTime: moment(t.updateTime).format("YYYY-MM-DD HH:mm:ss"),
+          updateDateTime: moment(t.updateTime).format('YYYY-MM-DD HH:mm:ss'),
           status: t.status
         }
         this.todoGroupList.push(todoGroup)

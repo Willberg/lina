@@ -9,7 +9,7 @@ export const nowDateTimeStr = () => {
 }
 
 export const startDateTimeStr = (m: Moment) => {
-  return m.format('YYYY-MM-DD') + " 00:00:00"
+  return m.format('YYYY-MM-DD') + ' 00:00:00'
 }
 
 export const thisStartWeekDay = () => {
@@ -18,4 +18,8 @@ export const thisStartWeekDay = () => {
 
 export const thisStartMonthDay = () => {
   return startDateTimeStr(moment().date(1))
+}
+
+export const originalStartDay = () => {
+  return startDateTimeStr(moment().set('year', 2000))
 }
