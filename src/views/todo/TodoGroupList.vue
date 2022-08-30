@@ -232,10 +232,11 @@ export default class extends Vue {
   private async getTodoGroupTotal () {
     const startTime = this.dateTimeRange !== null ? cvtTimeMillisByDateTimeStr(this.dateTimeRange[0]) : undefined
     const endTime = this.dateTimeRange !== null ? cvtTimeMillisByDateTimeStr(this.dateTimeRange[1]) : undefined
+    const status = this.status !== 0 ? this.status : undefined
     const param = {
       startTime: startTime,
       endTime: endTime,
-      status: this.status
+      status: status
     }
     const result = await countTodoGroup(param)
     if (result.status) {
