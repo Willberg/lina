@@ -30,7 +30,7 @@
     <el-table
       v-loading="listLoading"
       :data="ojList"
-      :default-sort="{prop: 'createTime', order: 'descending'}"
+      :default-sort="{prop: 'id', order: 'descending'}"
       border
       fit
       highlight-current-row
@@ -139,6 +139,8 @@
         label="操作">
         <template slot-scope="scope">
           <el-button @click="handleEdit(scope.row)" type="text" size="small">编辑</el-button>
+          <el-button @click="handleDelete(scope.row.id)" type="text" style="color: red" size="small">删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -515,6 +517,35 @@ export default class extends Vue {
     this.updateForm = JSON.parse(JSON.stringify(oj))
   }
 
+  private async handleDelete (id: number) {
+    this.listLoading = false
+    const param: IOjUpdate = {
+      id: id,
+      preTime: nowTimeMillis(),
+      status: 4
+    }
+    const result = await update(param)
+    if (result.status) {
+      let idx = -1
+      this.ojList.forEach((o, i) => {
+        if (o.id === id) {
+          idx = i
+        }
+      })
+      if (this.ojList[idx].status === 1) {
+        this.clearTimer()
+      }
+      this.ojList.splice(idx, 1)
+      this.$message.success('删除记录成功, ID: ' + id)
+    }
+    this.listLoading = false
+  }
+
+  private clearTimer () {
+    this.timerId = -1
+    clearInterval(this.countdownTimer)
+  }
+
   private handleUseTime () {
     this.useTimeVisible = !this.useTimeVisible
   }
@@ -579,16 +610,15 @@ export default class extends Vue {
     const result = await update(param)
     if (result.status) {
       const newOj = result.data
-      for (const key in newOj) {
-        this.oldOj[key] = newOj[key]
-      }
       if (newOj.status === 1) {
         this.addTimer(this.oldOj.id, this.oldOj.useTime, this.oldOj.preTime)
       } else {
-        if (this.timerId > 0) {
-          this.timerId = -1
-          clearInterval(this.countdownTimer)
+        if (this.oldOj.status === 1) {
+          this.clearTimer()
         }
+      }
+      for (const key in newOj) {
+        this.oldOj[key] = newOj[key]
       }
       this.$message.success('更新成功')
     }

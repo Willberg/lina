@@ -18,11 +18,11 @@ export const problemSet = [
 export const problemSetFilterArray = [
   {
     text: 'leetcode',
-    value: 'leetcode'
+    value: 1
   },
   {
     text: 'codeforces',
-    value: 'codeforces'
+    value: 2
   }
 ]
 
@@ -124,10 +124,6 @@ export const statusSet = [
   {
     label: '结束',
     value: 3
-  },
-  {
-    label: '删除',
-    value: 4
   }
 ]
 
