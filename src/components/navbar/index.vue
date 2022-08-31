@@ -3,8 +3,9 @@
     <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" active-text-color="#000000"
              background-color="#30B08F" text-color="#f4f4f5" @select="handleSelect">
       <el-menu-item index="1" @click.native.prevent="handleRedirect('/')">首页</el-menu-item>
-      <el-menu-item index="11" @click.native.prevent="handleRedirect('/record')">记录器</el-menu-item>
+      <el-menu-item index="11" @click.native.prevent="handleRedirect('/record')">作息</el-menu-item>
       <el-menu-item index="21" @click.native.prevent="handleRedirect('/todoGroupList')">待办</el-menu-item>
+      <el-menu-item index="22" @click.native.prevent="handleRedirect('/oj')">题库</el-menu-item>
       <el-menu-item index="31" @click.native.prevent="handleRedirect('/funds')">记账</el-menu-item>
       <el-menu-item index="41" @click.native.prevent="handleRedirect('/cipher')">密码器</el-menu-item>
       <el-menu-item index="51" @click.native.prevent="handleRedirect('/tool')">常用工具</el-menu-item>
@@ -99,6 +100,8 @@ export default class extends Vue {
       return '11'
     } else if (page === '/todoGroupList') {
       return '21'
+    } else if (page === '/oj') {
+      return '22'
     } else if (page === '/funds') {
       return '31'
     } else if (page === '/cipher') {

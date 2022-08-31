@@ -4,6 +4,7 @@ import Home from '@/views/Home.vue'
 import Record from '@/views/record/Record.vue'
 import TodoList from '@/views/todo/TodoList.vue'
 import TodoGroupList from '@/views/todo/TodoGroupList.vue'
+import Oj from '@/views/oj/Oj.vue'
 import Tool from '@/views/tool/Tool.vue'
 import Cipher from '@/views/cipher/Cipher.vue'
 import Funds from '@/views/funds/Funds.vue'
@@ -41,6 +42,11 @@ const routes = [
     path: '/todoList',
     name: 'TodoList',
     component: TodoList
+  },
+  {
+    path: '/oj',
+    name: 'Oj',
+    component: Oj
   },
   {
     path: '/funds',

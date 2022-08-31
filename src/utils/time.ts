@@ -23,3 +23,11 @@ export const thisStartMonthDay = () => {
 export const originalStartDay = () => {
   return startDateTimeStr(moment().set('year', 2000))
 }
+
+export const nowTimeMillis = () => {
+  return moment().unix() * 1000
+}
+
+export const timeMillis2DateTime = (ts: number) => {
+  return moment.unix(ts / 1000).format('YYYY-MM-DD HH:mm:ss')
+}
