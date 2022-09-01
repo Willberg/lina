@@ -130,11 +130,19 @@
         align="center"
         prop="standalone"
         label="参考题解">
+        <template slot-scope="scope">
+          <div v-show="scope.row.standalone==='否'" style="color: green"> {{ scope.row.standalone }}</div>
+          <div v-show="scope.row.standalone==='是'" style="color: red"> {{ scope.row.standalone }}</div>
+        </template>
       </el-table-column>
       <el-table-column
         align="center"
         prop="study"
         label="学习题解">
+        <template slot-scope="scope">
+          <div v-show="scope.row.study==='是'" style="color: green"> {{ scope.row.study }}</div>
+          <div v-show="scope.row.study==='否'" style="color: red"> {{ scope.row.study }}</div>
+        </template>
       </el-table-column>
       <el-table-column
         sortable
