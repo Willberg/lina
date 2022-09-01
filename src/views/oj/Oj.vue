@@ -1,17 +1,8 @@
 <template>
   <div>
     <Nav></Nav>
-    <el-row :gutter="10" style="margin-top: 10px; margin-bottom: 10px;">
-      <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="1">
-        <div style="margin-top: 10px;">功能：</div>
-      </el-col>
-      <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="1">
-        <el-button type="primary" @click.native.prevent="handleAdd">添加题目</el-button>
-      </el-col>
-    </el-row>
-
-    <el-row style="margin-top: 10px;" :gutter="10">
-      <el-col :xs="16" :sm="14" :md="12" :lg="8" :xl="8">
+    <el-row style="margin-top: 10px;" :gutter="10" type="flex">
+      <el-col :span="6">
         <el-date-picker
           v-model="dateTimeRange"
           type="datetimerange"
@@ -21,9 +12,9 @@
           value-format="yyyy-MM-dd HH:mm:ss">
         </el-date-picker>
       </el-col>
-
-      <el-col :xs="4" :sm="3" :md="2" :lg="2" :xl="2">
+      <el-col :span="3">
         <el-button type="primary" @click="searchList">查询</el-button>
+        <el-button type="primary" @click.native.prevent="handleAdd">添加题目</el-button>
       </el-col>
     </el-row>
 
@@ -610,15 +601,16 @@ export default class extends Vue {
     const result = await update(param)
     if (result.status) {
       const newOj = result.data
+      const oldStatus = this.oldOj.status
+      for (const key in newOj) {
+        this.oldOj[key] = newOj[key]
+      }
       if (newOj.status === 1) {
         this.addTimer(this.oldOj.id, this.oldOj.useTime, this.oldOj.preTime)
       } else {
-        if (this.oldOj.status === 1) {
+        if (oldStatus === 1) {
           this.clearTimer()
         }
-      }
-      for (const key in newOj) {
-        this.oldOj[key] = newOj[key]
       }
       this.$message.success('更新成功')
     }
