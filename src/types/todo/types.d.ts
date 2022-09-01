@@ -43,35 +43,3 @@ export interface IPatchAddTodo {
   estimateTime: number;
   priority: number;
 }
-
-export interface IOj {
-  id?: number;
-  pid?: number;
-  name?: string;
-  difficulty?: string;
-  ojType?: number;
-  type?: string;
-  preTime?: number;
-  useTime?: number;
-  standalone?: string;
-  study?: string;
-  link?: string;
-  createTime?: number;
-  updateTime?: number;
-  status?: number;
-}
-
-export interface IOjUpdate {
-  id: number;
-  pid?: number | undefined;
-  name?: string | undefined;
-  difficulty?: string | undefined;
-  ojType?: number | undefined;
-  type?: string | undefined;
-  preTime: number;
-  useTime?: number | undefined;
-  standalone?: string | undefined;
-  study?: string | undefined;
-  link?: string | undefined;
-  status?: number | undefined;
-}

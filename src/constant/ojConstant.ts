@@ -4,7 +4,36 @@ export const difficulties = [
   { label: '困难' }
 ]
 
+export const difficultiesArray = [
+  {
+    text: '简单',
+    value: '简单'
+  },
+  {
+    text: '中等',
+    value: '中等'
+  },
+  {
+    text: '困难',
+    value: '困难'
+  }
+]
+
 export const problemSet = [
+  {
+    label: 'leetcode',
+    value: 1
+  },
+  {
+    label: 'codeforces',
+    value: 2
+  }
+]
+export const questionBank = [
+  {
+    label: '全部',
+    value: 0
+  },
   {
     label: 'leetcode',
     value: 1

@@ -2,7 +2,49 @@
   <div>
     <Nav></Nav>
     <el-row style="margin-top: 10px;" :gutter="10" type="flex">
-      <el-col :span="6">
+      <el-col :span="4">
+        <el-select v-model="ojType" placeholder="请选择题库" @change="calSummary()">
+          <el-option v-for="p in questionBank" :label="p.label" :value="p.value" :key="p.value"></el-option>
+        </el-select>
+      </el-col>
+    </el-row>
+    <el-table
+      v-loading="summaryLoading"
+      :data="summaryList"
+      border
+      fit
+      highlight-current-row
+      style="width: 100%; margin-top: 10px;">
+      <el-table-column
+        fixed="left"
+        align="center"
+        prop="difficulty"
+        label="难度">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        prop="cnt0"
+        label="未参考题解">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        prop="cnt1"
+        label="参考题解">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        prop="total"
+        label="总数">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        prop="percent"
+        label="未参考题解的比例（%）">
+      </el-table-column>
+    </el-table>
+
+    <el-row style="margin-top: 10px;" :gutter="10" type="flex">
+      <el-col :span="4">
         <el-date-picker
           v-model="dateTimeRange"
           type="datetimerange"
@@ -12,7 +54,7 @@
           value-format="yyyy-MM-dd HH:mm:ss">
         </el-date-picker>
       </el-col>
-      <el-col :span="3">
+      <el-col :span="5">
         <el-button type="primary" @click="searchList">查询</el-button>
         <el-button type="primary" @click.native.prevent="handleAdd">添加题目</el-button>
       </el-col>
@@ -61,6 +103,8 @@
       <el-table-column
         align="center"
         prop="difficulty"
+        :filters="filterDifficultiesArray"
+        :filter-method="filterHandler"
         label="难度">
       </el-table-column>
       <el-table-column
@@ -265,14 +309,16 @@ import { add, count, list, update } from '@/api/oj'
 import {
   choices,
   difficulties,
+  difficultiesArray,
   problemSet,
   problemSetFilterArray,
   problemType,
   problemTypeArray,
+  questionBank,
   statusFilterArray,
   statusSet
 } from '@/constant/ojConstant'
-import { IOj, IOjUpdate } from '@/types/todo/types'
+import { IOj, IOjUpdate, ISummary } from '@/types/oj/types'
 import { filterHandlerMethod } from '@/utils/table'
 import { getUser } from '@/api/user'
 
@@ -283,6 +329,11 @@ import { getUser } from '@/api/user'
   }
 })
 export default class extends Vue {
+  private ojType = 0
+  private summaryLoading = false
+  private summaryList: ISummary[] = []
+  private questionBank = questionBank
+
   private difficulties = difficulties
   private problemSet = problemSet
   private problemType = problemType
@@ -297,6 +348,7 @@ export default class extends Vue {
   private total = 10
   private listLoading = false
   private ojList: any[] = []
+  private filterDifficultiesArray = difficultiesArray
   private filterProblemTypeArray = problemTypeArray
   private filterProblemSetArray = problemSetFilterArray
   private filterStatusArray = statusFilterArray
@@ -423,6 +475,7 @@ export default class extends Vue {
       }
     }
     this.listLoading = false
+    this.calSummary()
     return result.status
   }
 
@@ -527,6 +580,7 @@ export default class extends Vue {
         this.clearTimer()
       }
       this.ojList.splice(idx, 1)
+      this.timeoutCalSummary()
       this.$message.success('删除记录成功, ID: ' + id)
     }
     this.listLoading = false
@@ -601,6 +655,10 @@ export default class extends Vue {
     const result = await update(param)
     if (result.status) {
       const newOj = result.data
+      if ((newOj.difficulty !== undefined && newOj.difficulty !== this.oldOj.difficulty) ||
+        (newOj.standalone !== undefined && newOj.standalone !== this.oldOj.standalone)) {
+        this.timeoutCalSummary()
+      }
       const oldStatus = this.oldOj.status
       for (const key in newOj) {
         this.oldOj[key] = newOj[key]
@@ -616,6 +674,73 @@ export default class extends Vue {
     }
     this.updateLoading = false
     this.updateFormVisible = false
+  }
+
+  private initSummary (difficulty: string) {
+    const s: ISummary = {
+      difficulty: difficulty,
+      cnt0: 0,
+      cnt1: 0,
+      total: 0,
+      percent: 0
+    }
+    return s
+  }
+
+  private calSummary () {
+    this.summaryLoading = true
+    const easy: ISummary = this.initSummary('简单')
+    const medium: ISummary = this.initSummary('中等')
+    const hard: ISummary = this.initSummary('困难')
+    this.ojList.forEach(oj => {
+      if (oj.status !== 1 && (this.ojType === 0 || this.ojType === oj.ojType)) {
+        if (oj.standalone === '是') {
+          if (oj.difficulty === '简单') {
+            easy.cnt1++
+          } else if (oj.difficulty === '中等') {
+            medium.cnt1++
+          } else {
+            hard.cnt1++
+          }
+        } else {
+          if (oj.difficulty === '简单') {
+            easy.cnt0++
+          } else if (oj.difficulty === '中等') {
+            medium.cnt0++
+          } else {
+            hard.cnt0++
+          }
+        }
+      }
+    })
+    easy.total = easy.cnt0 + easy.cnt1
+    medium.total = medium.cnt0 + medium.cnt1
+    hard.total = hard.cnt0 + hard.cnt1
+    if (easy.total !== 0) {
+      easy.percent = this.calPercent(easy.cnt0, easy.total)
+    }
+    if (medium.total !== 0) {
+      medium.percent = this.calPercent(medium.cnt0, medium.total)
+    }
+    if (hard.total !== 0) {
+      hard.percent = this.calPercent(hard.cnt0, hard.total)
+    }
+    this.$set(this.summaryList, 0, easy)
+    this.$set(this.summaryList, 1, medium)
+    this.$set(this.summaryList, 2, hard)
+    this.summaryLoading = false
+  }
+
+  private calPercent (s: number, m: number) {
+    return Math.round(s / m * 10000) / 100
+  }
+
+  private timeoutCalSummary () {
+    // 延时计算summary， 解决summary表格不更新的bug,怀疑是vue或是elementUI table的bug
+    const ts = this.calSummary
+    setTimeout(function () {
+      ts()
+    }, 1000)
   }
 }
 </script>
