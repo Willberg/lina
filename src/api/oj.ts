@@ -9,6 +9,7 @@ export const add = (
     type: string;
     preTime: number;
     link: string;
+    importance: number;
   }) => request({
   url: '/api/oj/add',
   method: 'post',
@@ -28,6 +29,7 @@ export const update = (
     standalone?: string;
     study?: string;
     link?: string;
+    importance?: number;
     status?: number;
   }) => request({
   url: '/api/oj/update',

@@ -10,6 +10,7 @@ export interface IOj {
   standalone?: string;
   study?: string;
   link?: string;
+  importance?: number;
   createTime?: number;
   updateTime?: number;
   status?: number;
@@ -27,6 +28,7 @@ export interface IOjUpdate {
   standalone?: string | undefined;
   study?: string | undefined;
   link?: string | undefined;
+  importance?: number | undefined;
   status?: number | undefined;
 }
 

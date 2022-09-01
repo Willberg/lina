@@ -128,6 +128,13 @@
       </el-table-column>
       <el-table-column
         align="center"
+        prop="importance"
+        :filters="filterImportanceArray"
+        :filter-method="filterHandler"
+        label="重要程度">
+      </el-table-column>
+      <el-table-column
+        align="center"
         prop="standalone"
         label="参考题解">
         <template slot-scope="scope">
@@ -229,6 +236,9 @@
         <el-form-item label="链接" label-width="140px">
           <el-input v-model="addForm.link" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="重要程度" label-width="140px">
+          <el-input v-model="addForm.importance" autocomplete="off"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="clearAddInput">清 空</el-button>
@@ -287,6 +297,11 @@
         <el-form-item label="链接" label-width="140px">
           <el-input v-model="updateForm.link" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="重要程度" label-width="140px">
+          <el-select v-model="updateForm.importance" placeholder="请选择重要程度">
+            <el-option v-for="i in importances" :label="i.label" :value="i.label" :key="i.label"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="状态" label-width="140px">
           <el-select v-model="updateForm.status" placeholder="请选择状态">
             <el-option v-for="s in statusSet" :label="s.label" :value="s.value" :key="s.value"></el-option>
@@ -318,6 +333,8 @@ import {
   choices,
   difficulties,
   difficultiesArray,
+  importanceFilterArray,
+  importances,
   problemSet,
   problemSetFilterArray,
   problemType,
@@ -346,6 +363,7 @@ export default class extends Vue {
   private problemSet = problemSet
   private problemType = problemType
   private choices = choices
+  private importances = importances
   private statusSet = statusSet
 
   private dateTimeRange: string[] | null = []
@@ -360,6 +378,7 @@ export default class extends Vue {
   private filterProblemTypeArray = problemTypeArray
   private filterProblemSetArray = problemSetFilterArray
   private filterStatusArray = statusFilterArray
+  private filterImportanceArray = importanceFilterArray
   private filterHandler = filterHandlerMethod
 
   private timerId = -1
@@ -523,6 +542,7 @@ export default class extends Vue {
       this.addForm.difficulty === undefined ||
       this.addForm.ojType === undefined ||
       this.addForm.type === undefined ||
+      this.addForm.importance === undefined ||
       this.addForm.link === undefined) {
       this.$message.error('请填写题目信息')
       return
@@ -536,7 +556,8 @@ export default class extends Vue {
       ojType: this.addForm.ojType,
       type: this.addForm.type,
       preTime: nowTimeMillis(),
-      link: this.addForm.link
+      link: this.addForm.link,
+      importance: this.addForm.importance
     }
     const result = await add(param)
     if (result.status) {
@@ -658,6 +679,9 @@ export default class extends Vue {
     }
     if (this.oldOj.link !== this.updateForm.link) {
       param.link = this.updateForm.link
+    }
+    if (this.oldOj.importance !== this.updateForm.importance) {
+      param.importance = this.updateForm.importance
     }
     this.updateLoading = true
     const result = await update(param)
