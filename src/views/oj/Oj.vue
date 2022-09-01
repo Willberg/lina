@@ -693,7 +693,7 @@ export default class extends Vue {
     const medium: ISummary = this.initSummary('中等')
     const hard: ISummary = this.initSummary('困难')
     this.ojList.forEach(oj => {
-      if (oj.status !== 1 && (this.ojType === 0 || this.ojType === oj.ojType)) {
+      if (oj.status === 3 && (this.ojType === 0 || this.ojType === oj.ojType)) {
         if (oj.standalone === '是') {
           if (oj.difficulty === '简单') {
             easy.cnt1++
