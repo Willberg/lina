@@ -710,6 +710,8 @@ export default class extends Vue {
     if (result.status) {
       const newOj = result.data
       if ((newOj.difficulty !== undefined && newOj.difficulty !== this.oldOj.difficulty) ||
+        (newOj.status === 3 && (this.oldOj.status === 1 || this.oldOj.status === 2)) ||
+        (this.oldOj.status === 3 && (newOj.status === 1 || newOj.status === 2)) ||
         (newOj.standalone !== undefined && newOj.standalone !== this.oldOj.standalone)) {
         this.timeoutCalSummary()
       }
