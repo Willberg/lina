@@ -132,6 +132,14 @@
         :filters="filterImportanceArray"
         :filter-method="filterHandler"
         label="重要程度">
+        <template slot-scope="scope">
+          <div v-show="scope.row.importance<=2" style="color: green"> {{ descImportance(scope.row.importance) }}</div>
+          <div v-show="scope.row.importance===3" style="color: #e6a23c"> {{
+              descImportance(scope.row.importance)
+            }}
+          </div>
+          <div v-show="scope.row.importance===4" style="color: red"> {{ descImportance(scope.row.importance) }}</div>
+        </template>
       </el-table-column>
       <el-table-column
         align="center"
@@ -237,7 +245,9 @@
           <el-input v-model="addForm.link" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="重要程度" label-width="140px">
-          <el-input v-model="addForm.importance" autocomplete="off"></el-input>
+          <el-select v-model="addForm.importance" placeholder="请选择重要程度">
+            <el-option v-for="i in importances" :label="i.label" :value="i.value" :key="i.value"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -299,7 +309,7 @@
         </el-form-item>
         <el-form-item label="重要程度" label-width="140px">
           <el-select v-model="updateForm.importance" placeholder="请选择重要程度">
-            <el-option v-for="i in importances" :label="i.label" :value="i.label" :key="i.label"></el-option>
+            <el-option v-for="i in importances" :label="i.label" :value="i.value" :key="i.value"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="状态" label-width="140px">
@@ -437,6 +447,18 @@ export default class extends Vue {
       return 'codeforces'
     } else {
       return ''
+    }
+  }
+
+  private descImportance = (i: number) => {
+    if (i === 1) {
+      return '一般且容易'
+    } else if (i === 2) {
+      return '一般且困难'
+    } else if (i === 3) {
+      return '重要且容易'
+    } else {
+      return '重要且困难'
     }
   }
 
