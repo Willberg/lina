@@ -65,6 +65,8 @@ export const problemType = [
   { label: '分治' },
   { label: '数学' },
   { label: '位运算' },
+  { label: '哈希' },
+  { label: '数组' },
   { label: '队列' },
   { label: '栈' },
   { label: '链表' },
@@ -109,6 +111,14 @@ export const problemTypeArray = [
   {
     text: '位运算',
     value: '位运算'
+  },
+  {
+    text: '哈希',
+    value: '哈希'
+  },
+  {
+    text: '数组',
+    value: '数组'
   },
   {
     text: '队列',
