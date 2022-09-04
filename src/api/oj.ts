@@ -29,6 +29,7 @@ export const update = (
     standalone?: string;
     study?: string;
     link?: string;
+    ansLink?: string;
     importance?: number;
     status?: number;
   }) => request({

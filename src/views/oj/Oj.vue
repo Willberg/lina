@@ -160,6 +160,17 @@
         </template>
       </el-table-column>
       <el-table-column
+        align="center"
+        prop="ansLink"
+        label="题解">
+        <template slot-scope="scope">
+          <div v-show="scope.row.ansLink!==undefined && scope.row.ansLink!==''"> 　
+            <el-button @click="handleLink(scope.row.ansLink)" type="text" size="small">　是　</el-button>
+          </div>
+          <div v-show="scope.row.ansLink===undefined || scope.row.ansLink===''" style="color: red"> 否　</div>
+        </template>
+      </el-table-column>
+      <el-table-column
         sortable
         width="160"
         align="center"
@@ -241,7 +252,7 @@
             <el-option v-for="p in problemType" :label="p.label" :value="p.label" :key="p.label"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="链接" label-width="140px">
+        <el-form-item label="题目链接" label-width="140px">
           <el-input v-model="addForm.link" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="重要程度" label-width="140px">
@@ -304,8 +315,11 @@
             <el-option v-for="c in choices" :label="c.label" :value="c.label" :key="c.label"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="链接" label-width="140px">
+        <el-form-item label="题目链接" label-width="140px">
           <el-input v-model="updateForm.link" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="题解链接" label-width="140px">
+          <el-input v-model="updateForm.ansLink" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="重要程度" label-width="140px">
           <el-select v-model="updateForm.importance" placeholder="请选择重要程度">
@@ -701,6 +715,9 @@ export default class extends Vue {
     }
     if (this.oldOj.link !== this.updateForm.link) {
       param.link = this.updateForm.link
+    }
+    if (this.oldOj.ansLink !== this.updateForm.ansLink) {
+      param.ansLink = this.updateForm.ansLink
     }
     if (this.oldOj.importance !== this.updateForm.importance) {
       param.importance = this.updateForm.importance
