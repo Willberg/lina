@@ -123,7 +123,14 @@
           <div v-if="scope.row.id===timerId" style="color: red">
             {{ timer }}
           </div>
-          <div v-else>{{ calTimerFormatUseTime(scope.row.useTime) }}({{ scope.row.useTime }}秒)</div>
+          <div v-else>
+            <div v-show="calShowTime(scope.row)===1" style="color: green">
+              {{ calTimerFormatUseTime(scope.row.useTime) }}({{ scope.row.useTime }}秒)
+            </div>
+            <div v-show="calShowTime(scope.row)===2" style="color: red">
+              {{ calTimerFormatUseTime(scope.row.useTime) }}({{ scope.row.useTime }}秒)
+            </div>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -814,6 +821,31 @@ export default class extends Vue {
     setTimeout(function () {
       ts()
     }, 1000)
+  }
+
+  private calShowTime (t: IOj) {
+    if (t.difficulty === undefined || t.useTime === undefined) {
+      return 1
+    }
+    if (t.difficulty === '简单') {
+      if (t.useTime <= 10 * 60) {
+        return 1
+      } else {
+        return 2
+      }
+    } else if (t.difficulty === '中等') {
+      if (t.useTime <= 30 * 60) {
+        return 1
+      } else {
+        return 2
+      }
+    } else {
+      if (t.useTime <= 60 * 60) {
+        return 1
+      } else {
+        return 2
+      }
+    }
   }
 }
 </script>
