@@ -43,7 +43,7 @@
       </el-table-column>
     </el-table>
 
-    <el-row style="margin-top: 10px;" :gutter="10" type="flex">
+    <el-row style="margin-top: 10px;" :gutter="10">
       <el-col :sm="10" :md="10" :lg="5" :xl="4">
         <el-date-picker
           v-model="dateTimeRange"
@@ -54,7 +54,7 @@
           value-format="yyyy-MM-dd HH:mm:ss">
         </el-date-picker>
       </el-col>
-      <el-col :sm="10" :md="10" :lg="5" :xl="5">
+      <el-col :sm="14" :md="14" :lg="12" :xl="5">
         <el-button type="primary" @click="searchList">查询</el-button>
         <el-button type="primary" @click.native.prevent="handleAdd">添加题目</el-button>
       </el-col>
