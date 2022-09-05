@@ -2,7 +2,7 @@
   <div>
     <Nav></Nav>
     <el-row style="margin-top: 10px;" :gutter="10" type="flex">
-      <el-col :span="4">
+      <el-col :xs="7" :sm="7" :md="7" :lg="5" :xl="4">
         <el-select v-model="ojType" placeholder="请选择题库" @change="calSummary()">
           <el-option v-for="p in questionBank" :label="p.label" :value="p.value" :key="p.value"></el-option>
         </el-select>
@@ -44,7 +44,7 @@
     </el-table>
 
     <el-row style="margin-top: 10px;" :gutter="10" type="flex">
-      <el-col :span="4">
+      <el-col :sm="10" :md="10" :lg="5" :xl="4">
         <el-date-picker
           v-model="dateTimeRange"
           type="datetimerange"
@@ -54,7 +54,7 @@
           value-format="yyyy-MM-dd HH:mm:ss">
         </el-date-picker>
       </el-col>
-      <el-col :span="5">
+      <el-col :sm="10" :md="10" :lg="5" :xl="5">
         <el-button type="primary" @click="searchList">查询</el-button>
         <el-button type="primary" @click.native.prevent="handleAdd">添加题目</el-button>
       </el-col>
