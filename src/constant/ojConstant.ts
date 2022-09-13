@@ -156,6 +156,28 @@ export const choices = [
   { label: '否' }
 ]
 
+export const standaloneFilterArray = [
+  {
+    text: '是',
+    value: '是'
+  },
+  {
+    text: '否',
+    value: '否'
+  }
+]
+
+export const studyFilterArray = [
+  {
+    text: '是',
+    value: '是'
+  },
+  {
+    text: '否',
+    value: '否'
+  }
+]
+
 export const statusSet = [
   {
     label: '开始',
@@ -221,5 +243,16 @@ export const importanceFilterArray = [
   {
     text: '重要且困难',
     value: 4
+  }
+]
+
+export const ansLinkFilterArray = [
+  {
+    text: '是',
+    value: '是'
+  },
+  {
+    text: '否',
+    value: '否'
   }
 ]

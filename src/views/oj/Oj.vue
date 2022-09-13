@@ -43,6 +43,11 @@
       </el-table-column>
       <el-table-column
         align="center"
+        prop="cnt3"
+        label="未写题解">
+      </el-table-column>
+      <el-table-column
+        align="center"
         prop="percent"
         label="未参考题解的比例（%）">
       </el-table-column>
@@ -156,6 +161,8 @@
       <el-table-column
         align="center"
         prop="standalone"
+        :filters="filterStandaloneArray"
+        :filter-method="filterHandler"
         label="参考题解">
         <template slot-scope="scope">
           <div v-show="scope.row.standalone==='否'" style="color: green"> {{ scope.row.standalone }}</div>
@@ -165,6 +172,8 @@
       <el-table-column
         align="center"
         prop="study"
+        :filters="filterStudyArray"
+        :filter-method="filterHandler"
         label="学习题解">
         <template slot-scope="scope">
           <div v-show="scope.row.study==='是'" style="color: green"> {{ scope.row.study }}</div>
@@ -174,6 +183,8 @@
       <el-table-column
         align="center"
         prop="ansLink"
+        :filters="filterAnsLinkArray"
+        :filter-method="filterEmptyMethod"
         label="题解">
         <template slot-scope="scope">
           <div v-show="scope.row.ansLink!==undefined && scope.row.ansLink!==''"> 　
@@ -366,6 +377,7 @@ import moment from 'moment'
 import { UserModule } from '@/store/modules/user'
 import { add, count, list, update } from '@/api/oj'
 import {
+  ansLinkFilterArray,
   choices,
   difficulties,
   difficultiesArray,
@@ -376,11 +388,13 @@ import {
   problemType,
   problemTypeArray,
   questionBank,
+  standaloneFilterArray,
   statusFilterArray,
-  statusSet
+  statusSet,
+  studyFilterArray
 } from '@/constant/ojConstant'
 import { IOj, IOjUpdate, ISummary } from '@/types/oj/types'
-import { filterHandlerMethod } from '@/utils/table'
+import { filterEmptyMethod, filterHandlerMethod } from '@/utils/table'
 import { getUser } from '@/api/user'
 
 @Component({
@@ -413,9 +427,13 @@ export default class extends Vue {
   private filterDifficultiesArray = difficultiesArray
   private filterProblemTypeArray = problemTypeArray
   private filterProblemSetArray = problemSetFilterArray
+  private filterStandaloneArray = standaloneFilterArray
+  private filterStudyArray = studyFilterArray
+  private filterAnsLinkArray = ansLinkFilterArray
   private filterStatusArray = statusFilterArray
   private filterImportanceArray = importanceFilterArray
   private filterHandler = filterHandlerMethod
+  private filterEmptyMethod = filterEmptyMethod
 
   private timerId = -1
   private countdownTimer: any | undefined
@@ -767,6 +785,7 @@ export default class extends Vue {
       cnt0: 0,
       cnt1: 0,
       cnt2: 0,
+      cnt3: 0,
       total: 0,
       percent: 0
     }
@@ -787,6 +806,15 @@ export default class extends Vue {
             medium.cnt2++
           } else {
             hard.cnt2++
+          }
+        }
+        if (oj.ansLink === undefined || oj.ansLink === '') {
+          if (oj.difficulty === '简单') {
+            easy.cnt3++
+          } else if (oj.difficulty === '中等') {
+            medium.cnt3++
+          } else {
+            hard.cnt3++
           }
         }
         if (oj.standalone === '是') {
