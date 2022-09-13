@@ -38,6 +38,11 @@
       </el-table-column>
       <el-table-column
         align="center"
+        prop="cnt2"
+        label="未学习题解">
+      </el-table-column>
+      <el-table-column
+        align="center"
         prop="percent"
         label="未参考题解的比例（%）">
       </el-table-column>
@@ -761,6 +766,7 @@ export default class extends Vue {
       difficulty: difficulty,
       cnt0: 0,
       cnt1: 0,
+      cnt2: 0,
       total: 0,
       percent: 0
     }
@@ -774,6 +780,15 @@ export default class extends Vue {
     const hard: ISummary = this.initSummary('困难')
     this.ojList.forEach(oj => {
       if (oj.status === 3 && (this.ojType === 0 || this.ojType === oj.ojType)) {
+        if (oj.study === '否') {
+          if (oj.difficulty === '简单') {
+            easy.cnt2++
+          } else if (oj.difficulty === '中等') {
+            medium.cnt2++
+          } else {
+            hard.cnt2++
+          }
+        }
         if (oj.standalone === '是') {
           if (oj.difficulty === '简单') {
             easy.cnt1++

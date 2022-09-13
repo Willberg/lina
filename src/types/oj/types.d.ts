@@ -38,6 +38,7 @@ export interface ISummary {
   difficulty: string;
   cnt0: number;
   cnt1: number;
+  cnt2: number;
   total: number;
   percent: number;
 }
