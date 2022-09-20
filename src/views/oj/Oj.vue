@@ -756,10 +756,7 @@ export default class extends Vue {
     const result = await update(param)
     if (result.status) {
       const newOj = result.data
-      if ((newOj.difficulty !== undefined && newOj.difficulty !== this.oldOj.difficulty) ||
-        (newOj.status === 3 && (this.oldOj.status === 1 || this.oldOj.status === 2)) ||
-        (this.oldOj.status === 3 && (newOj.status === 1 || newOj.status === 2)) ||
-        (newOj.standalone !== undefined && newOj.standalone !== this.oldOj.standalone)) {
+      if (this.checkNeedUpdate(newOj)) {
         this.timeoutCalSummary()
       }
       const oldStatus = this.oldOj.status
@@ -777,6 +774,20 @@ export default class extends Vue {
     }
     this.updateLoading = false
     this.updateFormVisible = false
+  }
+
+  private checkNeedUpdate (newOj: any) {
+    if (newOj.status === undefined && this.oldOj.status !== 3) {
+      return false
+    }
+    if ((newOj.status === 3 && (this.oldOj.status === 1 || this.oldOj.status === 2)) ||
+      (this.oldOj.status === 3 && (newOj.status === 1 || newOj.status === 2))) {
+      return true
+    }
+    return (newOj.difficulty !== undefined && newOj.difficulty !== this.oldOj.difficulty) ||
+      (newOj.standalone !== undefined && newOj.standalone !== this.oldOj.standalone) ||
+      (newOj.study !== undefined && newOj.study !== this.oldOj.study) ||
+      (newOj.ansLink !== undefined && newOj.ansLink !== this.oldOj.ansLink)
   }
 
   private initSummary (difficulty: string) {
