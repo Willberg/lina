@@ -40,8 +40,8 @@ export default class extends Vue {
     tooltip: {
       // @ts-ignore
       formatter: function (params) {
-        return params.marker + params.data.name + ' : ' + params.data.value + '分钟'
-          + '(' + (params.data.value / 60).toFixed(2) + '小时)'
+        return params.marker + params.data.name + ' : ' + (params.data.value * 14.4).toFixed(1) + '分钟'
+          + '(' + (params.data.value * 0.24).toFixed(2) + '小时)'
       }
     },
     legend: {
@@ -106,23 +106,15 @@ export default class extends Vue {
     let center = this.calendarChart.convertToPixel('calendar', item)
 
     const retData = []
-    let restTime = 24 * 60
+    const ds = 24 * 6 * 6
     for (let key of Object.keys(data)) {
-      const useTime = parseFloat((data[key] / 60).toFixed(2))
-      if (key !== '6') {
-        restTime -= useTime
-        retData.push({
-          // @ts-ignore
-          name: this.timerTypeMap[key],
-          value: useTime
-        })
-      }
+      const useTime = Math.round(data[key] / ds)
+      retData.push({
+        // @ts-ignore
+        name: this.timerTypeMap[key],
+        value: useTime
+      })
     }
-    retData.push({
-      // @ts-ignore
-      name: this.timerTypeMap['6'],
-      value: parseFloat(restTime.toFixed(2))
-    })
 
     return {
       id: idx + 'pie',
