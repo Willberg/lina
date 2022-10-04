@@ -9,13 +9,13 @@
       <el-menu-item index="31" @click.native.prevent="handleRedirect('/funds')">记账</el-menu-item>
       <el-menu-item index="41" @click.native.prevent="handleRedirect('/cipher')">密码器</el-menu-item>
       <el-menu-item index="51" @click.native.prevent="handleRedirect('/tool')">常用工具</el-menu-item>
-      <el-menu-item v-if="!isLogin" index="91" style="position:absolute;right:0;"
+      <el-menu-item v-if="!isLogin" index="91" :style="position"
                     @click.native.prevent="handleRedirect('/login')">登陆
       </el-menu-item>
       <!--      <el-menu-item v-if="isLogin" index="12" style="position:absolute;right:0;" @click.native.prevent="handleLogout">-->
       <!--        退出-->
       <!--      </el-menu-item>-->
-      <el-submenu v-if="isLogin" index="91" style="position:absolute;right:0;">
+      <el-submenu v-if="isLogin" index="91" :style="position">
         <template slot="title">个人中心</template>
         <el-menu-item index="91-1" @click.native.prevent="editPasswordVisible=true">修改密码</el-menu-item>
         <el-menu-item index="91-2" @click.native.prevent="handleLogout">退出</el-menu-item>
@@ -55,6 +55,8 @@ export default class extends Vue {
   private isLogin = UserModule.userProfile !== undefined
   private activeIndex = localStorage.getItem(NAV_INDEX) || '1'
 
+  private position = 'position:absolute;right:0;'
+
   private editPasswordVisible = false
   private editLoading = false
   private updatePassword = {
@@ -67,6 +69,10 @@ export default class extends Vue {
       localStorage.setItem(NAV_INDEX, '1')
     }
     this.activeIndex = localStorage.getItem(NAV_INDEX) || '1'
+    const userAgent = navigator.userAgent
+    if (userAgent.indexOf('Android') >= 0 || userAgent.indexOf('iPhone') >= 0) {
+      this.position = ''
+    }
 
     const user = UserModule.userProfile
     if (user === undefined) {
