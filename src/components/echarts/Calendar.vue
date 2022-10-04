@@ -8,7 +8,7 @@
     </el-row>
     <el-row :gutter="10" style="margin-top: 10px;">
       <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-        <div id="calendarChart" style="width: 100%; height:640px;"></div>
+        <div id="calendarChart" :style="{ height: calendarChartHeight + 'px'}"></div>
       </el-col>
     </el-row>
   </div>
@@ -31,6 +31,9 @@ export default class extends Vue {
   private oldSelectedMonth = moment().format('YYYY-MM')
   private selectedMonth = moment().format('YYYY-MM')
 
+  private cellSize = [100, 100]
+  private radius = 45
+  private calendarChartHeight = 700
   private timerTypeMap = timerTypeMap
   private calendarChart: ECharts | undefined
   private calendarOption = {
@@ -92,6 +95,13 @@ export default class extends Vue {
   }
 
   mounted () {
+    const userAgent = navigator.userAgent
+    if (userAgent.indexOf('Android') >= 0 || userAgent.indexOf('iPhone') >= 0) {
+      const width = Math.floor((document.body.clientWidth - 10) / 7) - 2
+      this.cellSize = [width, width]
+      this.radius = Math.floor(width / 2) - 3
+      this.calendarChartHeight = 460
+    }
     const initCalendar = this.initCalendar
     setTimeout(function () {
       // 等待Nav渲染
@@ -126,7 +136,7 @@ export default class extends Vue {
           position: 'inside'
         }
       },
-      radius: 30,
+      radius: this.radius,
       data: retData
     }
   }
@@ -141,7 +151,7 @@ export default class extends Vue {
       this.showSelectedMonth = true
       const data = result.data
       this.calendarChart = echarts.init(<HTMLDivElement>document.getElementById('calendarChart'))
-      const cellSize = [80, 80]
+      const cellSize = this.cellSize
       // @ts-ignore
       this.calendarOption.calendar.cellSize = cellSize
       // @ts-ignore
