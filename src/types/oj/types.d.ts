@@ -43,3 +43,8 @@ export interface ISummary {
   total: number;
   percent: number;
 }
+
+export interface IAnsLink {
+  language?: string;
+  link?: string;
+}

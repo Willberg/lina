@@ -256,3 +256,11 @@ export const ansLinkFilterArray = [
     value: '否'
   }
 ]
+
+export const languages = [
+  { label: 'C' },
+  { label: 'C++' },
+  { label: 'Go' },
+  { label: 'Java' },
+  { label: 'Python3' },
+]

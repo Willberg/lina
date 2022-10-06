@@ -188,7 +188,10 @@
         label="题解">
         <template slot-scope="scope">
           <div v-show="scope.row.ansLink!==undefined && scope.row.ansLink!==''"> 　
-            <el-button @click="handleLink(scope.row.ansLink)" type="text" size="small">　是　</el-button>
+            <el-button v-for="(item)  in descAnsMap(scope.row.ansLink)" @click="handleLink(item.link)" type="text"
+                       size="small">
+              {{ item.language }}
+            </el-button>
           </div>
           <div v-show="scope.row.ansLink===undefined || scope.row.ansLink===''" style="color: red"> 否　</div>
         </template>
@@ -342,7 +345,29 @@
           <el-input v-model="updateForm.link" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="题解链接" label-width="140px">
-          <el-input v-model="updateForm.ansLink" autocomplete="off"></el-input>
+          <el-row v-show="ansLinkVisible" :gutter="20" type="flex">
+            <el-col>
+              <el-button v-for="item in ansLinkList" @click="handleLink(item.link)" type="text" size="small">
+                {{ item.language }}
+              </el-button>
+            </el-col>
+            <el-col>
+              <el-button type="primary" @click="handleEditAnsLink()">编辑</el-button>
+            </el-col>
+          </el-row>
+          <el-row v-show="!ansLinkVisible" :gutter="20" type="flex">
+            <el-col>
+              <el-select v-model="ansLinkForm.language" placeholder="请选择语言" @change="chooseLanguage()">
+                <el-option v-for="l in languages" :label="l.label" :value="l.label" :key="l.label"></el-option>
+              </el-select>
+            </el-col>
+            <el-col>
+              <el-input v-model="ansLinkForm.link" autocomplete="off"></el-input>
+            </el-col>
+            <el-col>
+              <el-button type="primary" @click="submitAnsLink()">确定</el-button>
+            </el-col>
+          </el-row>
         </el-form-item>
         <el-form-item label="重要程度" label-width="140px">
           <el-select v-model="updateForm.importance" placeholder="请选择重要程度">
@@ -383,6 +408,7 @@ import {
   difficultiesArray,
   importanceFilterArray,
   importances,
+  languages,
   problemSet,
   problemSetFilterArray,
   problemType,
@@ -415,6 +441,15 @@ export default class extends Vue {
   private choices = choices
   private importances = importances
   private statusSet = statusSet
+
+  private languages = languages
+  private ansLinkVisible = true
+  private ansLinkList: any = []
+  private ansLinkMap: any = {}
+  private ansLinkForm: any = {
+    'language': '',
+    'link': ''
+  }
 
   private dateTimeRange: string[] | null = []
   private currentPage = 1
@@ -572,6 +607,24 @@ export default class extends Vue {
     return result.status
   }
 
+  private descAnsMap (s?: string | undefined) {
+    let ansLinks: { language: string; link: string }[] = []
+    if (s === undefined || s === '') {
+      return ansLinks
+    }
+    const m = JSON.parse(s)
+    for (const l of languages) {
+      const link = m[l.label]
+      if (link !== undefined && link !== '') {
+        ansLinks.push({
+          'language': l.label,
+          'link': link
+        })
+      }
+    }
+    return ansLinks
+  }
+
   private async getTotal () {
     const begin = this.dateTimeRange !== null ? cvtTimeMillisByDateTimeStr(this.dateTimeRange[0]) : undefined
     const end = this.dateTimeRange !== null ? cvtTimeMillisByDateTimeStr(this.dateTimeRange[1]) : undefined
@@ -654,6 +707,8 @@ export default class extends Vue {
     this.oldOj = oj
     // 深拷贝
     this.updateForm = JSON.parse(JSON.stringify(oj))
+    this.ansLinkList = this.descAnsMap(this.updateForm.ansLink)
+    this.ansLinkMap = JSON.parse(this.updateForm.ansLink)
   }
 
   private async handleDelete (id: number) {
@@ -900,6 +955,23 @@ export default class extends Vue {
         return 2
       }
     }
+  }
+
+  private handleEditAnsLink () {
+    // 如果没有提交，重新设置成旧值
+    this.ansLinkForm.link = this.ansLinkMap[this.ansLinkForm.language]
+    this.ansLinkVisible = false
+  }
+
+  private submitAnsLink () {
+    this.ansLinkMap[this.ansLinkForm.language] = this.ansLinkForm.link
+    this.updateForm.ansLink = JSON.stringify(this.ansLinkMap)
+    this.ansLinkList = this.descAnsMap(this.updateForm.ansLink)
+    this.ansLinkVisible = true
+  }
+
+  private chooseLanguage () {
+    this.ansLinkForm.link = this.ansLinkMap[this.ansLinkForm.language]
   }
 }
 </script>
