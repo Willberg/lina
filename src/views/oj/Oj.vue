@@ -520,35 +520,30 @@ export default class extends Vue {
   }
 
   private descOjType = (ojType: number) => {
-    if (ojType === 1) {
-      return 'leetcode'
-    } else if (ojType === 2) {
-      return 'codeforces'
-    } else {
-      return ''
+    for (const t of problemSet) {
+      if (ojType === t.value) {
+        return t.label
+      }
     }
+    return ''
   }
 
   private descImportance = (i: number) => {
-    if (i === 1) {
-      return '一般且容易'
-    } else if (i === 2) {
-      return '一般且困难'
-    } else if (i === 3) {
-      return '重要且容易'
-    } else {
-      return '重要且困难'
+    for (const t of importances) {
+      if (i === t.value) {
+        return t.label
+      }
     }
+    return ''
   }
 
   private descStatus = (status: number) => {
-    if (status === 1) {
-      return '开始'
-    } else if (status === 2) {
-      return '暂停'
-    } else {
-      return '结束'
+    for (const t of statusSet) {
+      if (status === t.value) {
+        return t.label
+      }
     }
+    return ''
   }
 
   private async getUserAndInitData () {
@@ -643,6 +638,12 @@ export default class extends Vue {
   }
 
   private handleAdd () {
+    this.addForm = {
+      'difficulty': '中等',
+      'ojType': 1,
+      'type': '贪心',
+      'importance': 1
+    }
     this.addFormVisible = true
   }
 
