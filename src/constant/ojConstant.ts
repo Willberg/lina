@@ -276,3 +276,14 @@ export const languages = [
   { label: 'Java' },
   { label: 'Python3' },
 ]
+
+export const useTimeFilterArray = [
+  {
+    text: '用时达标',
+    value: 1
+  },
+  {
+    text: '用时不达标',
+    value: 2
+  },
+]
