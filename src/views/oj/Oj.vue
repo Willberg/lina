@@ -48,6 +48,11 @@
       </el-table-column>
       <el-table-column
         align="center"
+        prop="cnt4"
+        label="用时未达标">
+      </el-table-column>
+      <el-table-column
+        align="center"
         prop="percent"
         label="未参考题解的比例（%）">
       </el-table-column>
@@ -136,10 +141,10 @@
             {{ timer }}
           </div>
           <div v-else>
-            <div v-show="calShowTime(scope.row.difficulty, scope.row.useTime)===1" style="color: green">
+            <div v-show="calShowTime(scope.row.difficulty, scope.row.useTime)" style="color: green">
               {{ calTimerFormatUseTime(scope.row.useTime) }}({{ scope.row.useTime }}秒)
             </div>
-            <div v-show="calShowTime(scope.row.difficulty, scope.row.useTime)===2" style="color: red">
+            <div v-show="!calShowTime(scope.row.difficulty, scope.row.useTime)" style="color: red">
               {{ calTimerFormatUseTime(scope.row.useTime) }}({{ scope.row.useTime }}秒)
             </div>
           </div>
@@ -425,7 +430,7 @@ import {
 import { IOj, IOjUpdate, ISummary } from '@/types/oj/types'
 import { filterEmptyMethod, filterHandlerMethod, filterUseTimeHandler } from '@/utils/table'
 import { getUser } from '@/api/user'
-import { calShowTime } from '@/utils/oj'
+import { calUseTimeOk } from '@/utils/oj'
 
 @Component({
   name: 'Oj',
@@ -476,7 +481,7 @@ export default class extends Vue {
   private filterUseTimeArray = useTimeFilterArray
   private filterUseTimeHandler = filterUseTimeHandler
 
-  private calShowTime = calShowTime
+  private calShowTime = calUseTimeOk
 
   private timerId = -1
   private countdownTimer: any | undefined
@@ -861,6 +866,7 @@ export default class extends Vue {
       cnt1: 0,
       cnt2: 0,
       cnt3: 0,
+      cnt4: 0,
       total: 0,
       percent: 0
     }
@@ -907,6 +913,15 @@ export default class extends Vue {
             medium.cnt0++
           } else {
             hard.cnt0++
+          }
+        }
+        if (!calUseTimeOk(oj.difficulty, oj.useTime)) {
+          if (oj.difficulty === '简单') {
+            easy.cnt4++
+          } else if (oj.difficulty === '中等') {
+            medium.cnt4++
+          } else {
+            hard.cnt4++
           }
         }
       }

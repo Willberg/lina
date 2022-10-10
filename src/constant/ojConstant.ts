@@ -280,10 +280,10 @@ export const languages = [
 export const useTimeFilterArray = [
   {
     text: '用时达标',
-    value: 1
+    value: true
   },
   {
     text: '用时不达标',
-    value: 2
+    value: false
   },
 ]

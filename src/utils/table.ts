@@ -1,4 +1,4 @@
-import { calShowTime } from '@/utils/oj'
+import { calUseTimeOk } from '@/utils/oj'
 
 export const filterHandlerMethod = (value: number, row: any, column: any) => {
   const property = column['property']
@@ -14,6 +14,6 @@ export const filterEmptyMethod = (value: string, row: any, column: any) => {
   }
 }
 
-export const filterUseTimeHandler = (value: number, row: any, column: any) => {
-  return calShowTime(row['difficulty'], row['useTime']) === value
+export const filterUseTimeHandler = (value: boolean, row: any, column: any) => {
+  return calUseTimeOk(row['difficulty'], row['useTime']) === value
 }

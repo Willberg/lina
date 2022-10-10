@@ -40,6 +40,7 @@ export interface ISummary {
   cnt1: number;
   cnt2: number;
   cnt3: number;
+  cnt4: number;
   total: number;
   percent: number;
 }
