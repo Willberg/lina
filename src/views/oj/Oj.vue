@@ -25,6 +25,17 @@
         align="center"
         prop="cnt0"
         label="未参考题解">
+        <template slot-scope="scope">
+          {{ scope.row.cnt0 }}({{ scope.row.percent }}%)
+        </template>
+      </el-table-column>
+      <el-table-column
+        align="center"
+        prop="cnt4"
+        label="用时未达标">
+        <template slot-scope="scope">
+          {{ scope.row.cnt4 }}({{ calPercent(scope.row.cnt4, scope.row.total) }}%)
+        </template>
       </el-table-column>
       <el-table-column
         align="center"
@@ -45,16 +56,6 @@
         align="center"
         prop="cnt3"
         label="未写题解">
-      </el-table-column>
-      <el-table-column
-        align="center"
-        prop="cnt4"
-        label="用时未达标">
-      </el-table-column>
-      <el-table-column
-        align="center"
-        prop="percent"
-        label="未参考题解的比例（%）">
       </el-table-column>
     </el-table>
 
@@ -929,15 +930,9 @@ export default class extends Vue {
     easy.total = easy.cnt0 + easy.cnt1
     medium.total = medium.cnt0 + medium.cnt1
     hard.total = hard.cnt0 + hard.cnt1
-    if (easy.total !== 0) {
-      easy.percent = this.calPercent(easy.cnt0, easy.total)
-    }
-    if (medium.total !== 0) {
-      medium.percent = this.calPercent(medium.cnt0, medium.total)
-    }
-    if (hard.total !== 0) {
-      hard.percent = this.calPercent(hard.cnt0, hard.total)
-    }
+    easy.percent = this.calPercent(easy.cnt0, easy.total)
+    medium.percent = this.calPercent(medium.cnt0, medium.total)
+    hard.percent = this.calPercent(hard.cnt0, hard.total)
     this.$set(this.summaryList, 0, easy)
     this.$set(this.summaryList, 1, medium)
     this.$set(this.summaryList, 2, hard)
@@ -945,6 +940,9 @@ export default class extends Vue {
   }
 
   private calPercent (s: number, m: number) {
+    if (m === 0) {
+      return 0
+    }
     return Math.round(s / m * 10000) / 100
   }
 

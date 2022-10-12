@@ -29,6 +29,10 @@ export const problemSet = [
     value: 2
   },
   {
+    label: 'codewars',
+    value: 3
+  },
+  {
     label: 'mine',
     value: 101
   }
@@ -47,6 +51,10 @@ export const questionBank = [
     value: 2
   },
   {
+    label: 'codewars',
+    value: 3
+  },
+  {
     label: 'mine',
     value: 101
   }
@@ -60,6 +68,10 @@ export const problemSetFilterArray = [
   {
     text: 'codeforces',
     value: 2
+  },
+  {
+    text: 'codewars',
+    value: 3
   },
   {
     text: 'mine',
