@@ -59,8 +59,8 @@
       </el-table-column>
     </el-table>
 
-    <el-row style="margin-top: 10px;" :gutter="10">
-      <el-col :sm="10" :md="10" :lg="5" :xl="4">
+    <el-row style="margin-top: 10px;">
+      <el-col :md="8" :lg="5" :xl="4">
         <el-date-picker
           v-model="dateTimeRange"
           type="datetimerange"
@@ -70,7 +70,11 @@
           value-format="yyyy-MM-dd HH:mm:ss">
         </el-date-picker>
       </el-col>
-      <el-col :sm="14" :md="14" :lg="12" :xl="5">
+      <el-col :md="4" :lg="2" :xl="2" :offset="2">
+        <el-input v-model="pid" autocomplete="off" placeholder="请输入题号"></el-input>
+      </el-col>
+      <el-col :md="10" :lg="8" :xl="5">
+        <el-button type="primary" @click="resetSearchList">重置</el-button>
         <el-button type="primary" @click="searchList">查询</el-button>
         <el-button type="primary" @click.native.prevent="handleAdd">添加题目</el-button>
       </el-col>
@@ -463,8 +467,8 @@ export default class extends Vue {
 
   private dateTimeRange: string[] | null = []
   private currentPage = 1
-  private pageSizes = ['10000', '10', '20', '50', '100']
-  private pageSize = 10000
+  private pageSizes = ['10', '20', '50', '100', '10000']
+  private pageSize = 10
   private pageCount = 5
   private total = 10
   private listLoading = false
@@ -498,6 +502,8 @@ export default class extends Vue {
   private updateLoading = false
   private updateForm: any = {}
   private oldOj: any = {}
+
+  private pid: string = ''
 
   mounted () {
     this.dateTimeRange = [
@@ -568,6 +574,13 @@ export default class extends Vue {
     }
   }
 
+  private resetSearchList () {
+    if (this.dateTimeRange === null) {
+      this.dateTimeRange = [thisStartMonthDay(), startDateTimeStr(moment().add(1, 'days'))]
+    }
+    this.pid = ''
+  }
+
   private async searchList () {
     // 已登录，加载初始数据
     const status = await this.getList()
@@ -583,6 +596,7 @@ export default class extends Vue {
 
   private handleSizeChange (val: number) {
     this.pageSize = val
+    this.searchList()
   }
 
   private handleCurrentChange (val: number) {
@@ -590,11 +604,16 @@ export default class extends Vue {
     this.searchList()
   }
 
+  private stringToNumber (pid: string) {
+    return /^[1-9]+[0-9]*$/.test(pid.trim()) ? parseInt(pid.trim()) : undefined
+  }
+
   private async getList () {
     this.listLoading = true
     const startTime = this.dateTimeRange !== null ? cvtTimeMillisByDateTimeStr(this.dateTimeRange[0]) : undefined
     const endTime = this.dateTimeRange !== null ? cvtTimeMillisByDateTimeStr(this.dateTimeRange[1]) : undefined
     const param = {
+      pid: this.stringToNumber(this.pid),
       offset: (this.currentPage - 1) * this.pageSize,
       count: this.pageSize,
       begin: startTime,
@@ -638,6 +657,7 @@ export default class extends Vue {
     const begin = this.dateTimeRange !== null ? cvtTimeMillisByDateTimeStr(this.dateTimeRange[0]) : undefined
     const end = this.dateTimeRange !== null ? cvtTimeMillisByDateTimeStr(this.dateTimeRange[1]) : undefined
     const param = {
+      pid: this.stringToNumber(this.pid),
       begin: begin,
       end: end
     }

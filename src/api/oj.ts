@@ -40,6 +40,7 @@ export const update = (
 
 export const list = (
   data: {
+    pid?: number;
     begin?: number;
     end?: number;
     offset: number;
@@ -52,6 +53,7 @@ export const list = (
 
 export const count = (
   data: {
+    pid?: number;
     begin?: number;
     end?: number;
   }) => request({
