@@ -156,14 +156,13 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { UserModule } from '@/store/modules/user'
 import { countTodoGroup, listTodoGroup, updateTodoGroup } from '@/api/todo'
 import moment from 'moment'
 import { ITodoGroup } from '@/types/todo/types'
 import Nav from '@/components/navbar/index.vue'
 import { createUrl, getUser } from '@/api/user'
 import { todoGroupFilterArray, todoGroupList, todoGroupPriorities, todoGroupStatusGroup } from '@/constant/todoConstant'
-import { GROUP_ID, MAX_TIME, NAV_INDEX } from '@/constant/storageConstant'
+import { GROUP_ID, MAX_TIME, USER } from '@/constant/storageConstant'
 import TodoNav from '@/views/todo/component/TodoNav.vue'
 import { cvtTimeMillisByDateTimeStr, originalStartDay, startDateTimeStr } from '@/utils/time'
 import { filterHandlerMethod } from '@/utils/table'
@@ -204,8 +203,8 @@ export default class extends Vue {
     ]
 
     // html加载完成后执行。执行顺序：子组件-父组件
-    const user = UserModule.userProfile
-    if (user === undefined) {
+    const isLogin = localStorage.getItem(USER) !== null
+    if (!isLogin) {
       this.getUserAndInitData()
     } else {
       this.initData()
@@ -224,7 +223,7 @@ export default class extends Vue {
   private async getUserAndInitData () {
     const result = await getUser()
     if (result.status) {
-      UserModule.setUser(result.data)
+      localStorage.setItem(USER, JSON.stringify(result.data))
       await this.initData()
     }
   }
@@ -264,7 +263,6 @@ export default class extends Vue {
   private async handleDetails (row: any) {
     localStorage.setItem(GROUP_ID, row.id)
     localStorage.setItem(MAX_TIME, row.maxTime)
-    localStorage.setItem(NAV_INDEX, '0')
     await this.$router.push({
       path: '/todoList'
     })

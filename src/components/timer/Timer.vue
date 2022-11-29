@@ -63,11 +63,11 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { UserModule } from '@/store/modules/user'
 import { timerTypes } from '@/constant/timerConstant'
 import { IAddTimer, IRetTimer, IUpdateTimer } from '@/types/timer/types'
 import { apiAddTimer, apiSearchTimerLastOne, apiUpdateTimer } from '@/api/timer'
 import moment from 'moment'
+import { USER } from "@/constant/storageConstant";
 
 @Component({
   name: 'Timer'
@@ -97,7 +97,7 @@ export default class extends Vue {
     const initTimer = this.initTimer
     setTimeout(function () {
       // 等待Nav渲染
-      if (UserModule.userProfile !== undefined) {
+      if (localStorage.getItem(USER) !== null) {
         initTimer()
       }
     }, 1000)

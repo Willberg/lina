@@ -164,7 +164,7 @@
         <template slot-scope="scope">
           <div v-show="scope.row.importance<=2" style="color: green"> {{ descImportance(scope.row.importance) }}</div>
           <div v-show="scope.row.importance===3" style="color: #e6a23c"> {{
-              descImportance(scope.row.importance)
+            descImportance(scope.row.importance)
             }}
           </div>
           <div v-show="scope.row.importance===4" style="color: red"> {{ descImportance(scope.row.importance) }}</div>
@@ -411,7 +411,6 @@ import {
   timeMillis2DateTime
 } from '@/utils/time'
 import moment from 'moment'
-import { UserModule } from '@/store/modules/user'
 import { add, count, list, update } from '@/api/oj'
 import {
   ansLinkFilterArray,
@@ -436,6 +435,7 @@ import { IOj, IOjUpdate, ISummary } from '@/types/oj/types'
 import { filterEmptyMethod, filterHandlerMethod, filterUseTimeHandler } from '@/utils/table'
 import { getUser } from '@/api/user'
 import { calUseTimeOk } from '@/utils/oj'
+import { USER } from "@/constant/storageConstant";
 
 @Component({
   name: 'Oj',
@@ -512,8 +512,8 @@ export default class extends Vue {
     ]
 
     // html加载完成后执行。执行顺序：子组件-父组件
-    const user = UserModule.userProfile
-    if (user === undefined) {
+    const isLogin = localStorage.getItem(USER) !== null
+    if (!isLogin) {
       this.getUserAndInitData()
     } else {
       this.searchList()
@@ -569,7 +569,7 @@ export default class extends Vue {
   private async getUserAndInitData () {
     const result = await getUser()
     if (result.status) {
-      UserModule.setUser(result.data)
+      localStorage.setItem(USER, JSON.stringify(result.data))
       await this.searchList()
     }
   }

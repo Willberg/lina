@@ -168,10 +168,9 @@ import { Component, Vue } from 'vue-property-decorator'
 import Nav from '@/components/navbar/index.vue'
 import { ITodo } from '@/types/todo/types'
 import { listTodo, updateTodo } from '@/api/todo'
-import { UserModule } from '@/store/modules/user'
 import { openListTodo, openUpdateTodo } from '@/api/open/todo'
 import { filterArray, priorities, statusGroup, todoList } from '@/constant/todoConstant'
-import { GROUP_ID, TOKEN } from '@/constant/storageConstant'
+import { GROUP_ID, TOKEN, USER } from '@/constant/storageConstant'
 import { convertToTodo, handleTodoList } from '@/utils/todo'
 import { openFreshToken } from '@/api/open/token'
 import TodoNav from '@/views/todo/component/TodoNav.vue'
@@ -212,8 +211,8 @@ export default class extends Vue {
 
   mounted () {
     // html加载完成后执行。执行顺序：子组件-父组件
-    const user = UserModule.userProfile
-    if (user === undefined) {
+    const isLogin = localStorage.getItem(USER) !== null
+    if (!isLogin) {
       const token = this.$route.query.token
       if (typeof token !== 'string') {
         this.$router.push({

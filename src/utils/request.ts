@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
-import { UserModule } from '@/store/modules/user'
 
 const service = axios.create({
   baseURL: 'https://acgv.fun',
@@ -52,17 +51,13 @@ service.interceptors.response.use(
             type: 'warning'
           }
         ).then(() => {
-          // 重新登录，要清除vuex
-          UserModule.setUser(undefined)
           // 防止todoList页面死循环
           location.hash = '#/login'
-          // location.replace('/')
-          // location.reload() // To prevent bugs from vue-router
+        }).catch(() => {
+          location.hash = '#/'
         })
       }
     } else {
-      // for debug
-      console.log(res.message)
       Message({
         message: res.message,
         type: 'error',
@@ -72,8 +67,6 @@ service.interceptors.response.use(
     return res
   },
   (error) => {
-    // for debug
-    console.log(error.message)
     Message({
       message: error.message,
       type: 'error',

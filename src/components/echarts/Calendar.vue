@@ -20,7 +20,7 @@ import echarts, { ECharts } from 'echarts'
 import { timerTypeList, timerTypeMap } from '@/constant/timerConstant'
 import moment from 'moment'
 import { apiListTimer } from '@/api/timer'
-import { UserModule } from '@/store/modules/user'
+import { USER } from "@/constant/storageConstant";
 
 @Component({
   name: 'Calendar'
@@ -105,7 +105,7 @@ export default class extends Vue {
     const initCalendar = this.initCalendar
     setTimeout(function () {
       // 等待Nav渲染
-      if (UserModule.userProfile !== undefined) {
+      if (localStorage.getItem(USER) !== null) {
         initCalendar()
       }
     }, 1000)

@@ -67,9 +67,9 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { Form as ElForm, Input } from 'element-ui'
 import { isValidEmail, isValidLoginUser, isValidPassword, isValidPhoneNumber } from '@/utils/validate'
-import { UserModule } from '@/store/modules/user'
 import md5 from 'js-md5'
-import { NAV_INDEX } from '@/constant/storageConstant'
+import { login } from "@/api/user";
+import { USER } from "@/constant/storageConstant";
 
 @Component({
   name: 'Login'
@@ -119,8 +119,8 @@ export default class extends Vue {
 
   mounted () {
     // html加载完成后执行。执行顺序：子组件-父组件
-    const user = UserModule.userProfile
-    if (user) {
+    const isLogin = localStorage.getItem(USER) !== null
+    if (isLogin) {
       this.$router.push({
         path: '/'
       })
@@ -133,7 +133,7 @@ export default class extends Vue {
     }
   }
 
-  private handleLogin () {
+  private async handleLogin () {
     (this.$refs.loginForm as ElForm).validate(async (valid: boolean) => {
       if (!valid) {
         return false
@@ -147,16 +147,14 @@ export default class extends Vue {
         email: isValidEmail(this.loginForm.userName) ? this.loginForm.userName : undefined
       }
 
-      // 模拟请求
-      setTimeout(() => {
+      const result = await login(loginParam)
+      if (result.status) {
+        localStorage.setItem(USER, JSON.stringify(result.data))
+        await this.$router.push({
+          path: '/'
+        })
+      } else {
         this.loading = false
-      }, 3 * 1000)
-
-      const status = await UserModule.Login(loginParam)
-      if (status) {
-        localStorage.setItem(NAV_INDEX, '1')
-        // 防止router bug 不跳转
-        location.reload()
       }
     })
   }

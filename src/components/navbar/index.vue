@@ -2,19 +2,14 @@
   <div>
     <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" active-text-color="#000000"
              background-color="#30B08F" text-color="#f4f4f5" @select="handleSelect">
-      <el-menu-item index="1" @click.native.prevent="handleRedirect('/')">首页</el-menu-item>
-      <el-menu-item index="11" @click.native.prevent="handleRedirect('/record')">作息</el-menu-item>
-      <el-menu-item index="21" @click.native.prevent="handleRedirect('/todoGroupList')">待办</el-menu-item>
-      <el-menu-item index="22" @click.native.prevent="handleRedirect('/oj')">题库</el-menu-item>
-      <el-menu-item index="31" @click.native.prevent="handleRedirect('/funds')">记账</el-menu-item>
-      <el-menu-item index="41" @click.native.prevent="handleRedirect('/cipher')">密码器</el-menu-item>
-      <el-menu-item index="51" @click.native.prevent="handleRedirect('/tool')">常用工具</el-menu-item>
-      <el-menu-item v-if="!isLogin" index="91" :style="position"
-                    @click.native.prevent="handleRedirect('/login')">登陆
-      </el-menu-item>
-      <!--      <el-menu-item v-if="isLogin" index="12" style="position:absolute;right:0;" @click.native.prevent="handleLogout">-->
-      <!--        退出-->
-      <!--      </el-menu-item>-->
+      <el-menu-item index="1">首页</el-menu-item>
+      <el-menu-item index="11">作息</el-menu-item>
+      <el-menu-item index="21">待办</el-menu-item>
+      <el-menu-item index="22">题库</el-menu-item>
+      <el-menu-item index="31">记账</el-menu-item>
+      <el-menu-item index="41">密码器</el-menu-item>
+      <el-menu-item index="51">常用工具</el-menu-item>
+      <el-menu-item v-if="!isLogin" index="91" :style="position">登陆</el-menu-item>
       <el-submenu v-if="isLogin" index="91" :style="position">
         <template slot="title">个人中心</template>
         <el-menu-item index="91-1" @click.native.prevent="editPasswordVisible=true">修改密码</el-menu-item>
@@ -42,18 +37,18 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { UserModule } from '@/store/modules/user'
-import { NAV_INDEX } from '@/constant/storageConstant'
-import { getUser, updatePassword } from '@/api/user'
+import { getUser, logout, updatePassword } from '@/api/user'
 import md5 from 'js-md5'
 import { isValidPassword } from '@/utils/validate'
+import { navKeyUrlMap, navUrlKeyMap } from "@/constant/navbarConstant";
+import { USER } from "@/constant/storageConstant";
 
 @Component({
   name: 'Nav'
 })
 export default class extends Vue {
-  private isLogin = UserModule.userProfile !== undefined
-  private activeIndex = localStorage.getItem(NAV_INDEX) || '1'
+  private isLogin = localStorage.getItem(USER) !== null
+  private activeIndex = '1'
 
   private position = 'position:absolute;right:0;'
 
@@ -65,17 +60,13 @@ export default class extends Vue {
   }
 
   mounted () {
-    if (location.hash === '#/') {
-      localStorage.setItem(NAV_INDEX, '1')
-    }
-    this.activeIndex = localStorage.getItem(NAV_INDEX) || '1'
+    this.activeIndex = this.descPage(location.hash.substring(1))
     const userAgent = navigator.userAgent
     if (userAgent.indexOf('Android') >= 0 || userAgent.indexOf('iPhone') >= 0) {
       this.position = ''
     }
 
-    const user = UserModule.userProfile
-    if (user === undefined) {
+    if (!this.isLogin) {
       if (location.hash === '#/') {
         // 首页时进行用户资料查询
         this.getUserAndSetUser()
@@ -87,57 +78,33 @@ export default class extends Vue {
     const result = await getUser()
     if (result.status) {
       this.isLogin = true
-      UserModule.setUser(result.data)
+      localStorage.setItem(USER, JSON.stringify(result.data))
     }
   }
 
-  private async handleRedirect (page: string) {
-    if (this.descPage(page) !== this.activeIndex) {
+  private descPage (page: string) {
+    return navUrlKeyMap[page]
+  }
+
+  private async handleSelect (key: string) {
+    if (!key.startsWith('91-') && key !== this.activeIndex) {
+      const page = navKeyUrlMap[key]
       await this.$router.push({
         path: page
       })
     }
   }
 
-  private descPage (page: string) {
-    if (page === '/') {
-      return '1'
-    } else if (page === '/record') {
-      return '11'
-    } else if (page === '/todoGroupList') {
-      return '21'
-    } else if (page === '/oj') {
-      return '22'
-    } else if (page === '/funds') {
-      return '31'
-    } else if (page === '/cipher') {
-      return '41'
-    } else if (page === '/tool') {
-      return '51'
-    } else {
-      return '91'
-    }
-  }
-
-  private handleSelect (key: string) {
-    if (!key.startsWith('91')) {
-      localStorage.setItem(NAV_INDEX, key)
-    }
-  }
-
   private async handleLogout () {
-    const status = await UserModule.Logout()
-    if (status) {
+    const result = await logout()
+    if (result.status) {
       this.isLogin = false
+      localStorage.clear()
       if (location.hash !== '#/') {
         await this.$router.push({
           path: '/'
         })
       }
-    }
-    if (location.hash === '#/') {
-      // 首页退出，刷新首页，隐藏要登录的功能
-      location.reload()
     }
   }
 
