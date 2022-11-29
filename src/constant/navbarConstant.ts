@@ -2,6 +2,7 @@ export const navUrlKeyMap: { [key: string]: string } = {
   "/": "1",
   "/record": "11",
   "/todoGroupList": "21",
+  "/todoList": "21",
   "/oj": "22",
   "/funds": "31",
   "/cipher": "41",

@@ -10,10 +10,10 @@
       <el-menu-item index="41">密码器</el-menu-item>
       <el-menu-item index="51">常用工具</el-menu-item>
       <el-menu-item v-if="!isLogin" index="91" :style="position">登陆</el-menu-item>
-      <el-submenu v-if="isLogin" index="91" :style="position">
+      <el-submenu v-if="isLogin" index="92" :style="position">
         <template slot="title">个人中心</template>
-        <el-menu-item index="91-1" @click.native.prevent="editPasswordVisible=true">修改密码</el-menu-item>
-        <el-menu-item index="91-2" @click.native.prevent="handleLogout">退出</el-menu-item>
+        <el-menu-item index="92-1" @click.native.prevent="editPasswordVisible=true">修改密码</el-menu-item>
+        <el-menu-item index="92-2" @click.native.prevent="handleLogout">退出</el-menu-item>
       </el-submenu>
     </el-menu>
 
@@ -37,11 +37,11 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { getUser, logout, updatePassword } from '@/api/user'
+import { logout, updatePassword } from '@/api/user'
 import md5 from 'js-md5'
 import { isValidPassword } from '@/utils/validate'
-import { navKeyUrlMap, navUrlKeyMap } from "@/constant/navbarConstant";
-import { USER } from "@/constant/storageConstant";
+import { navKeyUrlMap, navUrlKeyMap } from '@/constant/navbarConstant'
+import { USER } from '@/constant/storageConstant'
 
 @Component({
   name: 'Nav'
@@ -65,21 +65,6 @@ export default class extends Vue {
     if (userAgent.indexOf('Android') >= 0 || userAgent.indexOf('iPhone') >= 0) {
       this.position = ''
     }
-
-    if (!this.isLogin) {
-      if (location.hash === '#/') {
-        // 首页时进行用户资料查询
-        this.getUserAndSetUser()
-      }
-    }
-  }
-
-  private async getUserAndSetUser () {
-    const result = await getUser()
-    if (result.status) {
-      this.isLogin = true
-      localStorage.setItem(USER, JSON.stringify(result.data))
-    }
   }
 
   private descPage (page: string) {
@@ -87,7 +72,10 @@ export default class extends Vue {
   }
 
   private async handleSelect (key: string) {
-    if (!key.startsWith('91-') && key !== this.activeIndex) {
+    if (key.startsWith('92')) {
+      return
+    }
+    if (location.hash === '#/todoList' || key !== this.activeIndex) {
       const page = navKeyUrlMap[key]
       await this.$router.push({
         path: page

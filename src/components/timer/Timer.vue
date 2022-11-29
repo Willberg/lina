@@ -68,6 +68,7 @@ import { IAddTimer, IRetTimer, IUpdateTimer } from '@/types/timer/types'
 import { apiAddTimer, apiSearchTimerLastOne, apiUpdateTimer } from '@/api/timer'
 import moment from 'moment'
 import { USER } from "@/constant/storageConstant";
+import { getUser } from "@/api/user";
 
 @Component({
   name: 'Timer'
@@ -94,24 +95,34 @@ export default class extends Vue {
   }
 
   mounted () {
-    const initTimer = this.initTimer
-    setTimeout(function () {
-      // 等待Nav渲染
-      if (localStorage.getItem(USER) !== null) {
-        initTimer()
-      }
-    }, 1000)
-
-    const updateTimerUseTime = this.updateTimerUseTime
-    this.countdownTimer = setInterval(function () {
-      updateTimerUseTime()
-    }, 1000)
+    const isLogin = localStorage.getItem(USER) !== null
+    if (!isLogin) {
+      this.getUserAndInitData()
+    } else {
+      this.initData()
+    }
   }
 
   beforeDestroy () {
     // 清除定时刷新，不清除会一直运行，关闭页面也会定时刷新
     if (this.countdownTimer !== undefined) {
       clearInterval(this.countdownTimer);
+    }
+  }
+
+  private initData () {
+    this.initTimer()
+    const updateTimerUseTime = this.updateTimerUseTime
+    this.countdownTimer = setInterval(function () {
+      updateTimerUseTime()
+    }, 1000)
+  }
+
+  private async getUserAndInitData () {
+    const result = await getUser()
+    if (result.status) {
+      localStorage.setItem(USER, JSON.stringify(result.data))
+      this.initData()
     }
   }
 

@@ -32,10 +32,6 @@ service.interceptors.response.use(
     }
 
     if (res.code === 'user.0002') {
-      if (location.hash === '#/') {
-        return res
-      }
-
       if (location.hash.endsWith('login')) {
         Message({
           message: '用户名或密码错误',
