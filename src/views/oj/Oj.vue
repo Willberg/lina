@@ -269,11 +269,28 @@
     <!-- addForm -->
     <el-dialog title="添加题目" :visible.sync="addFormVisible">
       <el-form :model="addForm">
-        <el-form-item label="题号" label-width="140px">
-          <el-input v-model="addForm.pid" autocomplete="off"></el-input>
+        <el-form-item v-show="!showIdName" label="题号" label-width="140px">
+          <el-row :gutter="20" type="flex">
+            <el-col>
+              <el-input v-model="addForm.pid" autocomplete="off"></el-input>
+            </el-col>
+            <el-col>
+              <el-button type="primary" @click="showIdName=true">编辑</el-button>
+            </el-col>
+          </el-row>
         </el-form-item>
-        <el-form-item label="题目" label-width="140px">
+        <el-form-item v-show="!showIdName" label="题目" label-width="140px">
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item v-show="showIdName" label="题目" label-width="140px">
+          <el-row :gutter="20" type="flex">
+            <el-col>
+              <el-input v-model="addFormIdName" autocomplete="off"></el-input>
+            </el-col>
+            <el-col>
+              <el-button type="primary" @click="showIdName=false">编辑</el-button>
+            </el-col>
+          </el-row>
         </el-form-item>
         <el-form-item label="难度" label-width="140px">
           <el-select v-model="addForm.difficulty" placeholder="请选择难度">
@@ -496,6 +513,8 @@ export default class extends Vue {
   private addFormVisible = false
   private addLoading = false
   private addForm: any = {}
+  private showIdName = true
+  private addFormIdName = ''
 
   private updateFormVisible = false
   private useTimeVisible = true
@@ -683,6 +702,8 @@ export default class extends Vue {
 
   private clearAddInput () {
     this.addForm = {}
+    this.showIdName = true
+    this.addFormIdName = ''
   }
 
   private async submitAdd () {
@@ -690,6 +711,15 @@ export default class extends Vue {
       this.$message.error('请先暂停或是完成正在进行中的题目')
       this.addFormVisible = false
       return
+    }
+    if (this.showIdName) {
+      if (!/^[1-9][0-9]*\..+$/.test(this.addFormIdName)) {
+        this.$message.error('请填写正确的题目信息')
+        return
+      }
+      const idx = this.addFormIdName.indexOf('.')
+      this.addForm.pid = this.addFormIdName.substring(0, idx).trim()
+      this.addForm.name = this.addFormIdName.substring(idx + 1).trim()
     }
     if (this.addForm.pid === undefined ||
       this.addForm.name === undefined ||

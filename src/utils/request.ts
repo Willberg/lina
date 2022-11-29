@@ -47,10 +47,15 @@ service.interceptors.response.use(
             type: 'warning'
           }
         ).then(() => {
-          // 防止todoList页面死循环
+          localStorage.clear()
           location.hash = '#/login'
         }).catch(() => {
-          location.hash = '#/'
+          localStorage.clear()
+          if (location.hash === '#/') {
+            location.reload()
+          } else {
+            location.hash = '#/'
+          }
         })
       }
     } else {
