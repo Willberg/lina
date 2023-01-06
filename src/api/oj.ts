@@ -31,6 +31,7 @@ export const update = (
     link?: string;
     ansLink?: string;
     importance?: number;
+    createTime?: number;
     status?: number;
   }) => request({
   url: '/api/oj/update',

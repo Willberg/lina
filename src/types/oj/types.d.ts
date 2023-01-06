@@ -31,6 +31,7 @@ export interface IOjUpdate {
   link?: string | undefined;
   ansLink?: string | undefined;
   importance?: number | undefined;
+  createTime?: number | undefined;
   status?: number | undefined;
 }
 

@@ -403,6 +403,13 @@
             <el-option v-for="i in importances" :label="i.label" :value="i.value" :key="i.value"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="创建时间" label-width="140px">
+          <el-date-picker
+            v-model="createTimeDateTime"
+            type="datetime"
+            placeholder="选择日期时间">
+          </el-date-picker>
+        </el-form-item>
         <el-form-item label="状态" label-width="140px">
           <el-select v-model="updateForm.status" placeholder="请选择状态">
             <el-option v-for="s in statusSet" :label="s.label" :value="s.value" :key="s.value"></el-option>
@@ -481,6 +488,7 @@ export default class extends Vue {
     'language': '',
     'link': ''
   }
+  private createTimeDateTime = ""
 
   private dateTimeRange: string[] | null = []
   private currentPage = 1
@@ -772,8 +780,11 @@ export default class extends Vue {
     this.oldOj = oj
     // 深拷贝
     this.updateForm = JSON.parse(JSON.stringify(oj))
+    this.createTimeDateTime = this.descTime(this.updateForm.createTime)
     this.ansLinkList = this.descAnsMap(this.updateForm.ansLink)
-    this.ansLinkMap = JSON.parse(this.updateForm.ansLink)
+    if (this.updateForm.ansLink !== undefined) {
+      this.ansLinkMap = JSON.parse(this.updateForm.ansLink)
+    }
   }
 
   private async handleDelete (id: number) {
@@ -815,6 +826,9 @@ export default class extends Vue {
   }
 
   private async submitUpdate () {
+    if (this.createTimeDateTime != null) {
+      this.updateForm.createTime = cvtTimeMillisByDateTimeStr(this.createTimeDateTime)
+    }
     let needUpdate = false
     for (const key in this.updateForm) {
       if (this.oldOj[key] !== this.updateForm[key]) {
@@ -871,6 +885,9 @@ export default class extends Vue {
     }
     if (this.oldOj.importance !== this.updateForm.importance) {
       param.importance = this.updateForm.importance
+    }
+    if (this.oldOj.createTime !== this.updateForm.createTime) {
+      param.createTime = this.updateForm.createTime
     }
     this.updateLoading = true
     const result = await update(param)
