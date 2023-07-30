@@ -2,7 +2,7 @@ import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
 
 const service = axios.create({
-  baseURL: 'https://acgv.fun',
+  baseURL: 'https://afor.fun',
   // baseURL: 'http://localhost:8081',
   withCredentials: true,
   timeout: 50 * 1000
