@@ -155,6 +155,7 @@ import { ICipher } from '@/types/cipher/types'
 import { statusMap } from '@/constant/cipherConstant'
 import { apiAddCipher, apiSearchCipher, apiUpdateCipher } from '@/api/cipher'
 import Nav from '@/components/navbar/index.vue'
+import { getUser } from "@/api/user";
 
 @Component({
   name: 'Cipher',
@@ -198,9 +199,12 @@ export default class extends Vue {
   private descStatus (status: number) {
     return status === 1 ? '正常' : '删除'
   }
+  mounted () {
+      this.searchByName()
+  }
 
   private async searchByName () {
-    if (this.searchName === '' || this.oldSearchName === this.searchName) {
+    if (this.oldSearchName === this.searchName) {
       return
     }
 
