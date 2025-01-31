@@ -164,7 +164,6 @@ import { getUser } from "@/api/user";
   }
 })
 export default class extends Vue {
-  private oldSearchName = ''
   private searchName = ''
   private listLoading = false
   private cipherList: ICipher[] = []
@@ -204,10 +203,6 @@ export default class extends Vue {
   }
 
   private async searchByName () {
-    if (this.oldSearchName === this.searchName) {
-      return
-    }
-
     this.listLoading = true
     const param = {
       name: this.searchName
