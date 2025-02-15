@@ -602,9 +602,7 @@ export default class extends Vue {
   }
 
   private resetSearchList () {
-    if (this.dateTimeRange === null) {
-      this.dateTimeRange = [thisStartMonthDay(), startDateTimeStr(moment().add(1, 'days'))]
-    }
+    this.dateTimeRange = [thisStartMonthDay(), startDateTimeStr(moment().add(1, 'days'))]
     this.pid = ''
   }
 
